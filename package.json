@@ -10,7 +10,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "test:e2e": "playwright test",
-    "download-models": "npx tsx scripts/download-models.ts"
+    "download-models": "npx tsx scripts/download-models.ts",
+    "build:wasm": "wasm-pack build --target web --out-dir ../public/wasm-logic ./src-rust"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.2.0",
@@ -39,6 +40,8 @@
     "nuxt": "3.15.2",
     "shadcn-nuxt": "^2.7.4",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5.7.3"
+    "terser": "^5.48.0",
+    "typescript": "^5.7.3",
+    "wasm-pack": "^0.15.0"
   }
 }

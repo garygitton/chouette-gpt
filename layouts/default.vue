@@ -11,38 +11,48 @@
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col min-w-0 h-full relative bg-white dark:bg-[#0b0f19]">
       
-      <!-- Desktop Right Sidebar Toggle -->
-      <div class="hidden md:flex absolute top-4 right-4 z-20">
-        <Button variant="ghost" size="icon" @click="isRightSidebarOpen = !isRightSidebarOpen" class="bg-white/50 dark:bg-[#0b0f19]/50 backdrop-blur-sm border border-slate-200 dark:border-slate-800">
-          <Settings2 class="w-5 h-5" />
-        </Button>
+      <!-- Desktop Top Bar Options -->
+      <div class="hidden md:flex absolute top-4 left-4 right-4 z-20 justify-between pointer-events-none">
+        <div class="pointer-events-auto">
+          <TopModelSelector />
+        </div>
+        <div class="pointer-events-auto shadow-sm">
+          <Button variant="ghost" size="icon" @click="isRightSidebarOpen = !isRightSidebarOpen" class="bg-white/50 dark:bg-[#0b0f19]/50 backdrop-blur-sm border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <Settings2 class="w-5 h-5 text-slate-600 dark:text-slate-300" />
+          </Button>
+        </div>
       </div>
 
       <!-- Mobile Top Bar -->
-      <header class="md:hidden flex-none flex items-center justify-between p-3 border-b border-slate-200 dark:border-slate-800/60 bg-white/80 dark:bg-[#0b0f19]/80 backdrop-blur-md z-20">
-        <Button
-          variant="ghost"
-          size="icon"
-          @click="isSidebarOpen = true"
-        >
-          <Menu class="w-5 h-5" />
-        </Button>
-        <span class="font-black text-slate-800 dark:text-white tracking-tight">Chouette<span class="text-indigo-500">GPT</span></span>
-        <div class="flex gap-1">
+      <header class="md:hidden flex-none flex flex-col p-3 border-b border-slate-200 dark:border-slate-800/60 bg-white/80 dark:bg-[#0b0f19]/80 backdrop-blur-md z-20 space-y-3">
+        <div class="flex items-center justify-between">
           <Button
             variant="ghost"
             size="icon"
-            @click="newChat"
+            @click="isSidebarOpen = true"
           >
-            <Plus class="w-5 h-5" />
+            <Menu class="w-5 h-5" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            @click="isRightSidebarOpen = true"
-          >
-            <Settings2 class="w-5 h-5" />
-          </Button>
+          <span class="font-black text-slate-800 dark:text-white tracking-tight text-lg">Chouette<span class="text-indigo-500">GPT</span></span>
+          <div class="flex gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              @click="newChat"
+            >
+              <Plus class="w-5 h-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              @click="isRightSidebarOpen = true"
+            >
+              <Settings2 class="w-5 h-5" />
+            </Button>
+          </div>
+        </div>
+        <div class="flex justify-center w-full pb-1">
+          <TopModelSelector />
         </div>
       </header>
 
@@ -91,6 +101,7 @@ import { useDeviceStore } from '~/stores/deviceStore'
 import SidebarContent from '~/components/SidebarContent.vue'
 import RightSidebar from '~/components/RightSidebar.vue'
 import WebGpuWizardModal from '~/components/WebGpuWizardModal.vue'
+import TopModelSelector from '~/components/TopModelSelector.vue'
 
 // Shadcn imports
 import { Button } from '~/components/ui/button'

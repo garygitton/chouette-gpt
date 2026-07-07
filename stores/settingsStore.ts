@@ -95,6 +95,23 @@ export const useSettingsStore = defineStore('settings', () => {
     localStorage.setItem('theme', isDarkMode.value ? 'dark' : 'light')
   }
 
+  function resetSettings() {
+    temperature.value = 0.7
+    topP.value = 0.9
+    maxTokens.value = 1024
+    topK.value = 50
+    frequencyPenalty.value = 0
+    presencePenalty.value = 0
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('llm_temperature')
+      localStorage.removeItem('llm_top_p')
+      localStorage.removeItem('llm_max_tokens')
+      localStorage.removeItem('llm_top_k')
+      localStorage.removeItem('llm_frequency_penalty')
+      localStorage.removeItem('llm_presence_penalty')
+    }
+  }
+
   function applyTheme() {
     if (typeof document !== 'undefined') {
       if (isDarkMode.value) {
@@ -119,6 +136,7 @@ export const useSettingsStore = defineStore('settings', () => {
     website,
     language,
     initSettings,
+    resetSettings,
     toggleTheme
   }
 })

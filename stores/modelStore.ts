@@ -108,6 +108,32 @@ export const useModelStore = defineStore('model', () => {
       status: 'available',
       ramRequired: 2048,
       backend: 'transformers'
+    },
+    {
+      id: 'Xenova/TinyLlama-1.1B-Chat-v1.0',
+      name: 'TinyLlama-1.1B-Chat (CPU)',
+      version: '1.0',
+      parameters: '1.1B',
+      totalSize: '650 MB',
+      quantization: 'q4',
+      estimatedMemory: '1 GB',
+      usageCount: 0,
+      status: 'available',
+      ramRequired: 2048,
+      backend: 'transformers'
+    },
+    {
+      id: 'onnx-community/Llama-3.2-1B-Instruct',
+      name: 'Llama-3.2-1B-Instruct (CPU)',
+      version: '3.2',
+      parameters: '1B',
+      totalSize: '800 MB',
+      quantization: 'q4',
+      estimatedMemory: '1.5 GB',
+      usageCount: 0,
+      status: 'available',
+      ramRequired: 3072,
+      backend: 'transformers'
     }
   ])
 

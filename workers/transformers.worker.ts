@@ -4,7 +4,7 @@ import { pipeline, env, TextStreamer } from '@huggingface/transformers';
 env.allowLocalModels = true;
 env.allowRemoteModels = false;
 env.localModelPath = '/models/';
-env.useBrowserCache = false;
+env.useBrowserCache = true;
 if (env.backends.onnx.wasm) {
   env.backends.onnx.wasm.wasmPaths = '/wasm/';
 }
@@ -31,8 +31,27 @@ self.onmessage = async (event: MessageEvent) => {
       });
       self.postMessage({ type: 'init_done' });
     } catch (e: any) {
-      console.error(e);
-      self.postMessage({ type: 'init_error', payload: e.message });
+      console.error('[Transformers Worker] Init error:', e);
+      let errorMsg = e.message || String(e);
+      
+      // If we got a JSON parse error, it's highly likely a 502/404 HTML error page was cached.
+      // We must clear the browser's Cache API to allow recovery on the next attempt.
+      if (e instanceof SyntaxError || errorMsg.includes('JSON') || errorMsg.includes('Unexpected token')) {
+        try {
+          const keys = await caches.keys();
+          for (const key of keys) {
+            if (key.includes('transformers')) {
+              await caches.delete(key);
+              console.warn(`[Transformers Worker] Cleared corrupted cache: ${key}`);
+            }
+          }
+          errorMsg = "Cache corrompu (erreur 502/404) nettoyé. Veuillez relancer le téléchargement.";
+        } catch (cacheErr) {
+          console.error('[Transformers Worker] Failed to clear cache', cacheErr);
+        }
+      }
+      
+      self.postMessage({ type: 'init_error', payload: errorMsg });
     }
   }
 

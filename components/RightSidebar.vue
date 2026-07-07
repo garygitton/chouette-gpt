@@ -16,22 +16,7 @@
       <Progress :model-value="(chatStore.sessionTokens / 8192) * 100" class="h-2" />
     </div>
 
-    <!-- Model Selection -->
-    <div class="space-y-2">
-      <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Modèle</label>
-      <Select :model-value="modelStore.currentModelId" @update:model-value="handleModelChange">
-        <SelectTrigger>
-          <SelectValue placeholder="Choisir un modèle" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectItem v-for="model in modelStore.compatibleModels" :key="model.id" :value="model.id">
-              {{ model.name }}
-            </SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-    </div>
+
 
     <!-- System Prompt -->
     <div class="space-y-2">
@@ -45,7 +30,12 @@
 
     <!-- Basic Parameters -->
     <div class="space-y-6 pt-2 border-t border-slate-200 dark:border-slate-800">
-      <h3 class="text-xs uppercase font-bold text-slate-500 tracking-wider">Base</h3>
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs uppercase font-bold text-slate-500 tracking-wider">Base</h3>
+        <Button variant="ghost" size="sm" class="h-6 px-2 text-xs text-slate-400 hover:text-slate-600" @click="settingsStore.resetSettings()">
+          Réinitialiser
+        </Button>
+      </div>
       
       <div class="space-y-3">
         <div class="flex justify-between text-sm">
@@ -75,8 +65,7 @@
     <!-- Advanced Parameters -->
     <div class="space-y-6 pt-2 border-t border-slate-200 dark:border-slate-800 pb-8">
       <h3 class="text-xs uppercase font-bold text-slate-500 tracking-wider">Avancé</h3>
-      
-      <div class="space-y-3">
+      <div v-if="modelStore.currentModel?.backend === 'transformers'" class="space-y-3">
         <div class="flex justify-between text-sm">
           <span>Top K</span>
           <span class="text-slate-500">{{ settingsStore.topK }}</span>
@@ -84,7 +73,7 @@
         <Slider v-model="topKArray" :min="0" :max="100" :step="1" />
       </div>
 
-      <div class="space-y-3">
+      <div v-if="modelStore.currentModel?.backend === 'mlc'" class="space-y-3">
         <div class="flex justify-between text-sm">
           <span>Frequency Penalty</span>
           <span class="text-slate-500">{{ settingsStore.frequencyPenalty }}</span>
@@ -92,7 +81,7 @@
         <Slider v-model="frequencyPenaltyArray" :min="0" :max="2" :step="0.1" />
       </div>
 
-      <div class="space-y-3">
+      <div v-if="modelStore.currentModel?.backend === 'mlc'" class="space-y-3">
         <div class="flex justify-between text-sm">
           <span>Presence Penalty</span>
           <span class="text-slate-500">{{ settingsStore.presencePenalty }}</span>
@@ -101,11 +90,7 @@
       </div>
     </div>
 
-    <ModelDownloadDialog 
-      v-model="showDownloadDialog" 
-      :model="pendingModel" 
-      @accept="confirmModelChange" 
-    />
+
   </div>
 </template>
 
@@ -118,10 +103,7 @@ import { Button } from '~/components/ui/button'
 import { Progress } from '~/components/ui/progress'
 import { Slider } from '~/components/ui/slider'
 import { Textarea } from '~/components/ui/textarea'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import { X } from 'lucide-vue-next'
-import ModelDownloadDialog from './ModelDownloadDialog.vue'
-import type { ModelInfo } from '~/types'
 
 const props = defineProps<{
   isMobile?: boolean
@@ -161,30 +143,4 @@ const presencePenaltyArray = computed({
   set: (val) => { settingsStore.presencePenalty = val[0] }
 })
 
-// Model Change Flow
-const showDownloadDialog = ref(false)
-const pendingModel = ref<ModelInfo | null>(null)
-
-function handleModelChange(modelId: string) {
-  if (modelId === modelStore.currentModelId) return
-  
-  const selectedModel = modelStore.models.find(m => m.id === modelId)
-  if (!selectedModel) return
-
-  // Check if model is already cached/downloaded. We can verify if status is available
-  // Web-LLM caches it, if it's the first time, it might need large download.
-  // We'll show the popup for ANY new model change unless we have a specific 'downloaded' flag.
-  // Since we don't track 'downloaded' easily without checking CacheAPI, we'll show it for any switch.
-  // Actually, WebLLM has `hasModelInCache`. For now we assume a change triggers confirmation.
-  pendingModel.value = selectedModel
-  showDownloadDialog.value = true
-}
-
-function confirmModelChange() {
-  if (pendingModel.value) {
-    modelStore.currentModelId = pendingModel.value.id
-    // Trigger engine init with the new model
-    chatStore.initEngine(pendingModel.value.id)
-  }
-}
 </script>

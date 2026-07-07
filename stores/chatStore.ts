@@ -16,9 +16,10 @@ export const useChatStore = defineStore('chat', () => {
   let currentBackend: 'mlc' | 'transformers' | null = null
   let generationIdCounter = 0
   let currentGenerationId = 0
+  let downloadQueue: string[] = []
 
-  async function initEngine(modelId: string) {
-    if (isEngineReady.value) return
+  async function initEngine(modelId: string, progressPrefix = '') {
+    if (isEngineReady.value && !progressPrefix) return
 
     const modelStore = useModelStore()
     const modelInfo = modelStore.models.find(m => m.id === modelId)
@@ -35,11 +36,11 @@ export const useChatStore = defineStore('chat', () => {
       isEngineLoading.value = true;
       // Simulate progress callback
       const steps = [
-        { text: 'Unpacking model metadata...', progress: 0.1 },
-        { text: 'Loading WebGPU pipeline cache...', progress: 0.4 },
-        { text: 'Downloading model weights (1/4)...', progress: 0.6 },
-        { text: 'Downloading model weights (4/4)...', progress: 0.8 },
-        { text: 'Model loaded and initialized!', progress: 1.0 }
+        { text: progressPrefix + 'Unpacking model metadata...', progress: 0.1 },
+        { text: progressPrefix + 'Loading WebGPU pipeline cache...', progress: 0.4 },
+        { text: progressPrefix + 'Downloading model weights (1/4)...', progress: 0.6 },
+        { text: progressPrefix + 'Downloading model weights (4/4)...', progress: 0.8 },
+        { text: progressPrefix + 'Model loaded and initialized!', progress: 1.0 }
       ];
       for (const step of steps) {
         if (!isEngineLoading.value) return; // If cancelled
@@ -101,7 +102,7 @@ export const useChatStore = defineStore('chat', () => {
           worker!.onmessage = (event) => {
             const { type, payload } = event.data
             if (type === 'progress') {
-              engineProgress.value = payload
+              engineProgress.value = { text: progressPrefix + payload.text, progress: payload.progress }
             } else if (type === 'init_done') {
               resolve()
             } else if (type === 'init_error') {
@@ -115,7 +116,7 @@ export const useChatStore = defineStore('chat', () => {
         const { CreateWebWorkerMLCEngine } = await import('@mlc-ai/web-llm')
         engine = await CreateWebWorkerMLCEngine(worker, modelId, {
           initProgressCallback: (progress) => {
-            engineProgress.value = progress
+            engineProgress.value = { text: progressPrefix + progress.text, progress: progress.progress }
           }
         })
       }
@@ -128,8 +129,44 @@ export const useChatStore = defineStore('chat', () => {
         throw error
       }
     } finally {
-      isEngineLoading.value = false
+      if (!progressPrefix) {
+        isEngineLoading.value = false
+      }
     }
+  }
+
+  async function downloadMultipleEngines(modelIds: string[]) {
+    if (isEngineReady.value || modelIds.length === 0) return
+
+    downloadQueue = [...modelIds]
+    const totalModels = downloadQueue.length
+    isEngineLoading.value = true
+
+    for (let i = 0; i < totalModels; i++) {
+      const modelId = downloadQueue[i]
+      if (!isEngineLoading.value) break // Cancelled
+
+      const progressPrefix = `[${i + 1}/${totalModels}] `
+      
+      try {
+        await initEngine(modelId, progressPrefix)
+        
+        // If it's not the last model, we terminate it so it stays cached but not in RAM
+        if (i < totalModels - 1) {
+          if (worker) {
+            worker.terminate()
+            worker = null
+          }
+          engine = null
+          isEngineReady.value = false
+        }
+      } catch (err) {
+        console.error(`Failed to download ${modelId}`, err)
+        // Continue to the next model even if one fails
+      }
+    }
+
+    isEngineLoading.value = false
   }
 
   function cancelDownload() {
@@ -181,14 +218,36 @@ export const useChatStore = defineStore('chat', () => {
 
     isGenerating.value = true
     try {
-      const messages = currentConv.messages.map(m => ({ role: m.role, content: m.content }))
-      // Exclude the last empty assistant message
-      messages.pop()
-
-      // Prepend system prompt if it exists
+      let messages: any[] = []
+      
+      const historyMessages = currentConv.messages.map(m => ({ role: m.role, content: m.content }))
+      historyMessages.pop() // Exclude assistant empty placeholder
+      
+      // If user sets their own system prompt, we use it directly
       if (settingsStore.systemPrompt && settingsStore.systemPrompt.trim().length > 0) {
+        messages = [...historyMessages]
         messages.unshift({ role: 'system', content: settingsStore.systemPrompt.trim() })
-        sessionTokens.value += Math.ceil(settingsStore.systemPrompt.length / 4) // Count system prompt once per turn
+        sessionTokens.value += Math.ceil(settingsStore.systemPrompt.length / 4)
+      } else {
+        // Fallback to secure default prompt from WASM logic
+        await initWasm()
+        if (wasmModule) {
+          try {
+            const historyJson = JSON.stringify(historyMessages)
+            // Use the prepare_messages function from the WASM exports
+            const prepared = wasmModule.prepare_messages(historyJson)
+            messages = prepared
+            
+            // Estimate tokens from the secure system prompt
+            const securePrompt = wasmModule.get_secure_system_prompt()
+            sessionTokens.value += Math.ceil(securePrompt.length / 4)
+          } catch (e) {
+            console.error('WASM prepare_messages failed, falling back to JS', e)
+            messages = historyMessages
+          }
+        } else {
+          messages = historyMessages
+        }
       }
 
       const llmParams = {
@@ -288,6 +347,7 @@ export const useChatStore = defineStore('chat', () => {
     isEngineReady,
     engineProgress,
     sessionTokens,
+    downloadMultipleEngines,
     initEngine,
     cancelDownload,
     generate,

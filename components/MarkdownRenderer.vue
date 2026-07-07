@@ -3,17 +3,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onMounted } from 'vue'
+import { computed, watch, onMounted, ref } from 'vue'
 import { Marked } from 'marked'
-import hljs from 'highlight.js'
-import 'highlight.js/styles/atom-one-dark.css' // Import a dark theme
 import markedKatex from 'marked-katex-extension'
-import mermaid from 'mermaid'
 
 const props = defineProps<{ content: string }>()
 
 const marked = new Marked()
 marked.use(markedKatex({ throwOnError: false }))
+
+let hljs: any = null
+let mermaid: any = null
+const depsLoaded = ref(false)
 
 // Register custom code block renderer for premium editor look and feel
 marked.use({
@@ -27,12 +28,14 @@ marked.use({
         return `<div class="mermaid">${code}</div>`
       }
       
-      const language = hljs.getLanguage(lang) ? lang : 'plaintext'
+      const language = (hljs && hljs.getLanguage(lang)) ? lang : 'plaintext'
       let highlighted = code
-      try {
-        highlighted = hljs.highlight(code, { language }).value
-      } catch (e) {
-        // Fallback
+      if (hljs) {
+        try {
+          highlighted = hljs.highlight(code, { language }).value
+        } catch (e) {
+          // Fallback
+        }
       }
 
       // Safe Base64 encoding compatible with both SSR/Node and Client/Browser
@@ -63,15 +66,16 @@ marked.use({
 })
 
 const htmlContent = computed(() => {
+  // Dependency tracking for reactivity when deps are loaded
+  depsLoaded.value
   return marked.parse(props.content, { async: false }) as string
 })
 
 const renderMermaid = () => {
-  if (typeof document !== 'undefined') {
-    mermaid.initialize({ startOnLoad: false, theme: 'dark' })
+  if (typeof document !== 'undefined' && mermaid) {
     mermaid.run({
       nodes: document.querySelectorAll('.mermaid'),
-    }).catch(e => console.error(e))
+    }).catch((e: any) => console.error(e))
   }
 }
 
@@ -79,7 +83,20 @@ watch(htmlContent, () => {
   setTimeout(renderMermaid, 100)
 })
 
-onMounted(() => {
-  renderMermaid()
+onMounted(async () => {
+  try {
+    const [hljsMod, mermaidMod] = await Promise.all([
+      import('highlight.js'),
+      import('mermaid'),
+      import('highlight.js/styles/atom-one-dark.css')
+    ])
+    hljs = hljsMod.default
+    mermaid = mermaidMod.default
+    mermaid.initialize({ startOnLoad: false, theme: 'dark' })
+    depsLoaded.value = true // Trigger re-render of computed
+    setTimeout(renderMermaid, 100)
+  } catch (e) {
+    console.error('Failed to load markdown dependencies', e)
+  }
 })
 </script>

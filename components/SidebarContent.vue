@@ -26,9 +26,9 @@
         class="pl-9 pr-12 rounded-xl shadow-sm bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
       />
       <div class="absolute right-2.5 top-2.5 flex items-center">
-        <kbd class="hidden lg:inline-flex items-center gap-0.5 h-5 select-none pointer-events-none px-1.5 text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded">
-          <span>Ctrl</span><span>K</span>
-        </kbd>
+        <Badge variant="outline" class="hidden lg:inline-flex items-center gap-0.5 h-5 select-none pointer-events-none px-1.5 text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded">
+          <kbd>Ctrl</kbd><kbd>K</kbd>
+        </Badge>
       </div>
     </div>
 
@@ -65,7 +65,9 @@
     </div>
 
     <!-- Footer Actions -->
-    <div class="mt-auto pt-4 border-t border-slate-200/60 dark:border-slate-800/40 space-y-2">
+    <div class="mt-auto pt-4 space-y-2">
+      <Separator class="bg-slate-200/60 dark:bg-slate-800/40 mb-4" />
+      
       <!-- Language Selector -->
       <LanguageSelector size="sm" />
 
@@ -99,16 +101,19 @@
         </Button>
       </div>
       <!-- Social Networks Links -->
-      <div v-if="settingsStore.linkedin || settingsStore.github || settingsStore.website" class="flex justify-center space-x-5 pt-3 border-t border-slate-200/60 dark:border-slate-800/40 mt-2">
-        <a v-if="settingsStore.linkedin" :href="settingsStore.linkedin" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-indigo-500 transition-colors" title="LinkedIn">
-          <Linkedin class="w-4 h-4" />
-        </a>
+      <div v-if="settingsStore.linkedin || settingsStore.github || settingsStore.website" class="flex flex-col justify-center pt-3 mt-2">
+        <Separator class="bg-slate-200/60 dark:bg-slate-800/40 mb-3" />
+        <div class="flex justify-center space-x-5">
+          <a v-if="settingsStore.linkedin" :href="settingsStore.linkedin" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-indigo-500 transition-colors" title="LinkedIn">
+            <Linkedin class="w-4 h-4" />
+          </a>
         <a v-if="settingsStore.github" :href="settingsStore.github" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-indigo-500 transition-colors" title="GitHub">
           <Github class="w-4 h-4" />
         </a>
         <a v-if="settingsStore.website" :href="settingsStore.website" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-indigo-500 transition-colors" :title="t('website_label')">
           <Globe class="w-4 h-4" />
         </a>
+        </div>
       </div>
     </div>
   </div>
@@ -125,6 +130,8 @@ import LanguageSelector from '~/components/LanguageSelector.vue'
 // Shadcn imports
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
+import { Separator } from '~/components/ui/separator'
+import { Badge } from '~/components/ui/badge'
 import {
   X, PlusCircle, Search, MessageSquare, Trash2,
   Settings, ShieldCheck, Sun, Moon, Linkedin, Github, Globe

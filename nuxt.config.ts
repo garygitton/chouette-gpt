@@ -171,6 +171,12 @@ export default defineNuxtConfig({
   },
   imports: { autoImport: false },
   ssr: false, // 100% Client-side
+  nitro: {
+    routeRules: {
+      '/models/**': { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
+      '/wasm/**': { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } }
+    }
+  },
   devtools: { enabled: true },
   experimental: {
     appManifest: false
@@ -232,6 +238,21 @@ export default defineNuxtConfig({
     plugins: [
       // ...(process.env.CI === 'true' || process.env.DISABLE_OWP === 'true' ? [] : [vitePluginOwpStandards()])
     ],
+    ...(process.env.NODE_ENV === 'production' ? {
+      build: {
+        modulePreload: false,
+        minify: 'terser',
+        terserOptions: {
+          compress: {
+            drop_console: true,
+            drop_debugger: true
+          },
+          format: {
+            comments: false
+          }
+        }
+      }
+    } : {}),
     worker: {
       format: 'es'
     },

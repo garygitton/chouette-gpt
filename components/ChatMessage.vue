@@ -6,17 +6,19 @@
     >
       <!-- Avatar -->
       <div class="relative flex-shrink-0">
-        <div 
-          class="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md transition-all duration-300"
-          :class="[
-            message.role === 'user' 
-              ? 'bg-slate-700 dark:bg-slate-800' 
-              : 'bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500'
-          ]"
-        >
-          <User v-if="message.role === 'user'" class="w-5 h-5" />
-          <Zap v-else class="w-5 h-5" />
-        </div>
+        <Avatar class="w-9 h-9 rounded-xl shadow-md transition-all duration-300">
+          <AvatarFallback
+            class="text-white"
+            :class="[
+              message.role === 'user' 
+                ? 'bg-slate-700 dark:bg-slate-800 rounded-xl' 
+                : 'bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 rounded-xl'
+            ]"
+          >
+            <User v-if="message.role === 'user'" class="w-5 h-5" />
+            <Zap v-else class="w-5 h-5" />
+          </AvatarFallback>
+        </Avatar>
         
         <!-- Active generation indicator for assistant -->
         <span 
@@ -69,10 +71,11 @@
 
         <!-- Optional Timestamp / Meta info -->
         <div 
-          class="text-[9px] font-bold text-slate-400 dark:text-slate-500 px-1"
-          :class="[message.role === 'user' ? 'text-right' : 'text-left']"
+          class="text-[9px] font-bold text-slate-400 dark:text-slate-500 px-1 mt-1 flex items-center gap-2"
+          :class="[message.role === 'user' ? 'justify-end' : 'justify-start']"
         >
-          {{ formatTime(message.timestamp) }}
+          <span v-if="message.role === 'assistant' && modelName" class="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800/60 text-slate-500 border border-slate-200/50 dark:border-slate-700/50">{{ modelName }}</span>
+          <span>{{ formatTime(message.timestamp) }}</span>
         </div>
       </div>
     </div>
@@ -80,14 +83,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, defineAsyncComponent } from 'vue'
 import type { Message } from '~/types'
 import { useChatStore } from '~/stores/chatStore'
 import { useRoute } from 'vue-router'
 import { useConversationStore } from '~/stores/conversationStore'
-import MarkdownRenderer from '~/components/MarkdownRenderer.vue'
+import { useModelStore } from '~/stores/modelStore'
 import { Button } from '~/components/ui/button'
+import { Avatar, AvatarFallback } from '~/components/ui/avatar'
 import { User, Zap, Check, Clipboard } from 'lucide-vue-next'
+
+const MarkdownRenderer = defineAsyncComponent(() => import('~/components/MarkdownRenderer.vue'))
 
 const props = defineProps<{ message: Message }>()
 const chatStore = useChatStore()
@@ -98,6 +104,14 @@ const copied = ref(false)
 
 const currentConversation = computed(() => {
   return convStore.conversations.find(c => c.id === route.query.id)
+})
+
+const modelStore = useModelStore()
+const modelName = computed(() => {
+  if (!currentConversation.value) return null
+  const modelId = currentConversation.value.modelId
+  const model = modelStore.models.find(m => m.id === modelId)
+  return model ? `${model.name} (${model.backend === 'mlc' ? 'GPU' : 'CPU'})` : modelId
 })
 
 const isLastMessage = computed(() => {

@@ -25,7 +25,7 @@
         <ChatInputArea 
           v-model="input" 
           @submit="submit" 
-          :disabled="!chatStore.isEngineReady && !chatStore.isEngineLoading"
+          :disabled="!chatStore.isEngineReady"
         />
       </div>
     </div>
