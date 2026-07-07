@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <style>
+    :root {
+      --bg-light: #ffffff;
+      --bg-dark: #0b0f19;
+      --text-light: #1e293b;
+      --text-dark: #f8fafc;
+      --indigo: #6366f1;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: var(--bg-dark);
+        color: var(--text-dark);
+      }
+    }
+    .spa-loader-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+    }
+    .logo-container {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-pulse {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background-color: rgba(99, 102, 241, 0.2);
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    .logo-svg {
+      width: 60px;
+      height: 60px;
+      color: var(--indigo);
+      z-index: 10;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .5; transform: scale(1.1); }
+    }
+    .title {
+      font-size: 1.8rem;
+      font-weight: 900;
+      letter-spacing: -0.025em;
+      margin-bottom: 8px;
+    }
+    .title span {
+      color: var(--indigo);
+    }
+    .subtitle {
+      color: #64748b;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="spa-loader-container">
+    <div class="logo-container">
+      <div class="logo-pulse"></div>
+      <svg class="logo-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    </div>
+    <div class="title">Chouette<span>GPT</span></div>
+    <div class="subtitle">Initialisation de l'application...</div>
+  </div>
+</body>
+</html>

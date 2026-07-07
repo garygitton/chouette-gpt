@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  chouette-gpt:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - HOST=0.0.0.0
+      - CHOKIDAR_USEPOLLING=true
+      - VITE_USE_POLLING=true
+    # The default command in the development stage is "npm run dev"
