@@ -241,6 +241,7 @@ export default defineNuxtConfig({
     },
     server: {
       host: '0.0.0.0',
+      allowedHosts: ['chouette-gpt.localhost', '.localhost'],
       hmr: {
         // Let Vite automatically infer the client port from window.location
       },

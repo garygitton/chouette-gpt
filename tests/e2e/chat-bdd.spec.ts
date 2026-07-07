@@ -12,10 +12,12 @@ test.describe('ChouetteGPT - E2E BDD Conversations and Behavior', () => {
     });
     page.on('requestfailed', request => console.log(`[BROWSER REQUEST FAILED] ${request.url()}: ${request.failure()?.errorText}`));
     
-    // Bypass onboarding modal during chat tests
+    // Bypass onboarding modal during chat tests and pre-set engine as ready via mock
     await page.addInitScript(() => {
       try {
         window.localStorage.setItem('chouette-onboarding-seen', 'true');
+        // Signal the app to use mock mode (bypasses real WebGPU & LLM loading)
+        (window as any).__mock_llm = true;
       } catch (e) {
         // Ignore storage access errors on about:blank
       }

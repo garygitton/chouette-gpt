@@ -11,6 +11,11 @@ export const useSettingsStore = defineStore('settings', () => {
   const website = ref('')
   const language = ref('fr')
 
+  const systemPrompt = ref('')
+  const topK = ref(50)
+  const frequencyPenalty = ref(0)
+  const presencePenalty = ref(0)
+
   // Initialize theme and LLM params from localStorage or system preference
   function initSettings() {
     if (typeof window !== 'undefined') {
@@ -30,6 +35,14 @@ export const useSettingsStore = defineStore('settings', () => {
       if (p) topP.value = parseFloat(p)
       const m = localStorage.getItem('llm_max_tokens')
       if (m) maxTokens.value = parseInt(m)
+      const tk = localStorage.getItem('llm_top_k')
+      if (tk) topK.value = parseInt(tk)
+      const fp = localStorage.getItem('llm_frequency_penalty')
+      if (fp) frequencyPenalty.value = parseFloat(fp)
+      const pp = localStorage.getItem('llm_presence_penalty')
+      if (pp) presencePenalty.value = parseFloat(pp)
+      const sp = localStorage.getItem('llm_system_prompt')
+      if (sp) systemPrompt.value = sp
 
       // Social networks
       linkedin.value = localStorage.getItem('social_linkedin') || ''
@@ -50,6 +63,18 @@ export const useSettingsStore = defineStore('settings', () => {
   })
   watch(maxTokens, (val) => {
     if (typeof window !== 'undefined') localStorage.setItem('llm_max_tokens', val.toString())
+  })
+  watch(topK, (val) => {
+    if (typeof window !== 'undefined') localStorage.setItem('llm_top_k', val.toString())
+  })
+  watch(frequencyPenalty, (val) => {
+    if (typeof window !== 'undefined') localStorage.setItem('llm_frequency_penalty', val.toString())
+  })
+  watch(presencePenalty, (val) => {
+    if (typeof window !== 'undefined') localStorage.setItem('llm_presence_penalty', val.toString())
+  })
+  watch(systemPrompt, (val) => {
+    if (typeof window !== 'undefined') localStorage.setItem('llm_system_prompt', val)
   })
   watch(linkedin, (val) => {
     if (typeof window !== 'undefined') localStorage.setItem('social_linkedin', val)
@@ -85,6 +110,10 @@ export const useSettingsStore = defineStore('settings', () => {
     temperature,
     topP,
     maxTokens,
+    topK,
+    frequencyPenalty,
+    presencePenalty,
+    systemPrompt,
     linkedin,
     github,
     website,

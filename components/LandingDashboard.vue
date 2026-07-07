@@ -54,40 +54,79 @@
         <h1 class="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
           Chouette<span class="ui-title-gradient">GPT</span>
         </h1>
-        <p class="text-slate-500 dark:text-slate-400 text-base md:text-lg max-w-xl mx-auto font-normal leading-relaxed">
+        <p v-if="chatStore.isEngineReady" class="text-slate-500 dark:text-slate-400 text-base md:text-lg max-w-xl mx-auto font-normal leading-relaxed">
           {{ t('empty_chat_subtitle') }}
+        </p>
+        <p v-else class="text-slate-500 dark:text-slate-400 text-base md:text-lg max-w-xl mx-auto font-normal leading-relaxed">
+          Pour garantir la confidentialité de vos échanges, l'intelligence artificielle doit être téléchargée localement sur votre appareil.
         </p>
       </div>
     </div>
 
     <!-- Dynamic Local Hardware capability badge -->
-    <div v-if="deviceStore.deviceInfo" class="max-w-md mx-auto p-4 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/30 backdrop-blur-xl flex items-center justify-between text-xs transition-all shadow-sm">
-      <div class="flex items-center space-x-3.5">
-        <div class="flex items-center">
-          <span class="ui-ring-ping" :class="[deviceStore.deviceInfo.hasWebGPU ? 'ui-ring-ping-secure' : 'ui-ring-ping-warning']">
-            <span class="ui-ring-ping-wave"></span>
-            <span class="ui-ring-ping-core"></span>
-          </span>
-        </div>
-        <div class="text-left space-y-0.5">
-          <div class="font-bold text-slate-800 dark:text-slate-200">
-            {{ deviceStore.deviceInfo.hasWebGPU ? 'WebGPU Acceleré' : 'Mode Processeur (CPU)' }}
+    <div v-if="deviceStore.deviceInfo" class="max-w-md mx-auto p-4 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/30 backdrop-blur-xl flex flex-col space-y-4 shadow-sm">
+      <div class="flex items-center justify-between text-xs">
+        <div class="flex items-center space-x-3.5">
+          <div class="flex items-center">
+            <span class="ui-ring-ping" :class="[deviceStore.deviceInfo.hasWebGPU ? 'ui-ring-ping-secure' : 'ui-ring-ping-warning']">
+              <span class="ui-ring-ping-wave"></span>
+              <span class="ui-ring-ping-core"></span>
+            </span>
           </div>
-          <div class="text-[10px] text-slate-400 dark:text-slate-500">
-            {{ deviceStore.deviceInfo.ramGB }} GB RAM • {{ deviceStore.deviceInfo.cpuCores }} Cores CPU • {{ deviceStore.deviceInfo.browser }}
+          <div class="text-left space-y-0.5">
+            <div class="font-bold text-slate-800 dark:text-slate-200">
+              {{ deviceStore.deviceInfo.hasWebGPU ? 'WebGPU Acceleré' : 'Mode Processeur (CPU)' }}
+            </div>
+            <div class="text-[10px] text-slate-400 dark:text-slate-500">
+              {{ deviceStore.deviceInfo.ramGB }} GB RAM • {{ deviceStore.deviceInfo.cpuCores }} Cores CPU • {{ deviceStore.deviceInfo.browser }}
+            </div>
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Score</div>
+          <div class="font-extrabold text-xs" :class="scoreColor">
+            {{ deviceStore.deviceInfo.score }}
           </div>
         </div>
       </div>
-      <div class="text-right">
-        <div class="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Score</div>
-        <div class="font-extrabold text-xs" :class="scoreColor">
-          {{ deviceStore.deviceInfo.score }}
+      
+      <!-- Model Onboarding Download UI -->
+      <div v-if="!chatStore.isEngineReady" class="pt-4 border-t border-slate-200 dark:border-slate-800/50 flex flex-col space-y-4">
+        
+        <div v-if="!chatStore.isEngineLoading" class="flex flex-col space-y-3">
+          <Select v-model="modelStore.currentModelId">
+            <SelectTrigger class="w-full">
+              <SelectValue placeholder="Choisir un modèle compatible" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem v-for="model in modelStore.compatibleModels" :key="model.id" :value="model.id">
+                  {{ model.name }} ({{ model.totalSize }})
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <Button @click="startDownload" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
+            <Download class="w-4 h-4 mr-2" />
+            Télécharger & Démarrer
+          </Button>
+        </div>
+
+        <div v-else class="flex flex-col space-y-3">
+          <div class="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+            <span>{{ chatStore.engineProgress.text || 'Chargement...' }}</span>
+            <span>{{ Math.round(chatStore.engineProgress.progress * 100) }}%</span>
+          </div>
+          <Progress :model-value="chatStore.engineProgress.progress * 100" class="h-2" />
+          <Button variant="outline" @click="chatStore.cancelDownload()" class="w-full text-slate-600 dark:text-slate-400">
+            Annuler
+          </Button>
         </div>
       </div>
     </div>
     
     <!-- Suggested Prompts Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto w-full px-4">
+    <div v-if="chatStore.isEngineReady" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto w-full px-4">
       <button 
         v-for="prompt in suggestedPrompts" 
         :key="prompt.text" 
@@ -116,18 +155,33 @@
 import { computed, onMounted } from 'vue'
 import { useI18n } from '~/composables/useI18n'
 import { useDeviceStore } from '~/stores/deviceStore'
-import { Globe, Code, Sparkles, Mail, ArrowRight } from 'lucide-vue-next'
+import { useModelStore } from '~/stores/modelStore'
+import { useChatStore } from '~/stores/chatStore'
+import { Globe, Code, Sparkles, Mail, ArrowRight, Download } from 'lucide-vue-next'
+import { Button } from '~/components/ui/button'
+import { Progress } from '~/components/ui/progress'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 
 defineEmits(['send-prompt'])
 
 const { t } = useI18n()
 const deviceStore = useDeviceStore()
+const modelStore = useModelStore()
+const chatStore = useChatStore()
 
-onMounted(() => {
+onMounted(async () => {
   if (!deviceStore.deviceInfo) {
-    deviceStore.evaluateDevice()
+    await deviceStore.evaluateDevice()
+    // Select best model automatically if not already
+    modelStore.detectBestModel()
   }
 })
+
+function startDownload() {
+  if (modelStore.currentModelId) {
+    chatStore.initEngine(modelStore.currentModelId)
+  }
+}
 
 const scoreColor = computed(() => {
   const score = deviceStore.deviceInfo?.score

@@ -12,8 +12,9 @@
             @paste="handlePaste"
             @drop.prevent="handleDrop"
             rows="1"
-            :placeholder="t('chat_placeholder')"
-            class="w-full bg-transparent border-0 outline-none focus:ring-0 text-slate-800 dark:text-slate-100 resize-none max-h-48 text-sm placeholder-slate-400 dark:placeholder-slate-500"
+            :placeholder="props.disabled ? 'Téléchargez un modèle pour commencer...' : t('chat_placeholder')"
+            :disabled="props.disabled"
+            class="w-full bg-transparent border-0 outline-none focus:ring-0 text-slate-800 dark:text-slate-100 resize-none max-h-48 text-sm placeholder-slate-400 dark:placeholder-slate-500 disabled:opacity-50 disabled:cursor-not-allowed"
             style="field-sizing: content;"
           ></textarea>
         </div>
@@ -49,7 +50,7 @@
             size="sm"
             class="rounded-xl font-bold px-4 hover:scale-[0.98] active:scale-[0.96] transition-all shadow-sm h-8"
             :variant="chatStore.isGenerating ? 'destructive' : 'default'"
-            :disabled="!input.trim() && !chatStore.isGenerating"
+            :disabled="props.disabled || (!input.trim() && !chatStore.isGenerating)"
             @click="chatStore.isGenerating ? chatStore.stopGenerate() : emitSubmit()"
           >
             <template v-if="chatStore.isGenerating">
@@ -80,7 +81,8 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Cpu, Send, Square } from 'lucide-vue-next'
 
 const props = defineProps({
-  modelValue: { type: String, default: '' }
+  modelValue: { type: String, default: '' },
+  disabled: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['update:modelValue', 'submit'])

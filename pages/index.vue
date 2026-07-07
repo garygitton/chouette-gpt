@@ -1,7 +1,6 @@
 <!-- @ds-ignore-file -->
 <template>
   <div class="flex-1 flex flex-col relative h-full bg-white dark:bg-[#0b0f19]">
-    <EngineLoadingOverlay />
 
     <!-- Chat Feed Container -->
     <div ref="scrollContainer" class="flex-1 overflow-y-auto px-4 md:px-8 pt-4 pb-36">
@@ -23,7 +22,11 @@
     <!-- Fixed Bottom Input Area -->
     <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-transparent dark:from-[#0b0f19] dark:via-[#0b0f19] dark:to-transparent pt-12 pb-4 px-4 md:px-8 pointer-events-none">
       <div class="max-w-3xl mx-auto pointer-events-auto">
-        <ChatInputArea v-model="input" @submit="submit" />
+        <ChatInputArea 
+          v-model="input" 
+          @submit="submit" 
+          :disabled="!chatStore.isEngineReady && !chatStore.isEngineLoading"
+        />
       </div>
     </div>
   </div>
@@ -36,7 +39,6 @@ import { useChatStore } from '~/stores/chatStore'
 import { useConversationStore } from '~/stores/conversationStore'
 import { useModelStore } from '~/stores/modelStore'
 import ChatMessage from '~/components/ChatMessage.vue'
-import EngineLoadingOverlay from '~/components/EngineLoadingOverlay.vue'
 import LandingDashboard from '~/components/LandingDashboard.vue'
 import ChatInputArea from '~/components/ChatInputArea.vue'
 import { Loader2 } from 'lucide-vue-next'
@@ -84,7 +86,7 @@ function sendPrompt(text: string) {
 }
 
 async function submit() {
-  if (!input.value.trim() || chatStore.isGenerating) return
+  if (!input.value.trim() || chatStore.isGenerating || !chatStore.isEngineReady) return
   
   const text = input.value
   input.value = ''

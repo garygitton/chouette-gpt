@@ -7,7 +7,10 @@ import { useSettingsStore } from './settingsStore'
 export const useChatStore = defineStore('chat', () => {
   const isGenerating = ref(false)
   const isEngineLoading = ref(false)
+  const isEngineReady = ref(false)
   const engineProgress = ref({ text: '', progress: 0 })
+  const sessionTokens = ref(0)
+  
   let engine: any = null
   let worker: Worker | null = null
   let currentBackend: 'mlc' | 'transformers' | null = null
@@ -15,7 +18,7 @@ export const useChatStore = defineStore('chat', () => {
   let currentGenerationId = 0
 
   async function initEngine(modelId: string) {
-    if (engine || (worker && currentBackend === 'transformers')) return
+    if (isEngineReady.value) return
 
     const modelStore = useModelStore()
     const modelInfo = modelStore.models.find(m => m.id === modelId)
@@ -39,6 +42,7 @@ export const useChatStore = defineStore('chat', () => {
         { text: 'Model loaded and initialized!', progress: 1.0 }
       ];
       for (const step of steps) {
+        if (!isEngineLoading.value) return; // If cancelled
         engineProgress.value = step;
         await new Promise(resolve => setTimeout(resolve, 500));
       }
@@ -84,6 +88,7 @@ export const useChatStore = defineStore('chat', () => {
       };
       
       isEngineLoading.value = false;
+      isEngineReady.value = true;
       return;
     }
 
@@ -114,12 +119,28 @@ export const useChatStore = defineStore('chat', () => {
           }
         })
       }
+      if (isEngineLoading.value) { // Ensure it wasn't cancelled
+        isEngineReady.value = true;
+      }
     } catch (error) {
-      console.error('Failed to init engine', error)
-      throw error
+      if (isEngineLoading.value) { // Ignore error if cancelled
+        console.error('Failed to init engine', error)
+        throw error
+      }
     } finally {
       isEngineLoading.value = false
     }
+  }
+
+  function cancelDownload() {
+    isEngineLoading.value = false
+    isEngineReady.value = false
+    if (worker) {
+      worker.terminate()
+      worker = null
+    }
+    engine = null
+    engineProgress.value = { text: 'Téléchargement annulé', progress: 0 }
   }
 
   async function generate(modelId: string, text: string) {
@@ -137,6 +158,9 @@ export const useChatStore = defineStore('chat', () => {
       content: text,
       timestamp: Date.now()
     })
+
+    // Update tokens for user message (rough estimation)
+    sessionTokens.value += Math.ceil(text.length / 4)
 
     // Init Engine
     if (!engine && !(worker && currentBackend === 'transformers')) {
@@ -161,6 +185,23 @@ export const useChatStore = defineStore('chat', () => {
       // Exclude the last empty assistant message
       messages.pop()
 
+      // Prepend system prompt if it exists
+      if (settingsStore.systemPrompt && settingsStore.systemPrompt.trim().length > 0) {
+        messages.unshift({ role: 'system', content: settingsStore.systemPrompt.trim() })
+        sessionTokens.value += Math.ceil(settingsStore.systemPrompt.length / 4) // Count system prompt once per turn
+      }
+
+      const llmParams = {
+        temperature: settingsStore.temperature,
+        top_p: settingsStore.topP,
+        max_tokens: settingsStore.maxTokens,
+        top_k: settingsStore.topK,
+        frequency_penalty: settingsStore.frequencyPenalty,
+        presence_penalty: settingsStore.presencePenalty
+      }
+
+      let generatedChars = 0
+
       if (currentBackend === 'transformers' && worker) {
         generationIdCounter++
         currentGenerationId = generationIdCounter
@@ -178,6 +219,7 @@ export const useChatStore = defineStore('chat', () => {
               fullContent += payload
               const msg = currentConv.messages.find(m => m.id === asstMsgId)
               if (msg) msg.content = fullContent
+              generatedChars = fullContent.length
             } else if (type === 'generate_done') {
               resolve()
             } else if (type === 'generate_error') {
@@ -192,9 +234,7 @@ export const useChatStore = defineStore('chat', () => {
             payload: { 
               messages, 
               generationId: currentGenerationId,
-              temperature: settingsStore.temperature,
-              topP: settingsStore.topP,
-              maxTokens: settingsStore.maxTokens
+              ...llmParams
             } 
           })
         })
@@ -202,9 +242,7 @@ export const useChatStore = defineStore('chat', () => {
         const chunks = await engine.chat.completions.create({
           messages,
           stream: true,
-          temperature: settingsStore.temperature,
-          top_p: settingsStore.topP,
-          max_tokens: settingsStore.maxTokens
+          ...llmParams
         })
 
         let fullContent = ''
@@ -212,6 +250,7 @@ export const useChatStore = defineStore('chat', () => {
           if (!isGenerating.value) break
           const delta = chunk.choices[0]?.delta?.content || ''
           fullContent += delta
+          generatedChars = fullContent.length
           
           // Update the message reactively
           const msg = currentConv.messages.find(m => m.id === asstMsgId)
@@ -220,6 +259,9 @@ export const useChatStore = defineStore('chat', () => {
           }
         }
       }
+      
+      // Update tokens for generated output
+      sessionTokens.value += Math.ceil(generatedChars / 4)
       
       // Save final state
       await convStore.persistConversation(convId)
@@ -243,8 +285,11 @@ export const useChatStore = defineStore('chat', () => {
   return {
     isGenerating,
     isEngineLoading,
+    isEngineReady,
     engineProgress,
+    sessionTokens,
     initEngine,
+    cancelDownload,
     generate,
     stopGenerate
   }
