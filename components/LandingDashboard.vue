@@ -162,50 +162,15 @@
         </div>
         
         <!-- Model Onboarding Download UI -->
-        <div v-if="!chatStore.isEngineReady" class="flex flex-col space-y-5">
-        
-          <div v-if="!chatStore.isEngineLoading" class="flex flex-col space-y-4">
-            <div class="space-y-2.5 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
-              <div v-for="model in modelStore.compatibleModels" :key="model.id" class="group/model flex items-center space-x-3 p-3 rounded-2xl bg-slate-50/50 dark:bg-slate-800/30 hover:bg-white dark:hover:bg-slate-800 hover:shadow-md border border-slate-200/50 dark:border-slate-700/50 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-all duration-300 cursor-pointer" @click="toggleModel(model.id, !selectedModels.includes(model.id))">
-                <Checkbox 
-                  :id="model.id" 
-                  :checked="selectedModels.includes(model.id)"
-                  @update:checked="(checked) => toggleModel(model.id, checked)"
-                  @click.stop
-                  class="data-[state=checked]:bg-indigo-500 data-[state=checked]:border-indigo-500"
-                />
-                <label
-                  :for="model.id"
-                  @click.stop
-                  class="text-sm font-semibold text-slate-700 dark:text-slate-200 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1 cursor-pointer select-none group-hover/model:text-indigo-600 dark:group-hover/model:text-indigo-400 transition-colors"
-                >
-                  {{ model.name }} <span class="text-xs text-slate-400 font-normal ml-1 border border-slate-200 dark:border-slate-700 rounded-md px-1.5 py-0.5">{{ model.totalSize }}</span>
-                </label>
-              </div>
+        <div v-if="!chatStore.isEngineReady" class="flex flex-col space-y-5 items-center justify-center py-4">
+          <div class="text-center space-y-3">
+            <div class="inline-flex items-center justify-center p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl text-indigo-500 mb-2">
+              <Cpu class="w-6 h-6" />
             </div>
-            
-            <Button @click="startDownload" :disabled="selectedModels.length === 0" class="w-full relative group/btn h-12 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white shadow-xl shadow-slate-900/20 dark:shadow-indigo-500/25 transition-all duration-300 overflow-hidden">
-              <div class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
-              <span class="relative z-10 flex items-center justify-center font-semibold tracking-wide">
-                <Download class="w-4 h-4 mr-2 group-hover/btn:-translate-y-0.5 transition-transform" />
-                Installer mon IA privée
-              </span>
-            </Button>
-            <p class="text-center text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center justify-center font-medium">
-              <Shield class="w-3 h-3 mr-1 text-emerald-500" />
-              Isolé dans votre navigateur et 100% sécurisé.
+            <h4 class="font-bold text-slate-800 dark:text-slate-100">Prêt à commencer ?</h4>
+            <p class="text-sm text-slate-500 dark:text-slate-400 max-w-[250px] mx-auto">
+              Veuillez sélectionner et télécharger un modèle depuis la <span class="font-semibold text-indigo-500">barre latérale gauche</span>.
             </p>
-          </div>
-
-          <div v-else class="flex flex-col space-y-4">
-            <div class="flex justify-between text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">
-              <span class="flex items-center"><Loader2 class="w-4 h-4 mr-2 animate-spin text-indigo-500" /> {{ chatStore.engineProgress.text || 'Chargement...' }}</span>
-              <span class="text-indigo-600 dark:text-indigo-400">{{ Math.round(chatStore.engineProgress.progress * 100) }}%</span>
-            </div>
-            <Progress :model-value="chatStore.engineProgress.progress * 100" class="h-2.5 rounded-full bg-slate-100 dark:bg-slate-800" indicator-class="bg-gradient-to-r from-indigo-500 to-purple-500" />
-            <Button variant="outline" @click="chatStore.cancelDownload()" class="w-full text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl font-medium">
-              Annuler l'installation
-            </Button>
           </div>
         </div>
       </CardContent>
@@ -258,9 +223,6 @@ import { useChatStore } from '~/stores/chatStore'
 import { Globe, Code, Sparkles, Mail, ArrowRight, Download, Shield, WifiOff, EyeOff, Lock, Cpu, Loader2 } from 'lucide-vue-next'
 import { Card, CardContent } from '~/components/ui/card'
 import { Badge } from '~/components/ui/badge'
-import { Button } from '~/components/ui/button'
-import { Progress } from '~/components/ui/progress'
-import { Checkbox } from '~/components/ui/checkbox'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '~/components/ui/collapsible'
 
 defineEmits(['send-prompt'])
@@ -270,32 +232,13 @@ const deviceStore = useDeviceStore()
 const modelStore = useModelStore()
 const chatStore = useChatStore()
 
-const selectedModels = ref<string[]>([])
-
 onMounted(async () => {
   if (!deviceStore.deviceInfo) {
     await deviceStore.evaluateDevice()
     // Select best model automatically if not already
     modelStore.detectBestModel()
   }
-  if (modelStore.currentModelId) {
-    selectedModels.value = [modelStore.currentModelId]
-  }
 })
-
-function toggleModel(id: string, checked: boolean) {
-  if (checked) {
-    if (!selectedModels.value.includes(id)) selectedModels.value.push(id)
-  } else {
-    selectedModels.value = selectedModels.value.filter(m => m !== id)
-  }
-}
-
-function startDownload() {
-  if (selectedModels.value.length > 0) {
-    chatStore.downloadMultipleEngines(selectedModels.value)
-  }
-}
 
 const scoreColor = computed(() => {
   const score = deviceStore.deviceInfo?.score

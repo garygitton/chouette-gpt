@@ -35,13 +35,15 @@ test.describe('ChouetteGPT - BDD Right Sidebar & Advanced Settings', () => {
       const textarea = page.getByTestId('chat-textarea');
       await expect(textarea).toBeDisabled({ timeout: 15000 });
       
-      // The download button should be visible
-      const downloadBtn = page.getByRole('button', { name: /Télécharger/ });
+      // The download button should be visible in the sidebar
+      const sidebar = page.getByTestId('sidebar');
+      const downloadBtn = sidebar.getByRole('button', { name: /Télécharger/ });
       await expect(downloadBtn).toBeVisible();
     });
 
-    await test.step('When je clique sur Télécharger & Démarrer', async () => {
-      const downloadBtn = page.getByRole('button', { name: /Télécharger/ });
+    await test.step('When je clique sur Télécharger et activer', async () => {
+      const sidebar = page.getByTestId('sidebar');
+      const downloadBtn = sidebar.getByRole('button', { name: /Télécharger/ });
       await downloadBtn.click();
     });
 
@@ -72,7 +74,8 @@ test.describe('ChouetteGPT - BDD Right Sidebar & Advanced Settings', () => {
       await page.goto('/?mock=true', { waitUntil: 'domcontentloaded' });
       
       // Trigger download to complete the engine load
-      const downloadBtn = page.getByRole('button', { name: /Télécharger/ });
+      const sidebar = page.getByTestId('sidebar');
+      const downloadBtn = sidebar.getByRole('button', { name: /Télécharger/ });
       await expect(downloadBtn).toBeVisible({ timeout: 15000 });
       await downloadBtn.click();
       

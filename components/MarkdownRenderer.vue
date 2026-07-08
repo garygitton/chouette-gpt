@@ -21,6 +21,7 @@ marked.use({
   renderer: {
     code({ text, lang }: { text: string, lang?: string }) {
       const code = text;
+      
       const infostring = lang;
       const langMatch = (infostring || '').match(/\S*/)?.[0] || 'code'
       

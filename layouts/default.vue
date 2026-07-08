@@ -14,7 +14,6 @@
       <!-- Desktop Top Bar Options -->
       <div class="hidden md:flex absolute top-4 left-4 right-4 z-20 justify-between pointer-events-none">
         <div class="pointer-events-auto">
-          <TopModelSelector />
         </div>
         <div class="pointer-events-auto shadow-sm">
           <Button variant="ghost" size="icon" @click="isRightSidebarOpen = !isRightSidebarOpen" class="bg-white/50 dark:bg-[#0b0f19]/50 backdrop-blur-sm border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
@@ -52,7 +51,6 @@
           </div>
         </div>
         <div class="flex justify-center w-full pb-1">
-          <TopModelSelector />
         </div>
       </header>
 
@@ -101,7 +99,6 @@ import { useDeviceStore } from '~/stores/deviceStore'
 import SidebarContent from '~/components/SidebarContent.vue'
 import RightSidebar from '~/components/RightSidebar.vue'
 import WebGpuWizardModal from '~/components/WebGpuWizardModal.vue'
-import TopModelSelector from '~/components/TopModelSelector.vue'
 
 // Shadcn imports
 import { Button } from '~/components/ui/button'

@@ -242,15 +242,6 @@ test.describe('ChouetteGPT - E2E BDD Conversations and Behavior', () => {
     await githubInput.fill('https://github.com/testuser');
     await websiteInput.fill('https://testuser.com');
 
-    // 2. Model Selection and Auto Choice
-    const qwenModelCard = page.getByTestId('model-card-Xenova/Qwen1.5-0.5B-Chat');
-    await expect(qwenModelCard).toBeVisible();
-    await qwenModelCard.click();
-
-    const autoSelectBtn = page.getByTestId('auto-select-model-btn');
-    await expect(autoSelectBtn).toBeVisible();
-    await autoSelectBtn.click();
-
     // 3. Language Selector
     const langSelectTrigger = page.locator('main').getByTestId('language-select-trigger');
     await expect(langSelectTrigger).toBeVisible();

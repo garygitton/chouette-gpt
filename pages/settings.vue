@@ -97,7 +97,6 @@
 
         <!-- Right Column: Available Models & Social Settings -->
         <div class="space-y-6">
-          <ModelSelectionCard />
 
           <!-- Social Networks Card -->
           <Card class="rounded-2xl border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-[#0b0f19]/70 backdrop-blur-xl shadow-lg mt-6">
@@ -166,7 +165,6 @@ import { useRouter } from 'vue-router'
 import { useDeviceStore } from '~/stores/deviceStore'
 import { useSettingsStore } from '~/stores/settingsStore'
 import DeviceInfoCard from '~/components/DeviceInfoCard.vue'
-import ModelSelectionCard from '~/components/ModelSelectionCard.vue'
 import { useI18n } from '~/composables/useI18n'
 
 import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card'

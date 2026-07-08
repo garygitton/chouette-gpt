@@ -17,6 +17,8 @@
       {{ t('new_chat') }}
     </Button>
 
+    <SidebarModelSelector />
+
     <!-- Search bar -->
     <div class="relative mb-4">
       <Search class="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
@@ -123,9 +125,10 @@
 import { ref, computed, onMounted } from 'vue'
 import { useConversationStore } from '~/stores/conversationStore'
 import { useSettingsStore } from '~/stores/settingsStore'
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '~/composables/useI18n'
 import LanguageSelector from '~/components/LanguageSelector.vue'
+import SidebarModelSelector from '~/components/SidebarModelSelector.vue'
 
 // Shadcn imports
 import { Button } from '~/components/ui/button'

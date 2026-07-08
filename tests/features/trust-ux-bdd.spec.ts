@@ -27,8 +27,9 @@ test.describe('ChouetteGPT - BDD Trust UX', () => {
     
     await test.step('Given un nouvel utilisateur arrive sur la page', async () => {
       await page.goto('/?mock=true', { waitUntil: 'domcontentloaded' });
-      // Wait for page to be interactive, using the new button name
-      const button = page.getByRole('button', { name: /Installer/ });
+      // Wait for page to be interactive by checking the sidebar download button
+      const sidebar = page.getByTestId('sidebar');
+      const button = sidebar.getByRole('button', { name: /Télécharger/ });
       await expect(button).toBeVisible({ timeout: 45000 });
     });
 
