@@ -22,3 +22,21 @@ Le projet s'appuie sur Nuxt et Docker :
 docker-compose up
 ```
 Accédez au site via [http://chouette-gpt.localhost/](http://chouette-gpt.localhost/) ou [http://localhost:3000](http://localhost:3000).
+
+## Déploiement & CDN (Scaleway Edge Services)
+
+L'application est déployée automatiquement en mode site statique sur un bucket S3 de Scaleway via GitLab CI.
+
+Pour assurer de hautes performances de chargement des actifs lourds (modèles ONNX et runtimes WebAssembly) tout en sécurisant l'accès HTTPS par certificat SSL Let's Encrypt géré, un pipeline **Scaleway Edge Services (CDN)** est placé devant le bucket S3.
+
+### Intégration CI/CD
+
+Lors de chaque déploiement sur la branche `main` :
+1. Les fichiers statiques compilés sont synchronisés avec le bucket S3 `chouette.chouette-gpt.fr`.
+2. Une commande de **purge de cache** ciblée est envoyée à l'API Scaleway Edge Services pour invalider uniquement le fichier `index.html`.
+3. Cela garantit que les utilisateurs obtiennent immédiatement la dernière version de l'application sans vider le cache des gros fichiers modèles (.onnx/.wasm) déjà mis en cache à la périphérie (Edge).
+
+Les variables CI/CD requises (configurées dans GitLab) sont :
+- `SCW_ACCESS_KEY` : Clé d'accès API Scaleway.
+- `SCW_SECRET_KEY` : Clé secrète API Scaleway.
+- `EDGE_PIPELINE_ID` : L'identifiant du pipeline Edge Services (défini dans `.gitlab-ci.yml`).
