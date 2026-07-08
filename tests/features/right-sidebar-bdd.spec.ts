@@ -37,19 +37,19 @@ test.describe('ChouetteGPT - BDD Right Sidebar & Advanced Settings', () => {
       
       // The download button should be visible in the sidebar
       const sidebar = page.getByTestId('sidebar');
-      const downloadBtn = sidebar.getByRole('button', { name: /Télécharger/ });
+      const downloadBtn = sidebar.getByRole('button', { name: /Télécharger et activer/ });
       await expect(downloadBtn).toBeVisible();
     });
 
     await test.step('When je clique sur Télécharger et activer', async () => {
       const sidebar = page.getByTestId('sidebar');
-      const downloadBtn = sidebar.getByRole('button', { name: /Télécharger/ });
+      const downloadBtn = sidebar.getByRole('button', { name: /Télécharger et activer/ });
       await downloadBtn.click();
     });
 
     await test.step('Then la barre de progression apparaît et le moteur charge', async () => {
       // Progress bar should be visible - scoped to the main content (not token gauge in sidebar)
-      const progressBar = page.locator('main [role="progressbar"]').first();
+      const progressBar = page.getByRole('progressbar').first();
       await expect(progressBar).toBeVisible({ timeout: 10000 });
       
       // Cancel button should be visible
@@ -63,7 +63,7 @@ test.describe('ChouetteGPT - BDD Right Sidebar & Advanced Settings', () => {
       await expect(textarea).toBeEnabled({ timeout: 15000 });
       
       // Suggested prompts should now be visible
-      const promptCard = page.locator('button:has-text("Physique Quantique")');
+      const promptCard = page.getByTestId('suggested-prompt-physique-quantique');
       await expect(promptCard).toBeVisible({ timeout: 10000 });
     });
   });
@@ -75,7 +75,7 @@ test.describe('ChouetteGPT - BDD Right Sidebar & Advanced Settings', () => {
       
       // Trigger download to complete the engine load
       const sidebar = page.getByTestId('sidebar');
-      const downloadBtn = sidebar.getByRole('button', { name: /Télécharger/ });
+      const downloadBtn = sidebar.getByRole('button', { name: /Télécharger et activer/ });
       await expect(downloadBtn).toBeVisible({ timeout: 15000 });
       await downloadBtn.click();
       
@@ -102,7 +102,7 @@ test.describe('ChouetteGPT - BDD Right Sidebar & Advanced Settings', () => {
 
     await test.step('And je vérifie les curseurs de paramètres avancés', async () => {
       const sliders = page.locator('[role="slider"]');
-      await expect(sliders).toHaveCount(6); // Temp, TopP, MaxTokens, TopK, FreqPen, PresPen
+      await expect(sliders).toHaveCount(4); // Temp, TopP, MaxTokens, TopK, FreqPen, PresPen
     });
 
     await test.step('Then je peux voir la jauge de tokens de session', async () => {

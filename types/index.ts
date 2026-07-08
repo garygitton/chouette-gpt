@@ -32,7 +32,6 @@ export interface ModelInfo {
   speed?: string
   quality?: string
   ramRequired: number // MB
-  backend: 'mlc' | 'transformers'
 }
 
 export interface DeviceInfo {

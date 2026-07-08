@@ -73,8 +73,8 @@ const pendingModel = computed(() => {
   return modelStore.models.find(m => m.id === modelStore.currentModelId)
 })
 
-function handleModelChange(modelId: string) {
-  if (modelId === modelStore.currentModelId) return
+function handleModelChange(modelId: any) {
+  if (typeof modelId !== 'string' || modelId === modelStore.currentModelId) return
   modelStore.currentModelId = modelId
   chatStore.isEngineReady = false
 }

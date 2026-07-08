@@ -11,9 +11,7 @@ export const useChatStore = defineStore('chat', () => {
   const engineProgress = ref({ text: '', progress: 0 })
   const sessionTokens = ref(0)
   
-  let engine: any = null
   let worker: Worker | null = null
-  let currentBackend: 'mlc' | 'transformers' | null = null
   let generationIdCounter = 0
   let currentGenerationId = 0
   let downloadQueue: string[] = []
@@ -23,8 +21,6 @@ export const useChatStore = defineStore('chat', () => {
 
     const modelStore = useModelStore()
     const modelInfo = modelStore.models.find(m => m.id === modelId)
-    const backend = modelInfo?.backend || 'mlc'
-    currentBackend = backend
 
     // Check for mock mode
     let isMock = typeof window !== 'undefined' && 
@@ -48,45 +44,31 @@ export const useChatStore = defineStore('chat', () => {
         await new Promise(resolve => setTimeout(resolve, 500));
       }
       
-      engine = {
-        chat: {
-          completions: {
-            create: async function (options: any) {
-              const userPrompt = options.messages[options.messages.length - 1].content;
-              const responseText = `Bonjour ! Je suis ChouetteGPT, un modèle d'IA local simulé (bouchonné) pour les tests E2E.\n\nVous m'avez demandé : "${userPrompt}".\n\nEst-ce que je peux vous aider pour autre chose ?`;
-              
-              if (options.stream) {
-                return (async function* () {
-                  const chunks = responseText.match(/.{1,4}/g) || [responseText];
-                  for (const chunk of chunks) {
-                    await new Promise(r => setTimeout(r, 20));
-                    yield {
-                      choices: [
-                        {
-                          delta: {
-                            content: chunk
-                          }
-                        }
-                      ]
-                    };
-                  }
-                })();
-              } else {
-                return {
-                  choices: [
-                    {
-                      message: {
-                        content: responseText
-                      }
-                    }
-                  ]
-                };
-              }
-            }
+      worker = {
+        postMessage: async (msg: any) => {
+          if (msg.type === 'generate') {
+             const userPrompt = msg.payload.messages[msg.payload.messages.length - 1].content;
+             const responseText = `Bonjour ! Je suis ChouetteGPT, un modèle d'IA local simulé (bouchonné) pour les tests E2E.\n\nVous m'avez demandé : "${userPrompt}".\n\nEst-ce que je peux vous aider pour autre chose ?`;
+             
+             const chunks = responseText.match(/.{1,4}/g) || [responseText];
+             for (const chunk of chunks) {
+               await new Promise(r => setTimeout(r, 20));
+               if (worker?.onmessage) {
+                 worker.onmessage({ data: { type: 'generate_chunk', payload: chunk, generationId: msg.payload.generationId } } as any);
+               }
+             }
+             if (worker?.onmessage) {
+               worker.onmessage({ data: { type: 'generate_done', generationId: msg.payload.generationId } } as any);
+             }
+          } else if (msg.type === 'interrupt') {
+             if (worker?.onmessage) {
+               worker.onmessage({ data: { type: 'interrupt_done' } } as any);
+             }
           }
         },
-        interruptGenerate: async () => {}
-      };
+        terminate: () => {},
+        onmessage: null
+      } as any;
       
       isEngineLoading.value = false;
       isEngineReady.value = true;
@@ -95,31 +77,21 @@ export const useChatStore = defineStore('chat', () => {
 
     isEngineLoading.value = true
     try {
-      if (backend === 'transformers') {
-        worker = new Worker(new URL('../workers/transformers.worker.ts', import.meta.url), { type: 'module' })
-        
-        await new Promise<void>((resolve, reject) => {
-          worker!.onmessage = (event) => {
-            const { type, payload } = event.data
-            if (type === 'progress') {
-              engineProgress.value = { text: progressPrefix + payload.text, progress: payload.progress }
-            } else if (type === 'init_done') {
-              resolve()
-            } else if (type === 'init_error') {
-              reject(new Error(payload))
-            }
+      worker = new Worker(new URL('../workers/transformers.worker.ts', import.meta.url), { type: 'module' })
+      
+      await new Promise<void>((resolve, reject) => {
+        worker!.onmessage = (event) => {
+          const { type, payload } = event.data
+          if (type === 'progress') {
+            engineProgress.value = { text: progressPrefix + payload.text, progress: payload.progress }
+          } else if (type === 'init_done') {
+            resolve()
+          } else if (type === 'init_error') {
+            reject(new Error(payload))
           }
-          worker!.postMessage({ type: 'init', payload: { modelId } })
-        })
-      } else {
-        worker = new Worker(new URL('../workers/llm.worker.ts', import.meta.url), { type: 'module' })
-        const { CreateWebWorkerMLCEngine } = await import('@mlc-ai/web-llm')
-        engine = await CreateWebWorkerMLCEngine(worker, modelId, {
-          initProgressCallback: (progress) => {
-            engineProgress.value = { text: progressPrefix + progress.text, progress: progress.progress }
-          }
-        })
-      }
+        }
+        worker!.postMessage({ type: 'init', payload: { modelId } })
+      })
       if (isEngineLoading.value) { // Ensure it wasn't cancelled
         isEngineReady.value = true;
       }
@@ -157,7 +129,6 @@ export const useChatStore = defineStore('chat', () => {
             worker.terminate()
             worker = null
           }
-          engine = null
           isEngineReady.value = false
         }
       } catch (err) {
@@ -176,7 +147,6 @@ export const useChatStore = defineStore('chat', () => {
       worker.terminate()
       worker = null
     }
-    engine = null
     engineProgress.value = { text: 'Téléchargement annulé', progress: 0 }
   }
 
@@ -200,7 +170,7 @@ export const useChatStore = defineStore('chat', () => {
     sessionTokens.value += Math.ceil(text.length / 4)
 
     // Init Engine
-    if (!engine && !(worker && currentBackend === 'transformers')) {
+    if (!worker) {
       await initEngine(modelId)
     }
 
@@ -229,39 +199,19 @@ export const useChatStore = defineStore('chat', () => {
         messages.unshift({ role: 'system', content: settingsStore.systemPrompt.trim() })
         sessionTokens.value += Math.ceil(settingsStore.systemPrompt.length / 4)
       } else {
-        // Fallback to secure default prompt from WASM logic
-        await initWasm()
-        if (wasmModule) {
-          try {
-            const historyJson = JSON.stringify(historyMessages)
-            // Use the prepare_messages function from the WASM exports
-            const prepared = wasmModule.prepare_messages(historyJson)
-            messages = prepared
-            
-            // Estimate tokens from the secure system prompt
-            const securePrompt = wasmModule.get_secure_system_prompt()
-            sessionTokens.value += Math.ceil(securePrompt.length / 4)
-          } catch (e) {
-            console.error('WASM prepare_messages failed, falling back to JS', e)
-            messages = historyMessages
-          }
-        } else {
-          messages = historyMessages
-        }
+        messages = historyMessages
       }
 
       const llmParams = {
         temperature: settingsStore.temperature,
         top_p: settingsStore.topP,
         max_tokens: settingsStore.maxTokens,
-        top_k: settingsStore.topK,
-        frequency_penalty: settingsStore.frequencyPenalty,
-        presence_penalty: settingsStore.presencePenalty
+        top_k: settingsStore.topK
       }
 
       let generatedChars = 0
 
-      if (currentBackend === 'transformers' && worker) {
+      if (worker) {
         generationIdCounter++
         currentGenerationId = generationIdCounter
         
@@ -297,26 +247,6 @@ export const useChatStore = defineStore('chat', () => {
             } 
           })
         })
-      } else if (engine) {
-        const chunks = await engine.chat.completions.create({
-          messages,
-          stream: true,
-          ...llmParams
-        })
-
-        let fullContent = ''
-        for await (const chunk of chunks) {
-          if (!isGenerating.value) break
-          const delta = chunk.choices[0]?.delta?.content || ''
-          fullContent += delta
-          generatedChars = fullContent.length
-          
-          // Update the message reactively
-          const msg = currentConv.messages.find(m => m.id === asstMsgId)
-          if (msg) {
-            msg.content = fullContent
-          }
-        }
       }
       
       // Update tokens for generated output
@@ -332,11 +262,8 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   async function stopGenerate() {
-    if (currentBackend === 'transformers' && worker) {
+    if (worker) {
       worker.postMessage({ type: 'interrupt' })
-      isGenerating.value = false
-    } else if (engine) {
-      await engine.interruptGenerate()
       isGenerating.value = false
     }
   }

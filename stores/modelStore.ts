@@ -15,8 +15,7 @@ export const useModelStore = defineStore('model', () => {
       estimatedMemory: '600 MB',
       usageCount: 0,
       status: 'available',
-      ramRequired: 2048,
-      backend: 'transformers'
+      ramRequired: 2048
     },
     {
       id: 'Xenova/TinyLlama-1.1B-Chat-v1.0',
@@ -28,8 +27,7 @@ export const useModelStore = defineStore('model', () => {
       estimatedMemory: '1 GB',
       usageCount: 0,
       status: 'available',
-      ramRequired: 2048,
-      backend: 'transformers'
+      ramRequired: 2048
     },
     {
       id: 'onnx-community/Llama-3.2-1B-Instruct',
@@ -41,15 +39,13 @@ export const useModelStore = defineStore('model', () => {
       estimatedMemory: '1.5 GB',
       usageCount: 0,
       status: 'available',
-      ramRequired: 3072,
-      backend: 'transformers'
+      ramRequired: 3072
     }
   ])
 
   const deviceStore = useDeviceStore()
   const currentModelId = ref<string>('Xenova/Qwen1.5-0.5B-Chat')
   const isDownloading = ref(false)
-  const hasWebGPU = computed(() => deviceStore.deviceInfo?.hasWebGPU ?? false)
   const deviceMemory = computed(() => deviceStore.deviceInfo ? deviceStore.deviceInfo.ramGB * 1024 : null)
 
   const currentModel = computed(() => {
@@ -61,10 +57,6 @@ export const useModelStore = defineStore('model', () => {
 
   const compatibleModels = computed(() => {
     return models.value.filter(model => {
-      // If model requires WebGPU (mlc backend) but browser doesn't have WebGPU, it's incompatible
-      if (model.backend === 'mlc' && !hasWebGPU.value) {
-        return false
-      }
       // If device memory is known and model requires more RAM than available
       if (deviceMemory.value && deviceMemory.value < model.ramRequired) {
         return false
@@ -106,7 +98,6 @@ export const useModelStore = defineStore('model', () => {
     currentModel,
     currentModelName,
     isDownloading,
-    hasWebGPU,
     deviceMemory,
     compatibleModels,
     updateModelStatus,

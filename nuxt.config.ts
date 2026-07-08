@@ -182,7 +182,6 @@ export default defineNuxtConfig({
     appManifest: false
   },
   devServer: {
-    host: '0.0.0.0',
     port: 3000
   },
   modules: [
@@ -261,7 +260,6 @@ export default defineNuxtConfig({
       exclude: ['@mlc-ai/web-llm']
     },
     server: {
-      host: '0.0.0.0',
       allowedHosts: ['chouette-gpt.localhost', '.localhost'],
       hmr: {
         // Let Vite automatically infer the client port from window.location

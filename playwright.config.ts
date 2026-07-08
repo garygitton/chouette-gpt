@@ -26,7 +26,7 @@ export default defineConfig({
     }
   },
   webServer: {
-    command: 'VITE_DEVTOOLS_DISABLE_CLIENT_AUTH=true PORT=3000 npm run dev',
+    command: 'npm run build && PORT=3000 npm run preview',
     url: 'http://127.0.0.1:3000/',
     timeout: 300 * 1000,
     reuseExistingServer: !process.env.CI,

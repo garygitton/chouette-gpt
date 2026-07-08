@@ -29,15 +29,15 @@ test.describe('ChouetteGPT - BDD Trust UX', () => {
       await page.goto('/?mock=true', { waitUntil: 'domcontentloaded' });
       // Wait for page to be interactive by checking the sidebar download button
       const sidebar = page.getByTestId('sidebar');
-      const button = sidebar.getByRole('button', { name: /Télécharger/ });
+      const button = sidebar.getByRole('button', { name: /Télécharger et activer/ });
       await expect(button).toBeVisible({ timeout: 45000 });
     });
 
     await test.step('Then il voit les badges de confidentialité et les explications pédagogiques', async () => {
       // Trust badges
-      await expect(page.getByText('100% Privé')).toBeVisible();
-      await expect(page.getByText('Hors-ligne')).toBeVisible();
-      await expect(page.getByText('Zéro Pistage')).toBeVisible();
+      await expect(page.getByText('100% Privé').first()).toBeVisible();
+      await expect(page.getByText('Hors-ligne').first()).toBeVisible();
+      await expect(page.getByText('Zéro Pistage').first()).toBeVisible();
       
       // Mini-tutorial
       await expect(page.getByText('1. Installer')).toBeVisible();

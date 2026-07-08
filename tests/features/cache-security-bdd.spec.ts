@@ -51,7 +51,7 @@ test.describe('ChouetteGPT - BDD Cache & Security', () => {
 
     await test.step('And le chat fonctionne et utilise la logique WASM sécurisée', async () => {
       // Install model (mock mode)
-      const downloadBtn = page.getByRole('button', { name: /Installer/ });
+      const downloadBtn = page.getByRole('button', { name: /Télécharger et activer/ });
       await expect(downloadBtn).toBeVisible({ timeout: 15000 });
       await downloadBtn.click();
       

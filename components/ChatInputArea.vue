@@ -17,32 +17,11 @@
             class="w-full bg-transparent border-0 outline-none focus:ring-0 text-slate-800 dark:text-slate-100 resize-none max-h-48 text-sm placeholder-slate-400 dark:placeholder-slate-500 disabled:opacity-50 disabled:cursor-not-allowed"
             style="field-sizing: content;"
           ></textarea>
-        </div>
-        
         <div class="flex items-center justify-between px-4 pb-3.5 border-t border-slate-100/50 dark:border-slate-800/40 pt-3">
           <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-slate-400 dark:text-slate-500 font-medium">
             <span>{{ input.length }} {{ t('char') }}</span>
             <span class="opacity-50">•</span>
             <span>~{{ Math.ceil(input.length / 4) }} tokens est.</span>
-            <span class="opacity-50">•</span>
-            <div class="flex items-center space-x-1.5">
-              <span class="text-slate-400 dark:text-slate-500">{{ t('model') }}:</span>
-              <Select v-model="modelStore.currentModelId" :disabled="chatStore.isGenerating || chatStore.isEngineLoading">
-                <SelectTrigger class="h-6 text-[11px] px-2 py-0 min-w-[200px] border-none shadow-none text-indigo-500 dark:text-indigo-400 font-bold bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800">
-                  <div class="flex items-center">
-                    <Cpu class="w-3.5 h-3.5 mr-1" />
-                    <SelectValue placeholder="Select a model" />
-                  </div>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem v-for="model in modelStore.compatibleModels" :key="model.id" :value="model.id">
-                      {{ model.name }}
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
           
           <Button 
@@ -67,6 +46,7 @@
       <p class="text-center text-[9.5px] text-slate-400 dark:text-slate-500 leading-normal max-w-2xl mx-auto mt-2">
         {{ t('disclaimer') }}
       </p>
+    </div>
   </div>
 </template>
 
@@ -77,8 +57,7 @@ import { useModelStore } from '~/stores/modelStore'
 import { useI18n } from '~/composables/useI18n'
 
 import { Button } from '~/components/ui/button'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
-import { Cpu, Send, Square } from 'lucide-vue-next'
+import { Send, Square } from 'lucide-vue-next'
 
 const props = defineProps({
   modelValue: { type: String, default: '' },

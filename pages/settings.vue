@@ -44,7 +44,7 @@
                 <Slider 
                   data-testid="temperature-slider"
                   :model-value="[settingsStore.temperature]"
-                  @update:model-value="(val) => settingsStore.temperature = val[0]"
+                  @update:model-value="(val) => { if (val) settingsStore.temperature = val[0] }"
                   :min="0" 
                   :max="2" 
                   :step="0.05" 
@@ -63,7 +63,7 @@
                 <Slider 
                   data-testid="topp-slider"
                   :model-value="[settingsStore.topP]"
-                  @update:model-value="(val) => settingsStore.topP = val[0]"
+                  @update:model-value="(val) => { if (val) settingsStore.topP = val[0] }"
                   :min="0.1" 
                   :max="1" 
                   :step="0.05" 
@@ -82,7 +82,7 @@
                 <Slider 
                   data-testid="maxtokens-slider"
                   :model-value="[settingsStore.maxTokens]"
-                  @update:model-value="(val) => settingsStore.maxTokens = val[0]"
+                  @update:model-value="(val) => { if (val) settingsStore.maxTokens = val[0] }"
                   :min="128" 
                   :max="4096" 
                   :step="128" 

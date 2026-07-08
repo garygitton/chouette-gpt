@@ -16,7 +16,6 @@
   "dependencies": {
     "@huggingface/transformers": "^4.2.0",
     "@lucide/vue": "^1.23.0",
-    "@mlc-ai/web-llm": "^0.2.73",
     "@pinia/nuxt": "^0.9.0",
     "@vueuse/core": "^14.3.0",
     "class-variance-authority": "^0.7.1",
@@ -38,10 +37,12 @@
     "@playwright/test": "^1.61.1",
     "lucide-vue-next": "^1.0.0",
     "nuxt": "3.15.2",
+    "puppeteer": "^25.3.0",
     "shadcn-nuxt": "^2.7.4",
     "tailwindcss-animate": "^1.0.7",
     "terser": "^5.48.0",
     "typescript": "^5.7.3",
+    "vue-tsc": "^3.3.7",
     "wasm-pack": "^0.15.0"
   }
 }

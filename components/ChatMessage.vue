@@ -111,7 +111,7 @@ const modelName = computed(() => {
   if (!currentConversation.value) return null
   const modelId = currentConversation.value.modelId
   const model = modelStore.models.find(m => m.id === modelId)
-  return model ? `${model.name} (${model.backend === 'mlc' ? 'GPU' : 'CPU'})` : modelId
+  return model ? `${model.name} (CPU)` : modelId
 })
 
 const isLastMessage = computed(() => {

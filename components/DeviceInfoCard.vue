@@ -95,29 +95,6 @@
           </div>
         </div>
 
-        <!-- GPU Warning Alert -->
-        <div v-if="!deviceStore.deviceInfo?.hasWebGPU" class="p-4 rounded-xl border border-amber-200/40 dark:border-amber-900/20 bg-amber-50/20 dark:bg-amber-950/5 space-y-3 mt-4">
-          <div class="flex items-start space-x-2.5">
-            <TriangleAlert class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-            <div class="space-y-1">
-              <h4 class="font-bold text-sm text-slate-800 dark:text-slate-200">{{ t('gpu_warning_title') }}</h4>
-              <p class="text-xs text-slate-500 dark:text-slate-400 leading-normal">
-                {{ t('gpu_warning_desc') }}
-              </p>
-            </div>
-          </div>
-          <div class="flex justify-end">
-            <Button
-              size="sm"
-              variant="outline"
-              class="rounded-lg font-bold border-amber-200 text-amber-600 hover:bg-amber-100 dark:border-amber-800 dark:text-amber-500 dark:hover:bg-amber-900/30"
-              @click="isOpenGpuWizard = true"
-            >
-              <BookOpen class="w-4 h-4 mr-1.5" />
-              {{ t('gpu_guide_btn') }}
-            </Button>
-          </div>
-        </div>
       </div>
       <div v-else class="text-center py-12 space-y-3">
         <Monitor class="w-12 h-12 text-slate-300 dark:text-slate-700 animate-pulse mx-auto" />
@@ -126,30 +103,19 @@
     </CardContent>
   </Card>
 
-  <!-- WebGPU Activation Wizard Modal -->
-  <WebGpuWizardModal v-model="isOpenGpuWizard" @reevaluate="reEvaluateFromWizard" />
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useDeviceStore } from '~/stores/deviceStore'
 import FeatureCheck from '~/components/FeatureCheck.vue'
-import WebGpuWizardModal from '~/components/WebGpuWizardModal.vue'
 import { useI18n } from '~/composables/useI18n'
 import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
-import { Monitor, Loader2, TriangleAlert, BookOpen } from 'lucide-vue-next'
+import { Monitor, Loader2 } from 'lucide-vue-next'
 
 const deviceStore = useDeviceStore()
 const { t } = useI18n()
-const isOpenGpuWizard = ref(false)
-
-async function reEvaluateFromWizard() {
-  await deviceStore.evaluateDevice()
-  if (deviceStore.deviceInfo?.hasWebGPU) {
-    isOpenGpuWizard.value = false
-  }
-}
 
 const scoreColor = computed(() => {
   const score = deviceStore.deviceInfo?.score

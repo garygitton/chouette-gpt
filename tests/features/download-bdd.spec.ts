@@ -27,7 +27,7 @@ test.describe('ChouetteGPT - BDD Download', () => {
       
       // The download button should be visible in the sidebar
       const sidebar = page.getByTestId('sidebar');
-      const downloadBtn = sidebar.getByRole('button', { name: /Télécharger/ });
+      const downloadBtn = sidebar.getByRole('button', { name: /Télécharger et activer/ });
       await expect(downloadBtn).toBeVisible();
     });
 

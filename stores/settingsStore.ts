@@ -13,8 +13,6 @@ export const useSettingsStore = defineStore('settings', () => {
 
   const systemPrompt = ref('')
   const topK = ref(50)
-  const frequencyPenalty = ref(0)
-  const presencePenalty = ref(0)
 
   // Initialize theme and LLM params from localStorage or system preference
   function initSettings() {
@@ -37,10 +35,6 @@ export const useSettingsStore = defineStore('settings', () => {
       if (m) maxTokens.value = parseInt(m)
       const tk = localStorage.getItem('llm_top_k')
       if (tk) topK.value = parseInt(tk)
-      const fp = localStorage.getItem('llm_frequency_penalty')
-      if (fp) frequencyPenalty.value = parseFloat(fp)
-      const pp = localStorage.getItem('llm_presence_penalty')
-      if (pp) presencePenalty.value = parseFloat(pp)
       const sp = localStorage.getItem('llm_system_prompt')
       if (sp) systemPrompt.value = sp
 
@@ -66,12 +60,6 @@ export const useSettingsStore = defineStore('settings', () => {
   })
   watch(topK, (val) => {
     if (typeof window !== 'undefined') localStorage.setItem('llm_top_k', val.toString())
-  })
-  watch(frequencyPenalty, (val) => {
-    if (typeof window !== 'undefined') localStorage.setItem('llm_frequency_penalty', val.toString())
-  })
-  watch(presencePenalty, (val) => {
-    if (typeof window !== 'undefined') localStorage.setItem('llm_presence_penalty', val.toString())
   })
   watch(systemPrompt, (val) => {
     if (typeof window !== 'undefined') localStorage.setItem('llm_system_prompt', val)
@@ -100,15 +88,11 @@ export const useSettingsStore = defineStore('settings', () => {
     topP.value = 0.9
     maxTokens.value = 1024
     topK.value = 50
-    frequencyPenalty.value = 0
-    presencePenalty.value = 0
     if (typeof window !== 'undefined') {
       localStorage.removeItem('llm_temperature')
       localStorage.removeItem('llm_top_p')
       localStorage.removeItem('llm_max_tokens')
       localStorage.removeItem('llm_top_k')
-      localStorage.removeItem('llm_frequency_penalty')
-      localStorage.removeItem('llm_presence_penalty')
     }
   }
 
@@ -128,8 +112,6 @@ export const useSettingsStore = defineStore('settings', () => {
     topP,
     maxTokens,
     topK,
-    frequencyPenalty,
-    presencePenalty,
     systemPrompt,
     linkedin,
     github,

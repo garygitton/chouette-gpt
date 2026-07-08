@@ -83,9 +83,6 @@
             <RightSidebar :isMobile="true" @close-sidebar="isRightSidebarOpen = false" />
           </SheetContent>
         </Sheet>
-
-        <!-- Modals -->
-        <WebGpuWizardModal :model-value="isOnboardingOpen" @update:model-value="closeOnboarding" @reevaluate="reEvaluateGpu" />
       </div>
     </div>
   </div>
@@ -98,7 +95,6 @@ import { useConversationStore } from '~/stores/conversationStore'
 import { useDeviceStore } from '~/stores/deviceStore'
 import SidebarContent from '~/components/SidebarContent.vue'
 import RightSidebar from '~/components/RightSidebar.vue'
-import WebGpuWizardModal from '~/components/WebGpuWizardModal.vue'
 
 // Shadcn imports
 import { Button } from '~/components/ui/button'
@@ -111,7 +107,6 @@ const router = useRouter()
 const route = useRoute()
 const isSidebarOpen = ref(false)
 const isRightSidebarOpen = ref(true)
-const isOnboardingOpen = ref(false)
 const isMobileView = ref(false)
 
 function checkMobile() {
@@ -126,11 +121,6 @@ function checkMobile() {
 onMounted(() => {
   checkMobile()
   window.addEventListener('resize', checkMobile)
-
-  const hasSeenOnboarding = localStorage.getItem('chouette-onboarding-seen')
-  if (!hasSeenOnboarding && typeof navigator !== 'undefined' && !navigator.gpu) {
-    isOnboardingOpen.value = true
-  }
 })
 
 onBeforeUnmount(() => {
@@ -138,20 +128,6 @@ onBeforeUnmount(() => {
     window.removeEventListener('resize', checkMobile)
   }
 })
-
-function closeOnboarding(val: boolean) {
-  isOnboardingOpen.value = val
-  if (!val) {
-    localStorage.setItem('chouette-onboarding-seen', 'true')
-  }
-}
-
-async function reEvaluateGpu() {
-  await deviceStore.evaluateDevice()
-  if (typeof navigator !== 'undefined' && navigator.gpu) {
-    closeOnboarding(false)
-  }
-}
 
 async function newChat() {
   const id = await convStore.createNewConversation()

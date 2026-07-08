@@ -28,67 +28,65 @@
       />
     </div>
 
-    <!-- Basic Parameters -->
-    <div class="space-y-6 pt-2 border-t border-slate-200 dark:border-slate-800">
-      <div class="flex items-center justify-between">
-        <h3 class="text-xs uppercase font-bold text-slate-500 tracking-wider">Base</h3>
-        <Button variant="ghost" size="sm" class="h-6 px-2 text-xs text-slate-400 hover:text-slate-600" @click="settingsStore.resetSettings()">
-          Réinitialiser
-        </Button>
-      </div>
-      
-      <div class="space-y-3">
-        <div class="flex justify-between text-sm">
-          <span>Temperature</span>
-          <span class="text-slate-500">{{ settingsStore.temperature }}</span>
-        </div>
-        <Slider v-model="temperatureArray" :min="0" :max="2" :step="0.1" />
-      </div>
+    <!-- Collapsible Advanced Parameters -->
+    <Collapsible v-slot="{ open }" v-model:open="isAdvancedOpen" class="w-full pt-4 border-t border-slate-200 dark:border-slate-800">
+      <CollapsibleTrigger class="flex items-center justify-between w-full font-semibold text-sm text-slate-700 dark:text-slate-300 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors py-2">
+        <span class="flex items-center">
+          <SlidersHorizontal class="w-4 h-4 mr-2 text-indigo-500" />
+          Paramètres avancés
+        </span>
+        <ChevronUp v-if="open" class="w-4 h-4 text-slate-500" />
+        <ChevronDown v-else class="w-4 h-4 text-slate-500" />
+      </CollapsibleTrigger>
 
-      <div class="space-y-3">
-        <div class="flex justify-between text-sm">
-          <span>Top P</span>
-          <span class="text-slate-500">{{ settingsStore.topP }}</span>
-        </div>
-        <Slider v-model="topPArray" :min="0" :max="1" :step="0.05" />
-      </div>
+      <CollapsibleContent class="space-y-6 pt-4">
+        <!-- Basic Parameters -->
+        <div class="space-y-6">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs uppercase font-bold text-slate-500 tracking-wider">Configuration base</h3>
+            <Button variant="ghost" size="sm" class="h-6 px-2 text-xs text-slate-400 hover:text-slate-600" @click="settingsStore.resetSettings()">
+              Réinitialiser
+            </Button>
+          </div>
+          
+          <div class="space-y-3">
+            <div class="flex justify-between text-sm">
+              <span>Temperature</span>
+              <span class="text-slate-500 font-mono font-semibold">{{ settingsStore.temperature }}</span>
+            </div>
+            <Slider v-model="temperatureArray" :min="0" :max="2" :step="0.1" />
+          </div>
 
-      <div class="space-y-3">
-        <div class="flex justify-between text-sm">
-          <span>Max Tokens</span>
-          <span class="text-slate-500">{{ settingsStore.maxTokens }}</span>
-        </div>
-        <Slider v-model="maxTokensArray" :min="256" :max="4096" :step="256" />
-      </div>
-    </div>
+          <div class="space-y-3">
+            <div class="flex justify-between text-sm">
+              <span>Top P</span>
+              <span class="text-slate-500 font-mono font-semibold">{{ settingsStore.topP }}</span>
+            </div>
+            <Slider v-model="topPArray" :min="0" :max="1" :step="0.05" />
+          </div>
 
-    <!-- Advanced Parameters -->
-    <div class="space-y-6 pt-2 border-t border-slate-200 dark:border-slate-800 pb-8">
-      <h3 class="text-xs uppercase font-bold text-slate-500 tracking-wider">Avancé</h3>
-      <div v-if="modelStore.currentModel?.backend === 'transformers'" class="space-y-3">
-        <div class="flex justify-between text-sm">
-          <span>Top K</span>
-          <span class="text-slate-500">{{ settingsStore.topK }}</span>
+          <div class="space-y-3">
+            <div class="flex justify-between text-sm">
+              <span>Max Tokens</span>
+              <span class="text-slate-500 font-mono font-semibold">{{ settingsStore.maxTokens }}</span>
+            </div>
+            <Slider v-model="maxTokensArray" :min="256" :max="4096" :step="256" />
+          </div>
         </div>
-        <Slider v-model="topKArray" :min="0" :max="100" :step="1" />
-      </div>
 
-      <div v-if="modelStore.currentModel?.backend === 'mlc'" class="space-y-3">
-        <div class="flex justify-between text-sm">
-          <span>Frequency Penalty</span>
-          <span class="text-slate-500">{{ settingsStore.frequencyPenalty }}</span>
+        <!-- Advanced Parameters -->
+        <div class="space-y-6 pt-4 border-t border-slate-200 dark:border-slate-800 pb-8">
+          <h3 class="text-xs uppercase font-bold text-slate-500 tracking-wider">Ajustements fins</h3>
+          <div class="space-y-3">
+            <div class="flex justify-between text-sm">
+              <span>Top K</span>
+              <span class="text-slate-500 font-mono font-semibold">{{ settingsStore.topK }}</span>
+            </div>
+            <Slider v-model="topKArray" :min="0" :max="100" :step="1" />
+          </div>
         </div>
-        <Slider v-model="frequencyPenaltyArray" :min="0" :max="2" :step="0.1" />
-      </div>
-
-      <div v-if="modelStore.currentModel?.backend === 'mlc'" class="space-y-3">
-        <div class="flex justify-between text-sm">
-          <span>Presence Penalty</span>
-          <span class="text-slate-500">{{ settingsStore.presencePenalty }}</span>
-        </div>
-        <Slider v-model="presencePenaltyArray" :min="0" :max="2" :step="0.1" />
-      </div>
-    </div>
+      </CollapsibleContent>
+    </Collapsible>
 
 
   </div>
@@ -103,7 +101,10 @@ import { Button } from '~/components/ui/button'
 import { Progress } from '~/components/ui/progress'
 import { Slider } from '~/components/ui/slider'
 import { Textarea } from '~/components/ui/textarea'
-import { X } from 'lucide-vue-next'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '~/components/ui/collapsible'
+import { X, ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-vue-next'
+
+const isAdvancedOpen = ref(false)
 
 const props = defineProps<{
   isMobile?: boolean
@@ -133,14 +134,6 @@ const maxTokensArray = computed({
 const topKArray = computed({
   get: () => [settingsStore.topK],
   set: (val) => { settingsStore.topK = val[0] }
-})
-const frequencyPenaltyArray = computed({
-  get: () => [settingsStore.frequencyPenalty],
-  set: (val) => { settingsStore.frequencyPenalty = val[0] }
-})
-const presencePenaltyArray = computed({
-  get: () => [settingsStore.presencePenalty],
-  set: (val) => { settingsStore.presencePenalty = val[0] }
 })
 
 </script>
