@@ -11,12 +11,11 @@
     "postinstall": "nuxt prepare",
     "test:e2e": "playwright test",
     "download-models": "npx tsx scripts/download-models.ts",
-    "build:wasm": "wasm-pack build --target web --out-dir ../public/wasm-logic ./src-rust"
+    "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.2.0",
     "@lucide/vue": "^1.23.0",
-    "@pinia/nuxt": "^0.9.0",
     "@vueuse/core": "^14.3.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -24,7 +23,6 @@
     "marked": "^15.0.6",
     "marked-katex-extension": "^5.1.2",
     "mermaid": "^11.4.1",
-    "pinia": "^2.3.0",
     "radix-vue": "^1.9.17",
     "reka-ui": "^2.10.1",
     "tailwind-merge": "^3.6.0",
@@ -42,7 +40,6 @@
     "tailwindcss-animate": "^1.0.7",
     "terser": "^5.48.0",
     "typescript": "^5.7.3",
-    "vue-tsc": "^3.3.7",
-    "wasm-pack": "^0.15.0"
+    "vue-tsc": "^3.3.7"
   }
 }
