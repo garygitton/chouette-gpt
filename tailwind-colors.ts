@@ -1,6 +1,5 @@
 import defaultColors from 'tailwindcss/colors.js'
 
-// Clean up deprecated colors to avoid warnings in client
 const colors = { ...defaultColors }
 delete (colors as any).lightBlue
 delete (colors as any).warmGray
