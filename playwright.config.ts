@@ -10,25 +10,15 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: 0,
   workers: 1,
-  reporter: [['list']],
+  outputDir: 'data/test-results',
+  reporter: [['list'], ['html', { outputFolder: 'data/playwright-report' }]],
   use: {
-    baseURL: 'http://127.0.0.1:3000/',
+    baseURL: 'http://localhost:3000/',
     viewport: { width: 1280, height: 800 },
     headless: true,
     locale: 'fr-FR',
     actionTimeout: 300000,
     navigationTimeout: 300000,
     screenshot: 'only-on-failure',
-    launchOptions: {
-      args: [
-        '--host-resolver-rules=MAP chouette-gpt.localhost 127.0.0.1'
-      ]
-    }
-  },
-  webServer: {
-    command: 'npm run build && PORT=3000 npm run preview',
-    url: 'http://127.0.0.1:3000/',
-    timeout: 300 * 1000,
-    reuseExistingServer: !process.env.CI,
   }
 });
