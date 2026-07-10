@@ -1,0 +1,60 @@
+import { DeviceScore } from '~/domain/device/DeviceScore'
+import { BrowserType } from '~/domain/device/BrowserType'
+import { OperatingSystem } from '~/domain/device/OperatingSystem'
+import { MessageRole } from '~/domain/chat/MessageRole'
+import { ModelStatus } from '~/domain/model/ModelStatus'
+
+export interface Message {
+  id: string
+  role: MessageRole
+  content: string
+  timestamp: number
+  tokens?: number
+}
+
+export interface Conversation {
+  id: string
+  title: string
+  messages: Message[]
+  createdAt: number
+  updatedAt: number
+  modelId: string
+}
+
+export interface ModelInfo {
+  id: string
+  name: string
+  version: string
+  parameters: string
+  downloadedSize?: string
+  totalSize: string
+  quantization: string
+  estimatedMemory: string
+  installedAt?: number
+  lastUsedAt?: number
+  usageCount: number
+  status: ModelStatus
+  downloadProgress?: number
+  speed?: string
+  quality?: string
+  ramRequired: number // MB
+}
+
+export interface DeviceInfo {
+  cpuCores: number
+  ramGB: number
+  hasWebGPU: boolean
+  hasWasmSIMD: boolean
+  hasThreads: boolean
+  hasSharedArrayBuffer: boolean
+  hasOPFS: boolean
+  hasIndexedDB: boolean
+  hasServiceWorker: boolean
+  hasPWA: boolean
+  storageAvailableGB: number
+  browser: BrowserType
+  os: OperatingSystem
+  language: string
+  score: DeviceScore
+  numericScore: number
+}
