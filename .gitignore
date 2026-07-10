@@ -28,3 +28,10 @@ logs
 src-rust/target/
 target/
 
+# Local ML Models & WASM (Do not commit large binaries)
+public/models/
+public/wasm/
+
+# Playwright artifacts
+playwright-report/
+test-results/
