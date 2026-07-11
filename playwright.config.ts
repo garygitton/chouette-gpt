@@ -15,14 +15,14 @@ export default defineConfig({
   use: {
     baseURL: process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}/`,
     viewport: { width: 1280, height: 800 },
-    headless: true,
+    headless: false,
     locale: 'fr-FR',
     actionTimeout: 300000,
     navigationTimeout: 300000,
     screenshot: 'only-on-failure',
   },
   webServer: {
-    command: `npm run dev --port ${process.env.PORT || 3000}`,
+    command: process.env.PORT ? `PORT=${process.env.PORT} npm run dev` : 'npm run dev',
     url: process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}/`,
     timeout: 120000,
     reuseExistingServer: !process.env.CI,
