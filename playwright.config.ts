@@ -13,7 +13,7 @@ export default defineConfig({
   outputDir: 'data/test-results',
   reporter: [['list'], ['html', { outputFolder: 'data/playwright-report' }]],
   use: {
-    baseURL: 'http://localhost:3000/',
+    baseURL: process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}/`,
     viewport: { width: 1280, height: 800 },
     headless: true,
     locale: 'fr-FR',
@@ -22,8 +22,8 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000/',
+    command: `npm run dev --port ${process.env.PORT || 3000}`,
+    url: process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}/`,
     timeout: 120000,
     reuseExistingServer: !process.env.CI,
   }
