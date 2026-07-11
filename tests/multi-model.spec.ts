@@ -21,7 +21,7 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
          if (parts.length >= 6) {
            const repoId = parts[1] + '/' + parts[2];
            const fileParts = parts.slice(5);
-           const localPath = path.join(process.cwd(), 'public', 'models', repoId, ...fileParts);
+           const localPath = path.join(process.cwd(), 'data', 'models', repoId, ...fileParts);
            if (fs.existsSync(localPath)) {
               return await route.fulfill({ path: localPath });
            }

@@ -21,7 +21,7 @@ for model in models:
     print(f"Downloading {model}...")
     snapshot_download(
         repo_id=model,
-        local_dir=os.path.join("public", "models", model),
+        local_dir=os.path.join("data", "models", model),
         allow_patterns=["*.json", "*.txt", "*.onnx", "*.wasm", "*.bin", "*.gguf"],
         max_workers=4
     )
