@@ -6,25 +6,25 @@ import type { DeviceContext } from './deviceContext'
 export function useProvideModel(deviceContext: DeviceContext) {
   const models = ref<ModelInfo[]>([
     {
-      id: 'Xenova/Qwen1.5-0.5B-Chat',
-      name: 'Qwen1.5-0.5B-Chat',
-      version: '1.5',
-      parameters: '0.5B',
-      totalSize: '482 MB',
+      id: 'HuggingFaceTB/SmolLM2-135M-Instruct',
+      name: 'SmolLM2-135M-Instruct',
+      version: '2.0',
+      parameters: '135M',
+      totalSize: '150 MB',
       quantization: 'q4',
-      estimatedMemory: '600 MB',
+      estimatedMemory: '250 MB',
       usageCount: 0,
       status: ModelStatus.Available,
-      ramRequired: 2048
+      ramRequired: 1024
     },
     {
-      id: 'Xenova/TinyLlama-1.1B-Chat-v1.0',
-      name: 'TinyLlama-1.1B-Chat',
-      version: '1.0',
-      parameters: '1.1B',
-      totalSize: '650 MB',
+      id: 'onnx-community/Qwen2.5-0.5B-Instruct',
+      name: 'Qwen2.5-0.5B-Instruct',
+      version: '2.5',
+      parameters: '0.5B',
+      totalSize: '350 MB',
       quantization: 'q4',
-      estimatedMemory: '1 GB',
+      estimatedMemory: '600 MB',
       usageCount: 0,
       status: ModelStatus.Available,
       ramRequired: 2048
@@ -42,33 +42,45 @@ export function useProvideModel(deviceContext: DeviceContext) {
       ramRequired: 3072
     },
     {
-      id: 'HuggingFaceTB/SmolLM-135M-Instruct',
-      name: 'SmolLM-135M-Instruct',
-      version: '1.0',
-      parameters: '135M',
-      totalSize: '150 MB',
+      id: 'onnx-community/Qwen2.5-1.5B-Instruct',
+      name: 'Qwen2.5-1.5B-Instruct',
+      version: '2.5',
+      parameters: '1.5B',
+      totalSize: '1 GB',
       quantization: 'q4',
-      estimatedMemory: '250 MB',
+      estimatedMemory: '2 GB',
       usageCount: 0,
       status: ModelStatus.Available,
-      ramRequired: 1024
+      ramRequired: 4096
     },
     {
-      id: 'Xenova/Phi-3-mini-4k-instruct',
-      name: 'Phi-3-mini-4k-instruct',
-      version: '3.0',
-      parameters: '3.8B',
-      totalSize: '2.2 GB',
+      id: 'onnx-community/Llama-3.2-3B-Instruct',
+      name: 'Llama-3.2-3B-Instruct',
+      version: '3.2',
+      parameters: '3B',
+      totalSize: '1.8 GB',
       quantization: 'q4',
       estimatedMemory: '3 GB',
       usageCount: 0,
       status: ModelStatus.Available,
-      ramRequired: 4096
+      ramRequired: 8192
+    },
+    {
+      id: 'onnx-community/Phi-3.5-mini-instruct',
+      name: 'Phi-3.5-mini-instruct',
+      version: '3.5',
+      parameters: '3.8B',
+      totalSize: '2.2 GB',
+      quantization: 'q4',
+      estimatedMemory: '4 GB',
+      usageCount: 0,
+      status: ModelStatus.Available,
+      ramRequired: 8192
     }
   ])
 
 
-  const currentModelId = ref<string>('Xenova/Qwen1.5-0.5B-Chat')
+  const currentModelId = ref<string>('onnx-community/Qwen2.5-0.5B-Instruct')
   const isDownloading = ref(false)
   const deviceMemory = computed(() => deviceContext.deviceInfo ? deviceContext.deviceInfo.ramGB * 1024 : null)
 

@@ -7,11 +7,12 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
   test.setTimeout(600000);
 
   const models = [
-    'Qwen1.5-0.5B-Chat',
-    'TinyLlama-1.1B-Chat',
+    'SmolLM2-135M-Instruct',
+    'Qwen2.5-0.5B-Instruct',
     'Llama-3.2-1B-Instruct',
-    'SmolLM-135M-Instruct',
-    'Phi-3-mini-4k-instruct'
+    'Qwen2.5-1.5B-Instruct',
+    'Llama-3.2-3B-Instruct',
+    'Phi-3.5-mini-instruct'
   ];
 
   for (const modelName of models) {

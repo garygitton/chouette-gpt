@@ -7,11 +7,12 @@ import { promisify } from 'util';
 const streamPipeline = promisify(pipeline);
 
 const models = [
-  'HuggingFaceTB/SmolLM-135M-Instruct',
-  'Xenova/Qwen1.5-0.5B-Chat',
-  'Xenova/TinyLlama-1.1B-Chat-v1.0',
+  'HuggingFaceTB/SmolLM2-135M-Instruct',
+  'onnx-community/Qwen2.5-0.5B-Instruct',
   'onnx-community/Llama-3.2-1B-Instruct',
-  'Xenova/Phi-3-mini-4k-instruct'
+  'onnx-community/Qwen2.5-1.5B-Instruct',
+  'onnx-community/Llama-3.2-3B-Instruct',
+  'onnx-community/Phi-3.5-mini-instruct'
 ];
 
 async function downloadModel(modelId) {

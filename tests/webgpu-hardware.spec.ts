@@ -43,8 +43,8 @@ test.describe('ChouetteGPT - Real WebGPU hardware acceleration', () => {
     // Click to open dropdown
     await combobox.click();
     
-    // Select SmolLM
-    const smolOption = page.getByRole('option', { name: /SmolLM/i });
+    // Select SmolLM2
+    const smolOption = page.getByRole('option', { name: /SmolLM2/i });
     await smolOption.click();
 
     // 4. Wait for the engine to finish downloading and loading into VRAM
