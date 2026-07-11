@@ -10,7 +10,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "test:e2e": "playwright test",
-    "download-models": "npx tsx scripts/download-models.ts",
+    "download-models": "python3 scripts/download_models.py",
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {

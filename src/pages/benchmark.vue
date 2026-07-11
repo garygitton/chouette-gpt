@@ -162,7 +162,7 @@ async function runFullBenchmark() {
   try {
     // 1. Run WebGPU Test
     activeTest.value = 'webgpu'
-    const gpuRes = await chatStore.runBenchmark(selectedModel.value, 'webgpu')
+    const gpuRes = await chatStore.runBenchmark(selectedModel.value, 'webgpu', () => {})
     results.webgpu.warmupMs = gpuRes.warmupMs
     results.webgpu.tokensPerSec = gpuRes.tokensPerSec
     results.webgpu.text = gpuRes.text
@@ -174,7 +174,7 @@ async function runFullBenchmark() {
     
     // 3. Run WASM Test
     activeTest.value = 'wasm'
-    const wasmRes = await chatStore.runBenchmark(selectedModel.value, 'wasm')
+    const wasmRes = await chatStore.runBenchmark(selectedModel.value, 'wasm', () => {})
     results.wasm.warmupMs = wasmRes.warmupMs
     results.wasm.tokensPerSec = wasmRes.tokensPerSec
     results.wasm.text = wasmRes.text

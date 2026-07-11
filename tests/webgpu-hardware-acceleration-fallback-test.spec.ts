@@ -12,6 +12,23 @@ test.describe('ChouetteGPT - Real WebGPU hardware acceleration', () => {
       } catch (e) {}
     });
 
+    // Intercepter les requêtes HuggingFace pour servir les modèles locaux
+    await page.route('https://huggingface.co/**/*', async (route) => {
+       const url = new URL(route.request().url());
+       const parts = url.pathname.split('/');
+       if (parts.length >= 6) {
+         const repoId = parts[1] + '/' + parts[2];
+         const fileParts = parts.slice(5);
+         const fs = require('fs');
+         const path = require('path');
+         const localPath = path.join(process.cwd(), 'public', 'models', repoId, ...fileParts);
+         if (fs.existsSync(localPath)) {
+            return await route.fulfill({ path: localPath });
+         }
+       }
+       await route.continue();
+    });
+
     // 1. Load the app in real mode (no mock bypass)
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     

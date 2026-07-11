@@ -27,6 +27,7 @@ export default defineNuxtConfig({
   },
   imports: { autoImport: false },
   ssr: false,
+  // @ts-ignore
   nitro: {
     preset: 'github-pages',
     output: {

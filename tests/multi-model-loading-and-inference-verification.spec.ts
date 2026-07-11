@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import * as fs from 'fs';
+import * as path from 'path';
 
 test.describe('Vérification du fonctionnement des 3 modèles', () => {
   // Give a very generous timeout to allow downloading all models (10 minutes)
@@ -12,6 +14,21 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
 
   for (const modelName of models) {
     test(`Tester le modèle ${modelName}`, async ({ page }) => {
+      // Intercepter les requêtes HuggingFace pour servir les modèles locaux en cache
+      await page.route('https://huggingface.co/**/*', async (route) => {
+         const url = new URL(route.request().url());
+         const parts = url.pathname.split('/');
+         if (parts.length >= 6) {
+           const repoId = parts[1] + '/' + parts[2];
+           const fileParts = parts.slice(5);
+           const localPath = path.join(process.cwd(), 'public', 'models', repoId, ...fileParts);
+           if (fs.existsSync(localPath)) {
+              return await route.fulfill({ path: localPath });
+           }
+         }
+         await route.continue();
+      });
+
       // 1. Ouvrir l'application
       await page.goto('/', { waitUntil: 'domcontentloaded' });
       

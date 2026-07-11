@@ -108,6 +108,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useDevice } from '~/contexts/deviceContext'
+import { DeviceScore } from '~/domain/device/DeviceScore'
 import FeatureCheck from '~/components/FeatureCheck.vue'
 import { useI18n } from '~/composables/useI18n'
 import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card'
@@ -120,11 +121,11 @@ const { t } = useI18n()
 const scoreColor = computed(() => {
   const score = deviceStore.deviceInfo?.score
   switch(score) {
-    case 'Excellent': return 'text-emerald-500'
-    case 'Bon': return 'text-green-500'
-    case 'Moyen': return 'text-amber-500'
-    case 'Faible': return 'text-orange-500'
-    case 'Très faible': return 'text-red-500'
+    case DeviceScore.Excellent: return 'text-emerald-500'
+    case DeviceScore.Good: return 'text-green-500'
+    case DeviceScore.Fair: return 'text-amber-500'
+    case DeviceScore.Poor: return 'text-orange-500'
+    case DeviceScore.VeryPoor: return 'text-red-500'
     default: return 'text-slate-500'
   }
 })
