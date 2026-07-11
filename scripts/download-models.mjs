@@ -10,7 +10,8 @@ const models = [
   'HuggingFaceTB/SmolLM-135M-Instruct',
   'Xenova/Qwen1.5-0.5B-Chat',
   'Xenova/TinyLlama-1.1B-Chat-v1.0',
-  'onnx-community/Llama-3.2-1B-Instruct'
+  'onnx-community/Llama-3.2-1B-Instruct',
+  'Xenova/Phi-3-mini-4k-instruct'
 ];
 
 async function downloadModel(modelId) {

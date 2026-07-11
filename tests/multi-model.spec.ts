@@ -9,7 +9,9 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
   const models = [
     'Qwen1.5-0.5B-Chat',
     'TinyLlama-1.1B-Chat',
-    'Llama-3.2-1B-Instruct'
+    'Llama-3.2-1B-Instruct',
+    'SmolLM-135M-Instruct',
+    'Phi-3-mini-4k-instruct'
   ];
 
   for (const modelName of models) {
