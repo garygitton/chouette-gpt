@@ -31,7 +31,6 @@ target/
 # Local ML Models & WASM (Do not commit large binaries)
 data/models/*
 !data/models/.gitkeep
-public/wasm/
 
 # Playwright artifacts
 playwright-report/

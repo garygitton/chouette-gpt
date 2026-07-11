@@ -7,7 +7,6 @@ env.allowRemoteModels = false;
 env.localModelPath = '/models/';
 env.useBrowserCache = true;
 if (env.backends.onnx.wasm) {
-  env.backends.onnx.wasm.wasmPaths = '/wasm/';
   // Optimize WASM multi-threading ONLY if supported
   if (typeof navigator !== 'undefined' && navigator.hardwareConcurrency && typeof crossOriginIsolated !== 'undefined' && crossOriginIsolated) {
     env.backends.onnx.wasm.numThreads = Math.min(navigator.hardwareConcurrency || 4, 4);

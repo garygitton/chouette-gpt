@@ -40,8 +40,7 @@ export default defineNuxtConfig({
           'Cross-Origin-Embedder-Policy': 'require-corp'
         }
       },
-      '/models/**': { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
-      '/wasm/**': { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } }
+      '/models/**': { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } }
     }
   },
   devtools: { enabled: false },
