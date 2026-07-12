@@ -16,9 +16,9 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
   ];
 
   for (const modelName of models) {
-    test(`Tester le modèle ${modelName}`, async ({ page }) => {
+    test(`Tester le modèle ${modelName}`, async ({ page, context }) => {
       // Intercepter les requêtes HuggingFace pour servir les modèles locaux en cache
-      await page.route('https://huggingface.co/**/*', async (route) => {
+      await context.route('https://huggingface.co/**/*', async (route) => {
          const url = new URL(route.request().url());
          const parts = url.pathname.split('/');
          if (parts.length >= 6) {

@@ -4,7 +4,7 @@ test.describe('ChouetteGPT - Real WebGPU hardware acceleration', () => {
   // Downloading a 150MB model locally might take 30-120 seconds depending on bandwidth
   test.setTimeout(300000); 
 
-  test('Should load SmolLM in WebGPU and generate response', async ({ page }) => {
+  test('Should load SmolLM in WebGPU and generate response', async ({ page, context }) => {
     // 0. Bypass onboarding modal
     await page.addInitScript(() => {
       try {
@@ -13,7 +13,7 @@ test.describe('ChouetteGPT - Real WebGPU hardware acceleration', () => {
     });
 
     // Intercepter les requêtes HuggingFace pour servir les modèles locaux
-    await page.route('https://huggingface.co/**/*', async (route) => {
+    await context.route('https://huggingface.co/**/*', async (route) => {
        const url = new URL(route.request().url());
        const parts = url.pathname.split('/');
        if (parts.length >= 6) {
