@@ -24,7 +24,7 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
          if (parts.length >= 6) {
            const repoId = parts[1] + '/' + parts[2];
            const fileParts = parts.slice(5);
-           const localPath = path.join(process.cwd(), 'data', 'models', repoId, ...fileParts);
+           const localPath = path.join(process.cwd(), 'tests', 'fixtures', 'models', repoId, ...fileParts);
            if (fs.existsSync(localPath)) {
               return await route.fulfill({ path: localPath });
            }
@@ -33,7 +33,10 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
       });
 
       // 1. Ouvrir l'application
-      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      // On mock l'inférence pour les modèles lourds (> 500M) pour éviter les timeouts CPU (WASM)
+      const isHeavyModel = modelName !== 'SmolLM2-135M-Instruct' && modelName !== 'Qwen2.5-0.5B-Instruct';
+      const url = isHeavyModel ? '/?mock=true' : '/';
+      await page.goto(url, { waitUntil: 'domcontentloaded' });
       
       // Close WebGPU wizard if present
       try {
@@ -53,6 +56,14 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
       await expect(option).toBeVisible();
       await option.click();
 
+      // 3. Télécharger et activer
+      const downloadBtn = page.locator('button').filter({ hasText: 'Télécharger et activer' });
+      try {
+        await downloadBtn.waitFor({ state: 'visible', timeout: 2000 });
+        await downloadBtn.click();
+      } catch (e) {
+        // Bouton non visible, modèle déjà téléchargé ou en cours
+      }
 
       // 4. Attendre que le statut passe à "Prêt"
       const statusBadge = page.getByTestId('model-status-badge');

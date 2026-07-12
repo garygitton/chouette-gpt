@@ -21,7 +21,7 @@ test.describe('ChouetteGPT - Real WebGPU hardware acceleration', () => {
          const fileParts = parts.slice(5);
          const fs = require('fs');
          const path = require('path');
-         const localPath = path.join(process.cwd(), 'data', 'models', repoId, ...fileParts);
+         const localPath = path.join(process.cwd(), 'tests', 'fixtures', 'models', repoId, ...fileParts);
          if (fs.existsSync(localPath)) {
             return await route.fulfill({ path: localPath });
          }

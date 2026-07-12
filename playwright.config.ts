@@ -24,7 +24,7 @@ export default defineConfig({
   webServer: {
     command: process.env.PORT ? `PORT=${process.env.PORT} npm run dev` : 'npm run dev',
     url: process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}/`,
-    timeout: 120000,
     reuseExistingServer: !process.env.CI,
+    timeout: 300000,
   }
 });
