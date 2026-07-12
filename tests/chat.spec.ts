@@ -239,7 +239,7 @@ test.describe('ChouetteGPT - E2E BDD Conversations and Behavior', () => {
     const licenseBadge = page.getByTestId('project-license-badge');
 
     await expect(linkedinLink).toBeVisible();
-    await expect(linkedinLink).toHaveAttribute('href', 'https://www.linkedin.com/in/gary-gitton/');
+    await expect(linkedinLink).toHaveAttribute('href', 'https://www.linkedin.com/in/garygitton');
     await expect(githubLink).toBeVisible();
     await expect(githubLink).toHaveAttribute('href', 'https://github.com/garygitton/chouette-gpt');
     await expect(licenseBadge).toBeVisible();

@@ -30,7 +30,7 @@
                   <p class="text-sm font-bold text-slate-900 dark:text-white">Gary Gitton</p>
                   <p class="text-xs text-slate-500 dark:text-slate-400">Consultant en Intelligence Artificielle & Cloud</p>
                 </div>
-                <a href="https://www.linkedin.com/in/gary-gitton/" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-8 h-8 rounded-lg bg-[#0077b5]/10 text-[#0077b5] hover:bg-[#0077b5]/20 transition-all duration-200" title="LinkedIn" data-testid="author-linkedin-link">
+                <a href="https://www.linkedin.com/in/garygitton" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-8 h-8 rounded-lg bg-[#0077b5]/10 text-[#0077b5] hover:bg-[#0077b5]/20 transition-all duration-200" title="LinkedIn" data-testid="author-linkedin-link">
                   <Linkedin class="w-4 h-4" />
                 </a>
               </div>

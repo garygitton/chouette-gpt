@@ -115,7 +115,7 @@
       <div class="flex flex-col justify-center pt-3 mt-2">
         <Separator class="bg-slate-200/60 dark:bg-slate-800/40 mb-3" />
         <div class="flex justify-center space-x-5">
-          <a href="https://www.linkedin.com/in/gary-gitton/" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-indigo-500 transition-colors" title="LinkedIn" data-testid="sidebar-linkedin-link">
+          <a href="https://www.linkedin.com/in/garygitton" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-indigo-500 transition-colors" title="LinkedIn" data-testid="sidebar-linkedin-link">
             <Linkedin class="w-4 h-4" />
           </a>
           <a href="https://github.com/garygitton/chouette-gpt" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-indigo-500 transition-colors" title="GitHub" data-testid="sidebar-github-link">
