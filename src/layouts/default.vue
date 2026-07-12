@@ -16,7 +16,7 @@
         <div class="pointer-events-auto">
         </div>
         <div class="pointer-events-auto shadow-sm">
-          <Button variant="ghost" size="icon" @click="isRightSidebarOpen = !isRightSidebarOpen" class="bg-white/50 dark:bg-[#0b0f19]/50 backdrop-blur-sm border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <Button data-testid="toggle-right-sidebar-btn" variant="ghost" size="icon" @click="isRightSidebarOpen = !isRightSidebarOpen" class="bg-white/50 dark:bg-[#0b0f19]/50 backdrop-blur-sm border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
             <Settings2 class="w-5 h-5 text-slate-600 dark:text-slate-300" />
           </Button>
         </div>
@@ -117,8 +117,10 @@ const isMobileView = ref(false)
 function checkMobile() {
   if (typeof window !== 'undefined') {
     isMobileView.value = window.innerWidth < 768
-    if (isMobileView.value) {
-      isRightSidebarOpen.value = false // Hide right sidebar by default on mobile
+    if (window.innerWidth < 1200) {
+      isRightSidebarOpen.value = false // Masquer par défaut sur mobile et petits écrans de portable
+    } else {
+      isRightSidebarOpen.value = true
     }
   }
 }

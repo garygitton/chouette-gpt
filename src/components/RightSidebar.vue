@@ -20,11 +20,30 @@
 
     <!-- System Prompt -->
     <div class="space-y-2">
-      <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Prompt Système</label>
+      <div class="flex items-center justify-between">
+        <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Prompt Système</label>
+        <Transition
+          enter-active-class="transition duration-300 ease-out"
+          enter-from-class="transform translate-y-1 opacity-0"
+          enter-to-class="transform translate-y-0 opacity-100"
+          leave-active-class="transition duration-500 ease-in"
+          leave-from-class="transform translate-y-0 opacity-100"
+          leave-to-class="transform translate-y-1 opacity-0"
+        >
+          <span v-if="showSavedFeedback" data-testid="system-prompt-saved-feedback" class="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+            <Check class="w-3.5 h-3.5" /> Enregistré
+          </span>
+        </Transition>
+      </div>
       <Textarea 
+        data-testid="system-prompt-textarea"
         v-model="settingsStore.systemPrompt" 
         placeholder="Comportement global de l'assistant..." 
-        class="h-24 resize-none text-sm"
+        class="h-24 resize-none text-sm transition-all duration-300"
+        :class="{
+          'border-emerald-500 focus-visible:ring-emerald-500 focus-visible:border-emerald-500 ring-2 ring-emerald-500/20': showSavedFeedback
+        }"
+        @blur="triggerSavedFeedback"
       />
     </div>
 
@@ -102,7 +121,18 @@ import { Progress } from '~/components/ui/progress'
 import { Slider } from '~/components/ui/slider'
 import { Textarea } from '~/components/ui/textarea'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '~/components/ui/collapsible'
-import { X, ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-vue-next'
+import { X, ChevronDown, ChevronUp, SlidersHorizontal, Check } from 'lucide-vue-next'
+
+const showSavedFeedback = ref(false)
+let feedbackTimeout: any = null
+
+function triggerSavedFeedback() {
+  showSavedFeedback.value = true
+  if (feedbackTimeout) clearTimeout(feedbackTimeout)
+  feedbackTimeout = setTimeout(() => {
+    showSavedFeedback.value = false
+  }, 2000)
+}
 
 const isAdvancedOpen = ref(false)
 
