@@ -1,10 +1,9 @@
 import { pipeline, env, TextStreamer } from '@huggingface/transformers';
 
 // Configuration for local WASM and Models
-env.allowLocalModels = true;
-// Set this to false if you want STRICT offline mode where it never checks Hugging Face Hub
-env.allowRemoteModels = false;
-env.localModelPath = '/models/';
+env.allowLocalModels = false;
+// Allow remote models from Hugging Face Hub (cached by the browser)
+env.allowRemoteModels = true;
 env.useBrowserCache = true;
 if (env.backends.onnx.wasm) {
   // Optimize WASM multi-threading ONLY if supported
@@ -39,19 +38,19 @@ self.onmessage = async (event: MessageEvent) => {
             downloadLoaded[progress.file] = downloadTotals[progress.file];
           }
         }
-        
+
         let totalBytes = 0;
         let loadedBytes = 0;
         let fileCount = 0;
         for (const file in downloadTotals) {
-           totalBytes += downloadTotals[file] || 0;
-           loadedBytes += downloadLoaded[file] || 0;
-           fileCount++;
+          totalBytes += downloadTotals[file] || 0;
+          loadedBytes += downloadLoaded[file] || 0;
+          fileCount++;
         }
-        
+
         let overallProgress = 0;
         if (totalBytes > 0) {
-           overallProgress = loadedBytes / totalBytes;
+          overallProgress = loadedBytes / totalBytes;
         }
 
         let text = 'Préparation...';
@@ -75,7 +74,7 @@ self.onmessage = async (event: MessageEvent) => {
         });
       } catch (gpuError) {
         if (forceDevice === 'webgpu') throw gpuError;
-        
+
         console.warn('[Transformers Worker] WebGPU initialization failed, falling back to WASM/CPU:', gpuError);
         generator = await pipeline('text-generation', modelId, {
           device: 'wasm',
@@ -88,7 +87,7 @@ self.onmessage = async (event: MessageEvent) => {
     } catch (e: any) {
       console.error('[Transformers Worker] Init error:', e);
       let errorMsg = e.message || String(e);
-      
+
       // If we got a JSON parse error, it's highly likely a 502/404 HTML error page was cached.
       // We must clear the browser's Cache API to allow recovery on the next attempt.
       if (e instanceof SyntaxError || errorMsg.includes('JSON') || errorMsg.includes('Unexpected token')) {
@@ -105,7 +104,7 @@ self.onmessage = async (event: MessageEvent) => {
           console.error('[Transformers Worker] Failed to clear cache', cacheErr);
         }
       }
-      
+
       self.postMessage({ type: 'init_error', payload: errorMsg });
     }
   }
@@ -116,9 +115,9 @@ self.onmessage = async (event: MessageEvent) => {
       self.postMessage({ type: 'generate_error', payload: 'Generator not initialized', generationId });
       return;
     }
-    
+
     currentGenerationId = generationId;
-    
+
     try {
       // Build streamer
       const streamer = new TextStreamer(generator.tokenizer, {
@@ -141,7 +140,7 @@ self.onmessage = async (event: MessageEvent) => {
         do_sample: doSample,
         streamer
       });
-      
+
       self.postMessage({ type: 'generate_done', generationId });
     } catch (e: any) {
       self.postMessage({ type: 'generate_error', payload: e.message, generationId });
@@ -149,7 +148,7 @@ self.onmessage = async (event: MessageEvent) => {
   }
 
   if (type === 'interrupt') {
-     currentGenerationId = -1; // stop streamer logic
-     self.postMessage({ type: 'interrupt_done' });
+    currentGenerationId = -1; // stop streamer logic
+    self.postMessage({ type: 'interrupt_done' });
   }
 }

@@ -38,6 +38,7 @@ export interface ModelInfo {
   speed?: string
   quality?: string
   ramRequired: number // MB
+  performanceScore?: number // 0-100 score for scatter plot
 }
 
 export interface DeviceInfo {

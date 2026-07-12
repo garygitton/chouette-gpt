@@ -6,7 +6,7 @@ import type { DeviceContext } from './deviceContext'
 export function useProvideModel(deviceContext: DeviceContext) {
   const models = ref<ModelInfo[]>([
     {
-      id: 'HuggingFaceTB/SmolLM2-135M-Instruct',
+      id: 'onnx-community/SmolLM2-135M-Instruct-ONNX-MHA',
       name: 'SmolLM2-135M-Instruct',
       version: '2.0',
       parameters: '135M',
@@ -15,11 +15,13 @@ export function useProvideModel(deviceContext: DeviceContext) {
       estimatedMemory: '250 MB',
       usageCount: 0,
       status: ModelStatus.Available,
-      ramRequired: 1024
+      ramRequired: 1024,
+      performanceScore: 30
     },
     {
       id: 'onnx-community/Qwen2.5-0.5B-Instruct',
       name: 'Qwen2.5-0.5B-Instruct',
+      
       version: '2.5',
       parameters: '0.5B',
       totalSize: '350 MB',
@@ -27,10 +29,11 @@ export function useProvideModel(deviceContext: DeviceContext) {
       estimatedMemory: '600 MB',
       usageCount: 0,
       status: ModelStatus.Available,
-      ramRequired: 2048
+      ramRequired: 2048,
+      performanceScore: 45
     },
     {
-      id: 'onnx-community/Llama-3.2-1B-Instruct',
+      id: 'onnx-community/Llama-3.2-1B-Instruct-ONNX',
       name: 'Llama-3.2-1B-Instruct',
       version: '3.2',
       parameters: '1B',
@@ -39,7 +42,8 @@ export function useProvideModel(deviceContext: DeviceContext) {
       estimatedMemory: '1.5 GB',
       usageCount: 0,
       status: ModelStatus.Available,
-      ramRequired: 3072
+      ramRequired: 3072,
+      performanceScore: 55
     },
     {
       id: 'onnx-community/Qwen2.5-1.5B-Instruct',
@@ -51,10 +55,11 @@ export function useProvideModel(deviceContext: DeviceContext) {
       estimatedMemory: '2 GB',
       usageCount: 0,
       status: ModelStatus.Available,
-      ramRequired: 4096
+      ramRequired: 4096,
+      performanceScore: 60
     },
     {
-      id: 'onnx-community/Llama-3.2-3B-Instruct',
+      id: 'onnx-community/Llama-3.2-3B-Instruct-ONNX',
       name: 'Llama-3.2-3B-Instruct',
       version: '3.2',
       parameters: '3B',
@@ -63,10 +68,11 @@ export function useProvideModel(deviceContext: DeviceContext) {
       estimatedMemory: '3 GB',
       usageCount: 0,
       status: ModelStatus.Available,
-      ramRequired: 8192
+      ramRequired: 8192,
+      performanceScore: 70
     },
     {
-      id: 'onnx-community/Phi-3.5-mini-instruct',
+      id: 'onnx-community/Phi-3.5-mini-instruct-onnx-web',
       name: 'Phi-3.5-mini-instruct',
       version: '3.5',
       parameters: '3.8B',
@@ -75,12 +81,13 @@ export function useProvideModel(deviceContext: DeviceContext) {
       estimatedMemory: '4 GB',
       usageCount: 0,
       status: ModelStatus.Available,
-      ramRequired: 8192
+      ramRequired: 8192,
+      performanceScore: 75
     }
   ])
 
 
-  const currentModelId = ref<string>('onnx-community/Qwen2.5-0.5B-Instruct')
+  const currentModelId = ref<string>('onnx-community/SmolLM2-135M-Instruct-ONNX-MHA')
   const isDownloading = ref(false)
   const deviceMemory = computed(() => deviceContext.deviceInfo ? deviceContext.deviceInfo.ramGB * 1024 : null)
 
