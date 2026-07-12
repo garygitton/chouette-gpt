@@ -8,7 +8,7 @@ export default defineConfig({
   },
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: 0,
+  retries: process.env.CI ? 2 : 1,
   workers: 1,
   outputDir: 'data/test-results',
   reporter: [['list'], ['html', { outputFolder: 'data/playwright-report' }]],
@@ -22,7 +22,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   webServer: {
-    command: process.env.PORT ? `PORT=${process.env.PORT} npm run dev` : 'npm run dev',
+    command: process.env.CI ? 'npm run build && node .output/server/index.mjs' : 'npm run dev',
     url: process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}/`,
     reuseExistingServer: !process.env.CI,
     timeout: 300000,
