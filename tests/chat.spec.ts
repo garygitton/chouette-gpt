@@ -233,6 +233,18 @@ test.describe('ChouetteGPT - E2E BDD Conversations and Behavior', () => {
     const deviceCard = page.getByText('Capacités de l\'appareil');
     await expect(deviceCard).toBeVisible();
 
+    // Verify static author and project links/badge are present
+    const linkedinLink = page.getByTestId('author-linkedin-link');
+    const githubLink = page.getByTestId('project-github-link');
+    const licenseBadge = page.getByTestId('project-license-badge');
+
+    await expect(linkedinLink).toBeVisible();
+    await expect(linkedinLink).toHaveAttribute('href', 'https://www.linkedin.com/in/gary-gitton/');
+    await expect(githubLink).toBeVisible();
+    await expect(githubLink).toHaveAttribute('href', 'https://github.com/garygitton/chouette-gpt');
+    await expect(licenseBadge).toBeVisible();
+    await expect(licenseBadge).toContainText('Apache 2.0');
+
     // Click back button to go to home page
     const backBtn = page.getByTestId('back-button');
     await expect(backBtn).toBeVisible();
