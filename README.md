@@ -1,3 +1,8 @@
+[English](#english) | [Français](#français)
+
+---
+
+<a id="english"></a>
 # ChouetteGPT
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -29,3 +34,40 @@ ChouetteGPT is an open-source project. If you are a company using this tool or a
 
 ## License
 This project is licensed under the **Apache License 2.0** - see the [LICENSE](LICENSE) file for details.
+
+<br>
+
+---
+
+<a id="français"></a>
+# ChouetteGPT
+
+[![License](https://img.shields.io/badge/Licence-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink.svg)](./SPONSORS.md)
+
+Une interface locale de génération de texte par IA avec support CPU/GPU (WebGPU/WebAssembly). Statut expérimental - à utiliser à vos propres risques.
+
+## Fonctionnalités
+- Modèles IA multiples (CPU/GPU)
+- Exécution locale (aucune donnée ne quitte votre appareil)
+- Accélération WebGPU pour les modèles MLC
+- Interface utilisateur intuitive avec Tailwind
+
+## Prérequis
+- Node.js 18+
+- Un navigateur supportant WebGPU (ou repli sur le CPU)
+
+## Installation
+1. `npm install`
+2. `npm run dev` pour lancer le serveur de développement
+3. Accédez à http://localhost:3000
+
+## Contribuer
+Voir CONTRIBUTING.md pour les directives.
+
+## Soutenir la Mission
+ChouetteGPT est un projet open-source. Si vous êtes une entreprise utilisant cet outil ou un développeur qui croit en notre mission de rendre l'IA privée accessible à tous, pensez à nous soutenir.
+👉 **[Voir nos Niveaux de Sponsoring](./SPONSORS.md)**
+
+## Licence
+Ce projet est sous licence **Apache License 2.0** - voir le fichier [LICENSE](LICENSE) pour plus de détails.
