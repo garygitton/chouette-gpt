@@ -8,6 +8,8 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink.svg)](./SPONSORS.md)
 
+![ChouetteGPT Demo](./public/demo.gif)
+
 A local AI text generation interface with CPU/GPU support (WebGPU/WebAssembly). Experimental status applies - use at your own risk.
 
 ## Features
@@ -44,6 +46,8 @@ This project is licensed under the **Apache License 2.0** - see the [LICENSE](LI
 
 [![License](https://img.shields.io/badge/Licence-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink.svg)](./SPONSORS.md)
+
+![ChouetteGPT Demo](./public/demo.gif)
 
 Une interface locale de génération de texte par IA avec support CPU/GPU (WebGPU/WebAssembly). Statut expérimental - à utiliser à vos propres risques.
 
