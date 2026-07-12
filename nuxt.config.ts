@@ -79,8 +79,11 @@ export default defineNuxtConfig({
       title: 'ChouetteGPT',
       meta: [
         { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { hid: 'description', name: 'description', content: 'Local AI Chat Assistant running on WebAssembly & WebGPU' }
+        { name: 'viewport', content: 'viewport-fit=cover, width=device-width, initial-scale=1' },
+        { hid: 'description', name: 'description', content: 'Local AI Chat Assistant running on WebAssembly & WebGPU' },
+        { 'http-equiv': 'Cache-Control', content: 'no-cache, no-store, must-revalidate' },
+        { 'http-equiv': 'Pragma', content: 'no-cache' },
+        { 'http-equiv': 'Expires', content: '0' }
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }

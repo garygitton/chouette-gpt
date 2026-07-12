@@ -196,33 +196,41 @@ test.describe('ChouetteGPT - E2E BDD Conversations and Behavior', () => {
 
 
 
-  test('Vérifier et modifier la langue depuis la barre latérale', async ({ page }) => {
+  test('Vérifier et modifier la langue depuis la barre latérale pour toutes les langues supportées', async ({ page }) => {
     // Open home page with mock=true
     await page.goto('/?mock=true', { waitUntil: 'domcontentloaded' });
 
-    // 1. Language Selector in the sidebar
-    const langSelectTrigger = page.getByTestId('language-select-trigger');
-    await expect(langSelectTrigger).toBeVisible();
-    await langSelectTrigger.click();
+    const supportedLanguages = [
+      { code: 'en', expectedText: 'New Chat' },
+      { code: 'es', expectedText: 'Nuevo chat' },
+      { code: 'zh', expectedText: '新建对话' },
+      { code: 'hi', expectedText: 'नया चैट' },
+      { code: 'ar', expectedText: 'محادثة جديدة' },
+      { code: 'pt', expectedText: 'Nova conversa' },
+      { code: 'ru', expectedText: 'Новый чат' },
+      { code: 'bn', expectedText: 'নতুন চ্যাট' },
+      { code: 'ur', expectedText: 'نیا چیٹ' },
+      { code: 'fr', expectedText: 'Nouveau chat' }
+    ];
 
-    // Select english language
-    const langEnItem = page.getByTestId('language-item-en');
-    await expect(langEnItem).toBeVisible();
-    await langEnItem.click();
+    for (const lang of supportedLanguages) {
+      // Click language selector trigger in the sidebar
+      const langSelectTrigger = page.getByTestId('language-select-trigger');
+      await expect(langSelectTrigger).toBeVisible({ timeout: 5000 });
+      await langSelectTrigger.click();
 
-    // Verify UI language changed to English (the New Chat button becomes "New Chat")
-    const newChatBtn = page.getByRole('button', { name: 'New Chat' }).first();
-    await expect(newChatBtn).toBeVisible();
+      // Click the language item
+      const langItem = page.getByTestId(`language-item-${lang.code}`);
+      await expect(langItem).toBeVisible({ timeout: 5000 });
+      await langItem.click();
 
-    // Restore language to french
-    await langSelectTrigger.click();
-    const langFrItem = page.getByTestId('language-item-fr');
-    await expect(langFrItem).toBeVisible();
-    await langFrItem.click();
+      // Wait briefly for the select portal to close and transitions to complete
+      await page.waitForTimeout(300);
 
-    // Verify UI language changed back to French
-    const newChatBtnFr = page.getByRole('button', { name: 'Nouveau chat' }).first();
-    await expect(newChatBtnFr).toBeVisible();
+      // Verify UI language changed (the New Chat button text matches expected translation)
+      const newChatBtn = page.getByRole('button', { name: lang.expectedText }).first();
+      await expect(newChatBtn).toBeVisible({ timeout: 5000 });
+    }
   });
 
   test('Accéder à la page des paramètres et vérifier les informations de l\'appareil', async ({ page }) => {

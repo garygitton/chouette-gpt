@@ -36,20 +36,18 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
          await route.continue();
       });
 
+      // 0. Bypass onboarding modal
+      await page.addInitScript(() => {
+        try {
+          window.localStorage.setItem('chouette-onboarding-seen', 'true');
+        } catch (e) {}
+      });
+
       // 1. Ouvrir l'application
       // On mock l'inférence pour TOUS les modèles dans ce test E2E pour éviter les crashs WebGPU/WASM
       // en mode headless. L'exécution réelle est testée dans webgpu-hardware.spec.ts
       const url = '/?mock=true';
       await page.goto(url, { waitUntil: 'domcontentloaded' });
-      
-      // Close WebGPU wizard if present
-      try {
-        const closeWizardBtn = page.getByTestId('close-wizard-btn');
-        await expect(closeWizardBtn).toBeVisible({ timeout: 2000 });
-        await closeWizardBtn.click();
-      } catch (e) {
-        // Modal didn't appear, continue
-      }
 
       // 2. Sélectionner le modèle dans la sidebar
       const modelSelectTrigger = page.getByTestId('model-select-trigger');
