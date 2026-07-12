@@ -28,6 +28,20 @@
               </SelectContent>
             </Select>
           </div>
+
+          <div class="flex-1 w-full space-y-2">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Moteur de Test</label>
+            <Select v-model="selectedEngine" :disabled="isRunning">
+              <SelectTrigger class="h-12 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
+                <SelectValue placeholder="Choisir le moteur..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="both">Les deux (Comparaison)</SelectItem>
+                <SelectItem value="webgpu">GPU uniquement (WebGPU)</SelectItem>
+                <SelectItem value="wasm">CPU uniquement (WASM)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           
           <Button 
             @click="runFullBenchmark" 
@@ -42,10 +56,10 @@
       </Card>
 
       <!-- Results Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 gap-6" :class="selectedEngine === 'both' ? 'md:grid-cols-2' : ''">
         
         <!-- GPU Card -->
-        <Card class="relative overflow-hidden rounded-3xl border transition-all duration-500" :class="activeTest === 'webgpu' ? 'border-indigo-500 shadow-xl shadow-indigo-500/20' : 'border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50'">
+        <Card v-if="selectedEngine === 'both' || selectedEngine === 'webgpu'" class="relative overflow-hidden rounded-3xl border transition-all duration-500" :class="activeTest === 'webgpu' ? 'border-indigo-500 shadow-xl shadow-indigo-500/20' : 'border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50'">
           <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none"></div>
           <div class="p-6 relative z-10 space-y-6">
             <div class="flex items-center justify-between">
@@ -74,7 +88,7 @@
         </Card>
 
         <!-- CPU Card -->
-        <Card class="relative overflow-hidden rounded-3xl border transition-all duration-500" :class="activeTest === 'wasm' ? 'border-pink-500 shadow-xl shadow-pink-500/20' : 'border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50'">
+        <Card v-if="selectedEngine === 'both' || selectedEngine === 'wasm'" class="relative overflow-hidden rounded-3xl border transition-all duration-500" :class="activeTest === 'wasm' ? 'border-pink-500 shadow-xl shadow-pink-500/20' : 'border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50'">
           <div class="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-orange-500/5 pointer-events-none"></div>
           <div class="p-6 relative z-10 space-y-6">
             <div class="flex items-center justify-between">
@@ -105,7 +119,7 @@
       </div>
       
       <!-- Analysis / Comparison -->
-      <Card v-if="results.webgpu.done && results.wasm.done" class="p-6 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50 rounded-3xl animate-in fade-in slide-in-from-bottom-4">
+      <Card v-if="selectedEngine === 'both' && results.webgpu.done && results.wasm.done" class="p-6 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50 rounded-3xl animate-in fade-in slide-in-from-bottom-4">
         <h3 class="text-lg font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-2 mb-2">
           <Zap class="w-5 h-5" /> Analyse des performances
         </h3>
@@ -130,6 +144,7 @@ import { useChat } from '~/contexts/chatContext'
 const chatStore = useChat()
 
 const selectedModel = ref('HuggingFaceTB/SmolLM-135M-Instruct')
+const selectedEngine = ref<'both' | 'webgpu' | 'wasm'>('both')
 const isRunning = ref(false)
 const activeTest = ref<'webgpu' | 'wasm' | null>(null)
 
@@ -160,25 +175,34 @@ async function runFullBenchmark() {
   resetResults()
   
   try {
-    // 1. Run WebGPU Test
-    activeTest.value = 'webgpu'
-    const gpuRes = await chatStore.runBenchmark(selectedModel.value, 'webgpu', () => {})
-    results.webgpu.warmupMs = gpuRes.warmupMs
-    results.webgpu.tokensPerSec = gpuRes.tokensPerSec
-    results.webgpu.text = gpuRes.text
-    results.webgpu.done = true
+    const runGpu = selectedEngine.value === 'both' || selectedEngine.value === 'webgpu'
+    const runCpu = selectedEngine.value === 'both' || selectedEngine.value === 'wasm'
+
+    if (runGpu) {
+      // 1. Run WebGPU Test
+      activeTest.value = 'webgpu'
+      const gpuRes = await chatStore.runBenchmark(selectedModel.value, 'webgpu', () => {})
+      results.webgpu.warmupMs = gpuRes.warmupMs
+      results.webgpu.tokensPerSec = gpuRes.tokensPerSec
+      results.webgpu.text = gpuRes.text
+      results.webgpu.done = true
+    }
     
-    // 2. Wait a bit for GC / Cooling
-    activeTest.value = null
-    await new Promise(r => setTimeout(r, 2000))
+    if (runGpu && runCpu) {
+      // 2. Wait a bit for GC / Cooling
+      activeTest.value = null
+      await new Promise(r => setTimeout(r, 2000))
+    }
     
-    // 3. Run WASM Test
-    activeTest.value = 'wasm'
-    const wasmRes = await chatStore.runBenchmark(selectedModel.value, 'wasm', () => {})
-    results.wasm.warmupMs = wasmRes.warmupMs
-    results.wasm.tokensPerSec = wasmRes.tokensPerSec
-    results.wasm.text = wasmRes.text
-    results.wasm.done = true
+    if (runCpu) {
+      // 3. Run WASM Test
+      activeTest.value = 'wasm'
+      const wasmRes = await chatStore.runBenchmark(selectedModel.value, 'wasm', () => {})
+      results.wasm.warmupMs = wasmRes.warmupMs
+      results.wasm.tokensPerSec = wasmRes.tokensPerSec
+      results.wasm.text = wasmRes.text
+      results.wasm.done = true
+    }
     
   } catch (err) {
     console.error('Benchmark failed', err)
