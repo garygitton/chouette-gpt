@@ -35,3 +35,7 @@ data/models/*
 # Playwright artifacts
 playwright-report/
 test-results/
+
+# Local test models
+tests/fixtures/models/*
+!tests/fixtures/models/.gitkeep

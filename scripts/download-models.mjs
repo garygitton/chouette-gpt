@@ -7,25 +7,24 @@ import { promisify } from 'util';
 const streamPipeline = promisify(pipeline);
 
 const models = [
-  'HuggingFaceTB/SmolLM2-135M-Instruct',
+  'onnx-community/SmolLM2-135M-Instruct-ONNX-MHA',
   'onnx-community/Qwen2.5-0.5B-Instruct',
-  'onnx-community/Llama-3.2-1B-Instruct',
+  'onnx-community/Llama-3.2-1B-Instruct-ONNX',
   'onnx-community/Qwen2.5-1.5B-Instruct',
-  'onnx-community/Llama-3.2-3B-Instruct',
-  'onnx-community/Phi-3.5-mini-instruct'
+  'onnx-community/Llama-3.2-3B-Instruct-ONNX',
+  'onnx-community/Phi-3.5-mini-instruct-onnx-web'
 ];
 
 async function downloadModel(modelId) {
   console.log(`\n========================================`);
   console.log(`Starting download for ${modelId}...`);
   console.log(`========================================`);
-  
-  const targetDir = path.join(process.cwd(), 'data', 'models', modelId);
+  const targetDir = path.join(process.cwd(), 'tests', 'fixtures', 'models', modelId);
   fs.mkdirSync(targetDir, { recursive: true });
 
   const files = [];
   try {
-    for await (const fileInfo of listFiles({ repo: modelId })) {
+    for await (const fileInfo of listFiles({ repo: modelId, recursive: true })) {
       files.push(fileInfo.path);
     }
   } catch (e) {
