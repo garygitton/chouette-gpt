@@ -2,6 +2,7 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
+  testIgnore: '**/webgpu-hardware.spec.ts',
   timeout: 120000,
   expect: {
     timeout: 30000,

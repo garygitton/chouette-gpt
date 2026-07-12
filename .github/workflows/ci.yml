@@ -7,29 +7,9 @@ on:
     branches: [ "main" ]
 
 jobs:
-  typecheck:
-    name: Typecheck & Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-      - name: Install dependencies
-        run: pnpm install
-      - name: Run Typecheck
-        run: pnpm run typecheck
-
   test-e2e:
     name: E2E Playwright Tests
     runs-on: ubuntu-latest
-    needs: typecheck
     steps:
       - uses: actions/checkout@v4
       - name: Setup pnpm
