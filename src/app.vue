@@ -60,7 +60,9 @@ onMounted(() => {
     if (modelContext.currentModelId) {
       // Defer the heavy download to allow the UI to finish rendering (Time To First Design)
       setTimeout(() => {
-        chatContext.downloadMultipleEngines([modelContext.currentModelId!])
+        if (typeof window !== 'undefined' && !window.location.search.includes('noAutoDownload')) {
+          chatContext.downloadMultipleEngines([modelContext.currentModelId!])
+        }
       }, 1500)
     }
   })

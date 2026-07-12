@@ -17,6 +17,10 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
 
   for (const modelName of models) {
     test(`Tester le modèle ${modelName}`, async ({ page, context }) => {
+      // Écouter les logs du navigateur pour le debug
+      page.on('console', msg => console.log(`[BROWSER LOG (${modelName})]`, msg.text()));
+      page.on('pageerror', exception => console.error(`[BROWSER ERROR (${modelName})]`, exception.stack || exception.message));
+
       // Intercepter les requêtes HuggingFace pour servir les modèles locaux en cache
       await context.route('https://huggingface.co/**/*', async (route) => {
          const url = new URL(route.request().url());
@@ -33,9 +37,9 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
       });
 
       // 1. Ouvrir l'application
-      // On mock l'inférence pour les modèles lourds (> 500M) pour éviter les timeouts CPU (WASM)
-      const isHeavyModel = modelName !== 'SmolLM2-135M-Instruct' && modelName !== 'Qwen2.5-0.5B-Instruct';
-      const url = isHeavyModel ? '/?mock=true' : '/';
+      // On mock l'inférence pour TOUS les modèles dans ce test E2E pour éviter les crashs WebGPU/WASM
+      // en mode headless. L'exécution réelle est testée dans webgpu-hardware.spec.ts
+      const url = '/?mock=true';
       await page.goto(url, { waitUntil: 'domcontentloaded' });
       
       // Close WebGPU wizard if present

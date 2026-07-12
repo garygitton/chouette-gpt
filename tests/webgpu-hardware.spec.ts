@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import fs from 'node:fs';
+import path from 'node:path';
 
 test.describe('ChouetteGPT - Real WebGPU hardware acceleration', () => {
   // Downloading a 150MB model locally might take 30-120 seconds depending on bandwidth
@@ -19,8 +21,6 @@ test.describe('ChouetteGPT - Real WebGPU hardware acceleration', () => {
        if (parts.length >= 6) {
          const repoId = parts[1] + '/' + parts[2];
          const fileParts = parts.slice(5);
-         const fs = require('fs');
-         const path = require('path');
          const localPath = path.join(process.cwd(), 'tests', 'fixtures', 'models', repoId, ...fileParts);
          if (fs.existsSync(localPath)) {
             return await route.fulfill({ path: localPath });

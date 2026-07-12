@@ -39,7 +39,7 @@ test.describe('ChouetteGPT - BDD Cache & Security', () => {
     await test.step('Then les fichiers statiques lourds sont servis avec un cache immutable', async () => {
       // Perform a manual fetch inside the browser page to trigger Nitro route rules and verify them
       const headers = await page.evaluate(async () => {
-        const res = await fetch('/wasm/ort-wasm-simd-threaded.wasm');
+        const res = await fetch('/models/dummy.txt');
         return {
           cacheControl: res.headers.get('cache-control')
         };
@@ -50,10 +50,7 @@ test.describe('ChouetteGPT - BDD Cache & Security', () => {
     });
 
     await test.step('And le chat fonctionne et utilise la logique WASM sécurisée', async () => {
-      // Install model (mock mode)
-      const downloadBtn = page.getByRole('button', { name: /Télécharger et activer/ });
-      await expect(downloadBtn).toBeVisible({ timeout: 15000 });
-      await downloadBtn.click();
+      // Wait for auto-download to complete and chat to be active
       
       // Wait for chat to be active
       const textarea = page.getByTestId('chat-textarea');

@@ -3,11 +3,11 @@ import defaultConfig from './playwright.config';
 
 export default defineConfig({
   ...defaultConfig,
-  testMatch: '**/webgpu-hardware-acceleration-fallback-test.spec.ts',
+  testMatch: '**/webgpu-hardware.spec.ts',
   webServer: undefined,
   use: {
     ...defaultConfig.use,
-    baseURL: 'http://localhost:3000/',
+    baseURL: process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}/`,
     headless: false, // Force headed mode to support WebGPU natively on desktop
     launchOptions: {
       args: [

@@ -39,10 +39,8 @@ test.describe('ChouetteGPT - BDD Trust UX', () => {
       await expect(page.getByText('Hors-ligne').first()).toBeVisible();
       await expect(page.getByText('Zéro Pistage').first()).toBeVisible();
       
-      // Mini-tutorial
-      await expect(page.getByText('1. Installer')).toBeVisible();
-      await expect(page.getByText('2. Exécuter')).toBeVisible();
-      await expect(page.getByText('3. Profiter')).toBeVisible();
+      // Minimalist CTA instead of mini-tutorial
+      await expect(page.getByText('Sélectionnez un modèle dans la barre latérale pour commencer')).toBeVisible();
     });
 
     await test.step('And le jargon technique est masqué par défaut', async () => {
