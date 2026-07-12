@@ -4,9 +4,9 @@ import { renameSync, readdirSync, existsSync, mkdirSync, statSync } from 'fs';
 import path from 'path';
 
 async function run() {
-  console.log('Starting Playwright for video recording (Headed WebGPU / Real Model)...');
+  console.log('Starting Playwright for video recording (Real Llama-1B WebGPU in English)...');
   
-  // Force headed mode and WebGPU launch arguments as defined in playwright.webgpu.config.ts
+  // Launch headed Chromium with WebGPU flags
   const browser = await chromium.launch({
     headless: false,
     args: [
@@ -31,59 +31,66 @@ async function run() {
 
   const page = await context.newPage();
 
-  // Bypass onboarding but DO NOT set mock mode
+  // Log browser console and errors to help debug
+  page.on('console', msg => console.log('BROWSER LOG:', msg.text()));
+  page.on('pageerror', err => console.log('BROWSER ERROR:', err.message));
+
+  // Bypass onboarding and set application language to English
   await page.addInitScript(() => {
     window.localStorage.setItem('chouette-onboarding-seen', 'true');
-    // window.__mock_llm = true; -> Removed to use REAL WebGPU models
+    window.localStorage.setItem('app_language', 'en');
   });
 
-  console.log('Navigating to app on port 3008...');
+  console.log('Navigating to app...');
   await page.goto('http://localhost:3008/?noAutoDownload=true', { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(2000);
 
-  // 1. Trigger Real Download (Default is SmolLM2-135M)
-  console.log('Clicking Download...');
-  const downloadBtn = page.getByRole('button', { name: /Télécharger et activer/ });
-  await downloadBtn.click();
-  await page.waitForTimeout(2000);
+  // 1. Switch model to Qwen2.5-0.5B-Instruct
+  console.log('Selecting Qwen2.5-0.5B-Instruct model...');
+  const modelTrigger = page.getByTestId('model-select-trigger');
+  await modelTrigger.click();
+  await page.waitForTimeout(1000);
 
-  // 2. Pause Download
+  const qwenOption = page.getByTestId('model-option-onnx-community/Qwen2.5-0.5B-Instruct');
+  await qwenOption.click();
+  await page.waitForTimeout(1500);
+
+  // 2. Pause Download (inside overlay modal)
   console.log('Pausing Download...');
   const pauseBtn = page.getByRole('button', { name: 'Mettre en pause' }).first();
   await pauseBtn.click();
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(1500);
 
-  // 3. Resume Download
+  // 4. Resume Download
   console.log('Resuming Download...');
   const resumeBtn = page.getByRole('button', { name: 'Reprendre' }).first();
   await resumeBtn.click();
   
-  // 4. Wait for real download & WebGPU loading to finish (ready badge becomes visible)
-  console.log('Waiting for WebGPU initialization & model download (this may take up to 2 minutes)...');
+  // 5. Wait for download & WebGPU compilation (can take up to 2-3 mins if uncached)
+  console.log('Waiting for WebGPU initialization & model load (Qwen-0.5B)...');
   const readyBadge = page.getByText(/Prêt à l'emploi/i).first();
   await readyBadge.waitFor({ state: 'visible', timeout: 180000 });
-  console.log('Model loaded in VRAM!');
+  console.log('Qwen-0.5B successfully loaded in VRAM!');
   await page.waitForTimeout(2000);
 
-  // 5. Chat turn 1
+  // 6. Chat turn 1 (English)
   console.log('Typing message 1...');
   const input = page.getByTestId('chat-textarea');
   await input.focus();
-  await input.pressSequentially("Bonjour ! Qui es-tu ? Présente-toi très brièvement.", { delay: 60 });
+  await input.pressSequentially("Hello! Explain what data sovereignty means in one simple sentence.", { delay: 60 });
   await page.waitForTimeout(500);
   await input.press('Enter');
 
   // Wait for real streaming generation
   console.log('Waiting for response 1...');
   const submitBtn = page.getByTestId('send-button');
-  // Send button is disabled during generation, wait for it to be enabled again
   await expect(submitBtn).toBeEnabled({ timeout: 60000 });
   await page.waitForTimeout(2000);
 
-  // 6. Chat turn 2
+  // 7. Chat turn 2 (English)
   console.log('Typing message 2...');
   await input.focus();
-  await input.pressSequentially("Merci pour cette présentation.", { delay: 60 });
+  await input.pressSequentially("Thank you, that was very clear!", { delay: 60 });
   await page.waitForTimeout(500);
   await input.press('Enter');
 
@@ -92,13 +99,13 @@ async function run() {
   await expect(submitBtn).toBeEnabled({ timeout: 60000 });
   await page.waitForTimeout(2000);
 
-  // 7. Interactive Sidebar: Change System Prompt
-  console.log('Modifying System Prompt in Sidebar...');
+  // 8. Interactive Sidebar: Change System Prompt
+  console.log('Modifying System Prompt...');
   const systemPrompt = page.getByTestId('system-prompt-textarea');
   await systemPrompt.focus();
   await systemPrompt.fill('');
   await page.waitForTimeout(500);
-  await systemPrompt.pressSequentially("Tu es un assistant de cybersécurité très concis.", { delay: 60 });
+  await systemPrompt.pressSequentially("You are a helpful and concise cybersecurity expert.", { delay: 60 });
   await page.waitForTimeout(500);
   
   // Click chat input to trigger blur

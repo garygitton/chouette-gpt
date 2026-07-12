@@ -27,12 +27,16 @@ A local AI text generation interface with CPU/GPU support (WebGPU/WebAssembly). 
 2. `npm run dev` to start dev server
 3. Access at http://localhost:3000
 
+## Project Direction
+- **[Project Goals](./GOAL.md)**: Read about the core philosophy, mission, and architectural goals of Chouette GPT.
+- **[Roadmap](./ROADMAP.md)**: Explore the planned evolutionary phases (Vision, Tools, specialized tasks).
+
 ## Contributing
 See CONTRIBUTING.md for guidelines
 
 ## Sponsor the Mission
 ChouetteGPT is an open-source project. If you are a company using this tool or a developer who believes in our mission of making private AI accessible to everyone, please consider supporting us.
-👉 **[View our Sponsorship Tiers](./SPONSORS.md)**
+👉 **[Support ChouetteGPT & Consulting](./SPONSORS.md)**
 
 ## License
 This project is licensed under the **Apache License 2.0** - see the [LICENSE](LICENSE) file for details.
@@ -66,12 +70,16 @@ Une interface locale de génération de texte par IA avec support CPU/GPU (WebGP
 2. `npm run dev` pour lancer le serveur de développement
 3. Accédez à http://localhost:3000
 
+## Orientation du projet
+- **[Objectifs du Projet](./GOAL.md)** : En savoir plus sur la philosophie centrale, la mission et les objectifs d'architecture de Chouette GPT.
+- **[Feuille de Route](./ROADMAP.md)** : Explorer les phases d'évolution planifiées (Vision, Outils, tâches spécialisées).
+
 ## Contribuer
 Voir CONTRIBUTING.md pour les directives.
 
 ## Soutenir la Mission
 ChouetteGPT est un projet open-source. Si vous êtes une entreprise utilisant cet outil ou un développeur qui croit en notre mission de rendre l'IA privée accessible à tous, pensez à nous soutenir.
-👉 **[Voir nos Niveaux de Sponsoring](./SPONSORS.md)**
+👉 **[Soutenir ChouetteGPT & Consulting](./SPONSORS.md)**
 
 ## Licence
 Ce projet est sous licence **Apache License 2.0** - voir le fichier [LICENSE](LICENSE) pour plus de détails.
