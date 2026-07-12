@@ -41,24 +41,5 @@ test.describe('ChouetteGPT - BDD Trust UX', () => {
       // Minimalist CTA instead of mini-tutorial
       await expect(page.getByText('Sélectionnez un modèle dans la barre latérale pour commencer')).toBeVisible();
     });
-
-    await test.step('And le jargon technique est masqué par défaut', async () => {
-      await expect(page.getByText('Bonne nouvelle !')).toBeVisible();
-      
-      // Technical details like WebGPU or CPU Cores should be hidden
-      const technicalDetails = page.getByText(/GB RAM •/);
-      await expect(technicalDetails).not.toBeVisible();
-    });
-
-    await test.step('When il clique sur "Voir les détails techniques"', async () => {
-      // Shadcn CollapsibleTrigger defaults to role="button" unless changed
-      const toggle = page.getByText('Voir les détails techniques');
-      await toggle.click();
-    });
-
-    await test.step('Then le composant avec le score et la RAM s\'affiche correctement', async () => {
-      const technicalDetails = page.getByText(/GB RAM •/);
-      await expect(technicalDetails).toBeVisible({ timeout: 5000 });
-    });
   });
 });

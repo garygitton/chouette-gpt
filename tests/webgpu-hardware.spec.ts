@@ -47,6 +47,15 @@ test.describe('ChouetteGPT - Real WebGPU hardware acceleration', () => {
     const smolOption = page.getByRole('option', { name: /SmolLM2/i });
     await smolOption.click();
 
+    // Click "Télécharger et activer" to start the loading/download process
+    const downloadBtn = page.getByRole('button', { name: 'Télécharger et activer' }).first();
+    try {
+      await downloadBtn.waitFor({ state: 'visible', timeout: 5000 });
+      await downloadBtn.click();
+    } catch (e) {
+      console.log('Download button not visible or already downloading/ready');
+    }
+
     // 4. Wait for the engine to finish downloading and loading into VRAM
     // The UI should display "Prêt à l'emploi" once WebGPU is initialized
     const readyBadge = page.getByText(/Prêt à l'emploi/i).first();

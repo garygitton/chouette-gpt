@@ -111,21 +111,6 @@
           <Activity class="w-5 h-5" />
         </Button>
       </div>
-      <!-- Social Networks Links -->
-      <div v-if="settingsStore.linkedin || settingsStore.github || settingsStore.website" class="flex flex-col justify-center pt-3 mt-2">
-        <Separator class="bg-slate-200/60 dark:bg-slate-800/40 mb-3" />
-        <div class="flex justify-center space-x-5">
-          <a v-if="settingsStore.linkedin" :href="settingsStore.linkedin" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-indigo-500 transition-colors" title="LinkedIn">
-            <Linkedin class="w-4 h-4" />
-          </a>
-        <a v-if="settingsStore.github" :href="settingsStore.github" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-indigo-500 transition-colors" title="GitHub">
-          <Github class="w-4 h-4" />
-        </a>
-        <a v-if="settingsStore.website" :href="settingsStore.website" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-indigo-500 transition-colors" :title="t('website_label')">
-          <Globe class="w-4 h-4" />
-        </a>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -147,7 +132,7 @@ import { Separator } from '~/components/ui/separator'
 import { Badge } from '~/components/ui/badge'
 import {
   X, PlusCircle, Search, MessageSquare, Trash2,
-  Settings, ShieldCheck, Sun, Moon, Linkedin, Github, Globe, Activity
+  Settings, ShieldCheck, Sun, Moon, Globe, Activity
 } from 'lucide-vue-next'
 
 const props = defineProps({

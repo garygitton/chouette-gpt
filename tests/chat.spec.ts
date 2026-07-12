@@ -196,22 +196,12 @@ test.describe('ChouetteGPT - E2E BDD Conversations and Behavior', () => {
 
 
 
-  test('Vérifier et modifier les paramètres de l\'application (Langue, LLM, Liens Sociaux)', async ({ page }) => {
-    // Go directly to settings
-    await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+  test('Vérifier et modifier la langue depuis la barre latérale', async ({ page }) => {
+    // Open home page with mock=true
+    await page.goto('/?mock=true', { waitUntil: 'domcontentloaded' });
 
-    // 1. Verify and Edit Social Inputs
-    const linkedinInput = page.getByTestId('linkedin-input');
-    const githubInput = page.getByTestId('github-input');
-    const websiteInput = page.getByTestId('website-input');
-
-    await expect(linkedinInput).toBeVisible();
-    await linkedinInput.fill('https://linkedin.com/in/testuser');
-    await githubInput.fill('https://github.com/testuser');
-    await websiteInput.fill('https://testuser.com');
-
-    // 3. Language Selector
-    const langSelectTrigger = page.locator('main').getByTestId('language-select-trigger');
+    // 1. Language Selector in the sidebar
+    const langSelectTrigger = page.getByTestId('language-select-trigger');
     await expect(langSelectTrigger).toBeVisible();
     await langSelectTrigger.click();
 
@@ -220,9 +210,9 @@ test.describe('ChouetteGPT - E2E BDD Conversations and Behavior', () => {
     await expect(langEnItem).toBeVisible();
     await langEnItem.click();
 
-    // Verify UI language changed to English (card title becomes "Interface Language")
-    const langCardTitle = page.getByTestId('language-card-title');
-    await expect(langCardTitle).toContainText('Interface Language');
+    // Verify UI language changed to English (the New Chat button becomes "New Chat")
+    const newChatBtn = page.getByRole('button', { name: 'New Chat' }).first();
+    await expect(newChatBtn).toBeVisible();
 
     // Restore language to french
     await langSelectTrigger.click();
@@ -230,27 +220,33 @@ test.describe('ChouetteGPT - E2E BDD Conversations and Behavior', () => {
     await expect(langFrItem).toBeVisible();
     await langFrItem.click();
 
-    // 4. Persistence verification: Navigate away and come back
+    // Verify UI language changed back to French
+    const newChatBtnFr = page.getByRole('button', { name: 'Nouveau chat' }).first();
+    await expect(newChatBtnFr).toBeVisible();
+  });
+
+  test('Accéder à la page des paramètres et vérifier les informations de l\'appareil', async ({ page }) => {
+    // Go directly to settings
+    await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+
+    // Verify DeviceInfoCard is visible (using text that appears inside DeviceInfoCard)
+    const deviceCard = page.getByText('Capacités de l\'appareil');
+    await expect(deviceCard).toBeVisible();
+
+    // Click back button to go to home page
     const backBtn = page.getByTestId('back-button');
     await expect(backBtn).toBeVisible();
     await backBtn.click();
 
-    // Navigate to settings again via sidebar footer button
-    const settingsSidebarBtn = page.getByTestId('settings-button');
-    await expect(settingsSidebarBtn).toBeVisible();
-    await settingsSidebarBtn.click();
-
-    // Check if the inputs are still populated (persisted via settingsStore localStorage watch)
-    await expect(linkedinInput).toHaveValue('https://linkedin.com/in/testuser');
-    await expect(githubInput).toHaveValue('https://github.com/testuser');
-    await expect(websiteInput).toHaveValue('https://testuser.com');
+    // We should be back on home page
+    await expect(page).toHaveURL(/\/(\?.*)?$/);
   });
 
 
 
   test('Accéder à la page de confidentialité et retourner à l\'accueil', async ({ page }) => {
-    // Open home page with mock=true
-    await page.goto('/?mock=true', { waitUntil: 'domcontentloaded' });
+    // Open home page
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     // Click privacy button in sidebar
     const privacySidebarBtn = page.getByTestId('privacy-button');
