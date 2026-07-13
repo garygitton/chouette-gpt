@@ -1,6 +1,12 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('UI & Experimental Mentions', () => {
+  test.beforeEach(async ({ page }) => {
+    // Abort third-party network requests to keep tests fast and offline-capable
+    await page.route(/hits\.seeyoufarm\.com/, route => route.abort());
+    await page.route(/shields\.io/, route => route.abort());
+  });
+
   test('should display experimental badges and disclaimers on the dashboard', async ({ page }) => {
     // Navigate to the app (mock mode to bypass heavy model loading)
     await page.goto('/?mock=true');
@@ -13,7 +19,7 @@ test.describe('UI & Experimental Mentions', () => {
     // 2. Verify the project objective text is present
     const projectObjective = page.locator('text=Objectif du projet :').first();
     await expect(projectObjective).toBeVisible();
-    
+
     // 3. Verify the minimalist "C" logo is present instead of an owl
     const logoC = page.locator('text=C').first();
     await expect(logoC).toBeVisible();
@@ -31,7 +37,7 @@ test.describe('UI & Experimental Mentions', () => {
     await page.waitForSelector('text=Modèle IA Local');
     await page.click('button[role="combobox"]');
     await page.getByRole('option', { name: /SmolLM/i }).click({ force: true });
-    
+
     // Wait for the Select dropdown animation to finish
     await page.waitForTimeout(500);
 

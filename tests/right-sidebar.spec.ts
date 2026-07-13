@@ -24,6 +24,10 @@ test.describe('ChouetteGPT - Advanced Settings & Right Sidebar', () => {
         // Ignore storage access errors
       }
     });
+
+    // Abort third-party network requests to keep tests fast and offline-capable
+    await page.route(/hits\.seeyoufarm\.com/, route => route.abort());
+    await page.route(/shields\.io/, route => route.abort());
   });
 
   test('Onboarding : télécharger un modèle avant de discuter', async ({ page }) => {
@@ -36,13 +40,18 @@ test.describe('ChouetteGPT - Advanced Settings & Right Sidebar', () => {
       await expect(textarea).toBeDisabled({ timeout: 15000 });
       
       // The download button should be visible in the sidebar
-      const downloadBtn = page.getByRole('button', { name: /Télécharger et activer/ });
+      const downloadBtn = page.getByTestId('sidebar').getByRole('button', { name: /Télécharger et activer/ });
       await expect(downloadBtn).toBeVisible();
     });
 
     await test.step('When je clique sur Télécharger et activer', async () => {
-      const downloadBtn = page.getByRole('button', { name: /Télécharger et activer/ });
+      const downloadBtn = page.getByTestId('sidebar').getByRole('button', { name: /Télécharger et activer/ });
       await downloadBtn.click();
+
+      // Accept download in the confirmation modal
+      const acceptBtn = page.getByRole('button', { name: /Accepter et Télécharger/i });
+      await expect(acceptBtn).toBeVisible({ timeout: 5000 });
+      await acceptBtn.click();
     });
 
     await test.step('Then la barre de progression apparaît et le moteur charge', async () => {
@@ -69,6 +78,16 @@ test.describe('ChouetteGPT - Advanced Settings & Right Sidebar', () => {
     await test.step('Given je suis sur la page avec le modèle chargé (mock)', async () => {
       await page.goto('/?mock=true', { waitUntil: 'networkidle' });
       
+      // Click download button
+      const downloadBtn = page.getByRole('button', { name: /Télécharger et activer l'IA/i });
+      await expect(downloadBtn).toBeVisible({ timeout: 5000 });
+      await downloadBtn.click();
+
+      // Accept download in the confirmation modal
+      const acceptBtn = page.getByRole('button', { name: /Accepter et Télécharger/i });
+      await expect(acceptBtn).toBeVisible({ timeout: 5000 });
+      await acceptBtn.click();
+
       // The chat textarea should be enabled (model loaded)
       const textarea = page.getByTestId('chat-textarea');
       await expect(textarea).toBeEnabled({ timeout: 15000 });
@@ -96,8 +115,8 @@ test.describe('ChouetteGPT - Advanced Settings & Right Sidebar', () => {
       await expect(sliders).toHaveCount(4); // Temp, TopP, MaxTokens, TopK
     });
 
-    await test.step('Then je peux voir la jauge de tokens de session', async () => {
-      const usageMeter = page.getByText(/Tokens de session/i);
+    await test.step('Then je peux voir la jauge de tokens de conversation', async () => {
+      const usageMeter = page.getByText(/Tokens de conversation/i);
       await expect(usageMeter).toBeVisible();
     });
 
@@ -110,9 +129,20 @@ test.describe('ChouetteGPT - Advanced Settings & Right Sidebar', () => {
       const option = page.locator('[role="option"]').nth(1);
       await expect(option).toBeVisible();
       await option.click({ force: true });
+      await expect(option).toBeHidden();
+
+      // Click "Télécharger et activer" button in the sidebar
+      const downloadBtn = page.getByTestId('sidebar').getByRole('button', { name: /Télécharger et activer/i });
+      await expect(downloadBtn).toBeVisible({ timeout: 5000 });
+      await downloadBtn.click();
+
+      // Accept download in the confirmation modal
+      const acceptBtn = page.getByRole('button', { name: /Accepter et Télécharger/i });
+      await expect(acceptBtn).toBeVisible({ timeout: 5000 });
+      await acceptBtn.click();
     });
 
-    await test.step('Then le chargement du nouveau modèle commence automatiquement', async () => {
+    await test.step('Then le chargement du nouveau modèle commence', async () => {
       // Vérifie que le statut de chargement ou "Prêt" apparaît
       const statusBadge = page.getByTestId('model-status-badge');
       await expect(statusBadge).toBeVisible({ timeout: 10000 });

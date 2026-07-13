@@ -66,6 +66,7 @@ self.onmessage = async (event: MessageEvent) => {
         self.postMessage({ type: 'progress', payload: { text, progress: overallProgress } });
       };
 
+      let activeDevice = 'webgpu';
       try {
         generator = await pipeline('text-generation', modelId, {
           device: forceDevice || 'webgpu',
@@ -81,9 +82,10 @@ self.onmessage = async (event: MessageEvent) => {
           dtype: 'q4',
           progress_callback: progressCb
         });
+        activeDevice = 'wasm';
       }
 
-      self.postMessage({ type: 'init_done' });
+      self.postMessage({ type: 'init_done', payload: { device: activeDevice } });
     } catch (e: any) {
       console.error('[Transformers Worker] Init error:', e);
       let errorMsg = e.message || String(e);

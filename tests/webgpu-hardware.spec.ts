@@ -52,6 +52,11 @@ test.describe('ChouetteGPT - Real WebGPU hardware acceleration', () => {
     try {
       await downloadBtn.waitFor({ state: 'visible', timeout: 5000 });
       await downloadBtn.click();
+      
+      // Accept download in the confirmation modal
+      const acceptBtn = page.getByRole('button', { name: /Accepter et Télécharger/i });
+      await expect(acceptBtn).toBeVisible({ timeout: 5000 });
+      await acceptBtn.click();
     } catch (e) {
       console.log('Download button not visible or already downloading/ready');
     }
@@ -136,6 +141,11 @@ test.describe('ChouetteGPT - Real WebGPU hardware acceleration', () => {
     try {
       await downloadBtn.waitFor({ state: 'visible', timeout: 5000 });
       await downloadBtn.click();
+      
+      // Accept download in the confirmation modal
+      const acceptBtn = page.getByRole('button', { name: /Accepter et Télécharger/i });
+      await expect(acceptBtn).toBeVisible({ timeout: 5000 });
+      await acceptBtn.click();
     } catch (e) {
       console.log('Download button not visible or already downloading/ready');
     }

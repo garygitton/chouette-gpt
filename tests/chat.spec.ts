@@ -51,9 +51,14 @@ test.describe('ChouetteGPT - E2E BDD Conversations and Behavior', () => {
       await expect(welcomeHeader).toContainText('ChouetteGPT');
       
       // Download model
-      const downloadBtn = page.getByRole('button', { name: /Télécharger et activer/ });
+      const downloadBtn = page.getByRole('button', { name: /Télécharger et activer l'IA/i });
       if (await downloadBtn.isVisible()) {
         await downloadBtn.click();
+        
+        // Accept download in the confirmation modal
+        const acceptBtn = page.getByRole('button', { name: /Accepter et Télécharger/i });
+        await expect(acceptBtn).toBeVisible({ timeout: 5000 });
+        await acceptBtn.click();
       }
       
       // Wait for engine to be ready
@@ -242,8 +247,8 @@ test.describe('ChouetteGPT - E2E BDD Conversations and Behavior', () => {
     await expect(deviceCard).toBeVisible();
 
     // Verify static author and project links/badge are present
-    const linkedinLink = page.getByTestId('author-linkedin-link');
-    const githubLink = page.getByTestId('project-github-link');
+    const linkedinLink = page.getByTestId('sidebar-linkedin-link');
+    const githubLink = page.getByTestId('sidebar-github-link');
     const licenseBadge = page.getByTestId('project-license-badge');
 
     await expect(linkedinLink).toBeVisible();

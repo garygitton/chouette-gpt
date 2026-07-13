@@ -124,7 +124,7 @@ function handleModelChange(modelId: any) {
 
 function resumeDownload() {
   console.log('[SIDEBAR] resumeDownload clicked, model:', modelStore.currentModelId)
-  chatStore.downloadMultipleEngines([modelStore.currentModelId])
+  chatStore.downloadMultipleEngines([modelStore.currentModelId], true)
 }
 
 function downloadEngine() {

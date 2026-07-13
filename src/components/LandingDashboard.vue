@@ -26,10 +26,15 @@
         <p v-else class="text-slate-500 dark:text-slate-400 text-base md:text-lg max-w-xl mx-auto font-normal leading-relaxed">
           Votre assistant IA local, 100% privé et hors-ligne.
         </p>
-        <div class="max-w-xl mx-auto text-sm text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner">
-          <p>
-            <strong class="text-slate-700 dark:text-slate-300">Objectif du projet :</strong> Ce laboratoire expérimental vise à tester les limites de l'inférence des modèles d'intelligence artificielle fonctionnant entièrement dans le navigateur web (WebGPU/WASM), sans faire appel à des serveurs distants.
+        <div class="max-w-xl mx-auto text-xs text-left text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/20 p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 space-y-3 shadow-sm">
+          <p class="leading-relaxed">
+            <strong class="text-slate-800 dark:text-slate-200">Objectif du projet :</strong> Ce laboratoire expérimental vise à tester les limites de l'inférence des modèles d'intelligence artificielle fonctionnant entièrement dans le navigateur web (WebGPU/WASM), sans serveurs distants.
           </p>
+          <div class="flex items-start space-x-2.5 text-amber-600 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20 p-3 rounded-xl border border-amber-100/50 dark:border-amber-900/30">
+            <p class="leading-relaxed font-medium">
+              {{ t('performance_notice') }}
+            </p>
+          </div>
         </div>
         
         <!-- Trust Badges -->
@@ -48,22 +53,32 @@
     </div>
 
     <!-- Minimalist Call To Action for Onboarding -->
-    <div v-if="!chatStore.isEngineReady" class="flex flex-col items-center justify-center max-w-md mx-auto py-8">
-      <!-- Desktop CTA -->
-      <div class="hidden md:flex flex-col items-center space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 fill-mode-both">
-        <div class="flex items-center space-x-3 text-slate-500 dark:text-slate-400">
-          <ArrowLeft class="w-5 h-5 animate-pulse text-indigo-500" />
-          <span class="text-sm font-medium">Sélectionnez un modèle dans la barre latérale pour commencer</span>
+    <!-- Minimalist Call To Action for Onboarding -->
+    <div v-if="!chatStore.isEngineReady" class="flex flex-col items-center justify-center max-w-md mx-auto py-6 space-y-4">
+      <div v-if="!chatStore.isEngineLoading" class="flex flex-col items-center space-y-3">
+        <Button 
+          @click="chatStore.downloadMultipleEngines([modelStore.currentModelId])" 
+          class="h-12 px-8 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-700 hover:to-pink-600 text-white shadow-lg shadow-indigo-500/25 transition-all hover:scale-105 font-bold flex items-center gap-2"
+        >
+          <Download class="w-5 h-5" />
+          Télécharger et activer l'IA
+        </Button>
+        <p class="text-xs text-slate-400 dark:text-slate-500 text-center max-w-xs leading-relaxed">
+          Modèle par défaut : <strong>{{ modelStore.currentModelName }}</strong> ({{ modelStore.currentModel?.totalSize }}).
+        </p>
+      </div>
+
+      <div v-else class="flex flex-col items-center space-y-3">
+        <div class="flex items-center space-x-2 text-indigo-500 dark:text-indigo-400 text-sm font-semibold">
+          <Loader2 class="w-5 h-5 animate-spin" />
+          <span>Téléchargement et configuration en cours...</span>
         </div>
       </div>
       
-      <!-- Mobile CTA -->
-      <div class="md:hidden flex flex-col items-center space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 fill-mode-both">
-        <div class="flex flex-col items-center text-center space-y-2 text-slate-500 dark:text-slate-400 px-4">
-          <Menu class="w-6 h-6 text-indigo-500 mb-1" />
-          <span class="text-sm font-medium">Ouvrez le menu pour télécharger et activer votre IA</span>
-        </div>
-      </div>
+      <!-- Desktop & Mobile Hint -->
+      <p class="text-[11px] text-slate-400 dark:text-slate-500 text-center pt-2">
+        Vous pouvez également changer de modèle dans le menu latéral.
+      </p>
     </div>
     
     <!-- Suggested Prompts Grid -->
@@ -110,9 +125,9 @@ import { useI18n } from '~/composables/useI18n'
 import { useDevice } from '~/contexts/deviceContext'
 import { useModel } from '~/contexts/modelContext'
 import { useChat } from '~/contexts/chatContext'
-import { Globe, Code, Sparkles, Mail, ArrowRight, ArrowLeft, Menu, Shield, WifiOff, EyeOff } from 'lucide-vue-next'
+import { Globe, Code, Sparkles, Mail, ArrowRight, ArrowLeft, Menu, Shield, WifiOff, EyeOff, Download, Loader2 } from 'lucide-vue-next'
 import { Card } from '~/components/ui/card'
-import { Badge } from '~/components/ui/badge'
+import { Button } from '~/components/ui/button'
 
 defineEmits(['send-prompt'])
 

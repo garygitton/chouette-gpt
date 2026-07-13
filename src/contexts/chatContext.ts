@@ -1,4 +1,4 @@
-import { ref, inject, reactive, type InjectionKey } from 'vue'
+import { ref, inject, reactive, computed, watch, type InjectionKey } from 'vue'
 import { MessageRole } from '~/domain/chat/MessageRole'
 import type { ConversationContext } from './conversationContext'
 import type { ModelContext } from './modelContext'
@@ -10,7 +10,7 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
   const isEngineReady = ref(false)
   const isEnginePaused = ref(false)
   const engineProgress = ref({ text: '', progress: 0 })
-  const sessionTokens = ref(0)
+  const actualDevice = ref<'webgpu' | 'wasm' | null>(null)
   
   let worker: Worker | null = null
   let generationIdCounter = 0
@@ -18,6 +18,64 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
   let downloadQueue: string[] = []
   let engineLoadSessionId = 0
   let estimateTokens = (text: string) => Math.ceil((text || '').length / 4)
+
+  const conversationTokens = computed(() => {
+    let total = 0
+    if (settingsContext.systemPrompt && settingsContext.systemPrompt.trim().length > 0) {
+      total += estimateTokens(settingsContext.systemPrompt.trim())
+    }
+    if (convContext.currentConversationId) {
+      const currentConv = convContext.conversations.find((c: any) => c.id === convContext.currentConversationId)
+      if (currentConv && currentConv.messages) {
+        for (const msg of currentConv.messages) {
+          
+          total += estimateTokens(msg.content || '')
+        }
+      }
+    }
+    return total
+  })
+
+  const showDownloadConfirmation = ref(false)
+  const pendingDownloadModelId = ref<string | null>(null)
+  
+  const pendingModelForConfirmation = computed(() => {
+    if (!pendingDownloadModelId.value) return null
+    return modelContext.models.find(m => m.id === pendingDownloadModelId.value) || null
+  })
+
+  function confirmDownload() {
+    if (pendingDownloadModelId.value) {
+      downloadMultipleEngines([pendingDownloadModelId.value], true)
+      pendingDownloadModelId.value = null
+    }
+    showDownloadConfirmation.value = false
+  }
+
+  // Reset engine status when selected model changes
+  watch(() => modelContext.currentModelId, (newId, oldId) => {
+    if (newId && newId !== oldId) {
+      cancelDownload()
+      isEngineReady.value = false
+    }
+  })
+
+  async function isModelCached(modelId: string): Promise<boolean> {
+    if (typeof window === 'undefined' || !window.caches) return false
+    try {
+      const cacheNames = await window.caches.keys()
+      const tfCacheNames = cacheNames.filter(name => name.includes('transformers') || name.includes('huggingface'))
+      for (const cacheName of tfCacheNames) {
+        const cache = await window.caches.open(cacheName)
+        const keys = await cache.keys()
+        const isCached = keys.some(request => request.url.includes(modelId))
+        if (isCached) return true
+      }
+    } catch (e) {
+      console.error('Error checking cache', e)
+    }
+    return false
+  }
 
 
   async function initEngine(modelId: string, progressPrefix = '', sessionId?: number) {
@@ -103,6 +161,7 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
           if (type === 'progress') {
             engineProgress.value = { text: progressPrefix + payload.text, progress: payload.progress }
           } else if (type === 'init_done') {
+            actualDevice.value = payload?.device || 'webgpu'
             resolve()
           } else if (type === 'init_error') {
             reject(new Error(payload))
@@ -132,9 +191,17 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
     }
   }
 
-  async function downloadMultipleEngines(modelIds: string[]) {
+  async function downloadMultipleEngines(modelIds: string[], force = false) {
     console.log('[CHATSTORE] downloadMultipleEngines called', { isEngineReady: isEngineReady.value, modelIds, isEngineLoading: isEngineLoading.value, downloadQueue });
     if (isEngineReady.value || modelIds.length === 0) return
+
+    const targetModelId = modelIds[0]
+    const cached = await isModelCached(targetModelId)
+    if (!cached && !force) {
+      pendingDownloadModelId.value = targetModelId
+      showDownloadConfirmation.value = true
+      return
+    }
 
     if (isEngineLoading.value && JSON.stringify(downloadQueue) === JSON.stringify(modelIds)) {
       return
@@ -210,8 +277,6 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
       timestamp: Date.now()
     })
 
-    sessionTokens.value += estimateTokens(text)
-
     if (!worker) {
       await initEngine(modelId)
     }
@@ -245,7 +310,6 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
         } else {
           messages.unshift({ role: MessageRole.System, content: settingsContext.systemPrompt.trim() })
         }
-        sessionTokens.value += estimateTokens(settingsContext.systemPrompt.trim())
       } else {
         messages = historyMessages.map((m: any) => ({ ...m }))
       }
@@ -295,8 +359,6 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
           })
         })
       }
-      
-      sessionTokens.value += estimateTokens(finalContent)
       
       await convContext.persistConversation(convId)
     } catch (error) {
@@ -416,14 +478,19 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
     isEngineReady,
     isEnginePaused,
     engineProgress,
-    sessionTokens,
+    actualDevice,
+    conversationTokens,
     downloadMultipleEngines,
     initEngine,
     cancelDownload,
     pauseDownload,
     generate,
     stopGenerate,
-    runBenchmark
+    runBenchmark,
+    showDownloadConfirmation,
+    pendingModelForConfirmation,
+    confirmDownload,
+    isModelCached
   })
 }
 

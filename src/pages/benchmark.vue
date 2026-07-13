@@ -129,16 +129,91 @@
       </Card>
       
     </div>
+
+    <!-- Reassuring Benchmark Consent Dialog -->
+    <Dialog :open="showBenchmarkConfirm" @update:open="showBenchmarkConfirm = $event">
+      <DialogContent class="sm:max-w-[450px] bg-white dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-6">
+        <DialogHeader class="space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+            <Activity class="w-6 h-6" />
+          </div>
+          <div>
+            <DialogTitle class="text-xl font-bold text-slate-900 dark:text-white">
+              Autoriser le test de performance ?
+            </DialogTitle>
+            <DialogDescription class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Pour mesurer les performances, ChouetteGPT doit charger un modèle de test.
+            </DialogDescription>
+          </div>
+        </DialogHeader>
+        
+        <div class="py-4 space-y-4">
+          <!-- Model Info Card -->
+          <div class="bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800/80 p-4 rounded-2xl flex items-center justify-between">
+            <div class="space-y-1">
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Modèle de test</p>
+              <p class="text-sm font-bold text-slate-800 dark:text-slate-200">
+                {{ selectedModelName }}
+              </p>
+            </div>
+            <div class="text-right">
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Taille de l'IA</p>
+              <Badge class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border-indigo-200/50 font-mono font-bold mt-0.5">
+                {{ selectedModelSize }}
+              </Badge>
+            </div>
+          </div>
+          
+          <!-- Reassurance Bullet Points -->
+          <div class="space-y-3.5 pt-2">
+            <div class="flex items-start space-x-3 text-xs">
+              <div class="p-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5">
+                <ShieldCheck class="w-4 h-4" />
+              </div>
+              <div>
+                <p class="font-bold text-slate-800 dark:text-slate-200">Test local & sécurisé</p>
+                <p class="text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
+                  Le calcul s'effectue entièrement sur votre matériel (CPU/GPU) via votre navigateur. Aucune donnée n'est collectée.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-3 text-xs">
+              <div class="p-1 rounded-lg bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5">
+                <Wifi class="w-4 h-4" />
+              </div>
+              <div>
+                <p class="font-bold text-slate-800 dark:text-slate-200">Connexion internet requise</p>
+                <p class="text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
+                  Si le modèle de test ({{ selectedModelSize }}) n'est pas dans votre cache, il sera téléchargé. Nous vous recommandons d'utiliser le Wi-Fi.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <DialogFooter class="grid grid-cols-2 gap-3 sm:space-x-0 pt-2">
+          <Button variant="outline" @click="showBenchmarkConfirm = false" class="rounded-xl border-slate-200 dark:border-slate-800 h-11 text-xs font-semibold">
+            Annuler
+          </Button>
+          <Button @click="startBenchmarkAfterConfirm" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl h-11 text-xs font-bold shadow-lg shadow-indigo-500/20">
+            Autoriser et Démarrer
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { Card } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
 import { Badge } from '~/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
-import { Activity, Play, Cpu, Cpu as Microchip, Loader2, Zap } from 'lucide-vue-next'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '~/components/ui/dialog'
+import { Activity, Play, Cpu, Cpu as Microchip, Loader2, Zap, ShieldCheck, Wifi } from 'lucide-vue-next'
 import { useChat } from '~/contexts/chatContext'
 
 const chatStore = useChat()
@@ -147,6 +222,19 @@ const selectedModel = ref('HuggingFaceTB/SmolLM-135M-Instruct')
 const selectedEngine = ref<'both' | 'webgpu' | 'wasm'>('both')
 const isRunning = ref(false)
 const activeTest = ref<'webgpu' | 'wasm' | null>(null)
+const showBenchmarkConfirm = ref(false)
+
+const selectedModelName = computed(() => {
+  if (selectedModel.value === 'HuggingFaceTB/SmolLM-135M-Instruct') return 'SmolLM-135M-Instruct'
+  if (selectedModel.value === 'Xenova/Qwen1.5-0.5B-Chat') return 'Qwen1.5-0.5B-Chat'
+  return selectedModel.value
+})
+
+const selectedModelSize = computed(() => {
+  if (selectedModel.value === 'HuggingFaceTB/SmolLM-135M-Instruct') return '150 MB'
+  if (selectedModel.value === 'Xenova/Qwen1.5-0.5B-Chat') return '350 MB'
+  return 'Inconnue'
+})
 
 const results = reactive({
   webgpu: {
@@ -171,6 +259,21 @@ function resetResults() {
 async function runFullBenchmark() {
   if (!selectedModel.value || isRunning.value) return
   
+  // Check cache before starting
+  const isCached = await chatStore.isModelCached(selectedModel.value)
+  if (!isCached) {
+    showBenchmarkConfirm.value = true
+  } else {
+    await executeBenchmark()
+  }
+}
+
+async function startBenchmarkAfterConfirm() {
+  showBenchmarkConfirm.value = false
+  await executeBenchmark()
+}
+
+async function executeBenchmark() {
   isRunning.value = true
   resetResults()
   

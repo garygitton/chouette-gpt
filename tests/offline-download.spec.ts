@@ -7,10 +7,19 @@ test.describe('Model Download & Pause Flow', () => {
     page.on('pageerror', error => console.log('BROWSER ERROR:', error.message));
 
     // Navigate to the app (using the mock mode so it downloads a fake small payload and we can control it)
-    // The app auto-downloads the best model on mount (or we can select one).
     await page.goto('/?mock=true');
 
-    // Verify the download modal appears (triggered automatically by app.vue)
+    // Click "Télécharger et activer l'IA" button on the landing dashboard
+    const downloadBtn = page.getByRole('button', { name: /Télécharger et activer l'IA/i });
+    await expect(downloadBtn).toBeVisible({ timeout: 10000 });
+    await downloadBtn.click();
+
+    // Accept download in the confirmation modal
+    const acceptBtn = page.getByRole('button', { name: /Accepter et Télécharger/i });
+    await expect(acceptBtn).toBeVisible({ timeout: 5000 });
+    await acceptBtn.click();
+
+    // Verify the download modal appears
     const loadingModal = page.locator('text=Téléchargement en cours').first();
     await expect(loadingModal).toBeVisible({ timeout: 15000 });
 

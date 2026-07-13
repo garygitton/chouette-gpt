@@ -21,6 +21,10 @@ test.describe('ChouetteGPT - BDD Trust UX', () => {
       } catch (e) {
       }
     });
+
+    // Abort third-party network requests to keep tests fast and offline-capable
+    await page.route(/hits\.seeyoufarm\.com/, route => route.abort());
+    await page.route(/shields\.io/, route => route.abort());
   });
 
   test('Vérification des éléments de confiance et du mode Expert', async ({ page }) => {
@@ -39,7 +43,7 @@ test.describe('ChouetteGPT - BDD Trust UX', () => {
       await expect(page.getByText('Zéro Pistage').first()).toBeVisible();
       
       // Minimalist CTA instead of mini-tutorial
-      await expect(page.getByText('Sélectionnez un modèle dans la barre latérale pour commencer')).toBeVisible();
+      await expect(page.getByText("Télécharger et activer l'IA").first()).toBeVisible();
     });
   });
 });

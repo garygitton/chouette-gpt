@@ -25,6 +25,10 @@ test.describe('ChouetteGPT - BDD Cache & Security', () => {
       }
     });
 
+    // Abort third-party network requests to keep tests fast and offline-capable
+    await page.route(/hits\.seeyoufarm\.com/, route => route.abort());
+    await page.route(/shields\.io/, route => route.abort());
+
     page.on('console', msg => {
       console.log(`[BROWSER CONSOLE] ${msg.type()}: ${msg.text()}`);
     });
@@ -55,7 +59,15 @@ test.describe('ChouetteGPT - BDD Cache & Security', () => {
     });
 
     await test.step('And le chat fonctionne et utilise la logique WASM sécurisée', async () => {
-      // Wait for auto-download to complete and chat to be active
+      // Click download button
+      const downloadBtn = page.getByRole('button', { name: /Télécharger et activer l'IA/i });
+      await expect(downloadBtn).toBeVisible({ timeout: 5000 });
+      await downloadBtn.click();
+
+      // Accept download in the confirmation modal
+      const acceptBtn = page.getByRole('button', { name: /Accepter et Télécharger/i });
+      await expect(acceptBtn).toBeVisible({ timeout: 5000 });
+      await acceptBtn.click();
       
       // Wait for chat to be active
       const textarea = page.getByTestId('chat-textarea');
@@ -68,6 +80,10 @@ test.describe('ChouetteGPT - BDD Cache & Security', () => {
       // Wait for response
       const assistantMessage = page.locator('main').getByText(/Bonjour/);
       await expect(assistantMessage).toBeVisible({ timeout: 10000 });
+
+      // Verify hardware indicator (GPU) is shown in the chat message header
+      const hardwareIndicator = page.locator('main').getByText(/\(GPU\)/);
+      await expect(hardwareIndicator).toBeVisible();
     });
   });
 });

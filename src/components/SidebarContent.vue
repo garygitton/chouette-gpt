@@ -67,54 +67,57 @@
     </div>
 
     <!-- Footer Actions -->
-    <div class="mt-auto pt-4 space-y-2">
-      <Separator class="bg-slate-200/60 dark:bg-slate-800/40 mb-4" />
+    <div class="mt-auto pt-4 space-y-3.5">
+      <Separator class="bg-slate-200/60 dark:bg-slate-800/40" />
       
-      <!-- Language Selector -->
-      <LanguageSelector size="sm" />
+      <!-- Premium Config & Action Card -->
+      <div class="p-3 rounded-2xl bg-slate-50/50 dark:bg-slate-900/30 border border-slate-100 dark:border-slate-900/50 space-y-3 shadow-inner">
+        <!-- Language Selector -->
+        <LanguageSelector size="sm" />
 
-      <div class="grid grid-cols-4 gap-1.5 pt-1">
-        <Button
-          data-testid="settings-button"
-          variant="ghost"
-          class="rounded-xl justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900"
-          :title="t('settings')"
-          @click="navigateTo('/settings'); $emit('close-sidebar')"
-        >
-          <Settings class="w-5 h-5" />
-        </Button>
-        <Button
-          data-testid="privacy-button"
-          variant="ghost"
-          class="rounded-xl justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900"
-          :title="t('privacy')"
-          @click="navigateTo('/privacy'); $emit('close-sidebar')"
-        >
-          <ShieldCheck class="w-5 h-5" />
-        </Button>
-        <Button
-          data-testid="theme-toggle"
-          variant="ghost"
-          class="rounded-xl justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900"
-          :title="settingsStore.isDarkMode ? t('light_mode') : t('dark_mode')"
-          @click="toggleTheme"
-        >
-          <component :is="settingsStore.isDarkMode ? Sun : Moon" class="w-5 h-5" />
-        </Button>
-        <Button
-          data-testid="benchmark-button"
-          variant="ghost"
-          class="rounded-xl justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900"
-          title="Banc d'Essai"
-          @click="navigateTo('/benchmark'); $emit('close-sidebar')"
-        >
-          <Activity class="w-5 h-5" />
-        </Button>
+        <div class="grid grid-cols-4 gap-1">
+          <Button
+            data-testid="settings-button"
+            variant="ghost"
+            class="rounded-xl justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900"
+            :title="t('settings')"
+            @click="navigateTo('/settings'); $emit('close-sidebar')"
+          >
+            <Settings class="w-4 h-4" />
+          </Button>
+          <Button
+            data-testid="privacy-button"
+            variant="ghost"
+            class="rounded-xl justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900"
+            :title="t('privacy')"
+            @click="navigateTo('/privacy'); $emit('close-sidebar')"
+          >
+            <ShieldCheck class="w-4 h-4" />
+          </Button>
+          <Button
+            data-testid="theme-toggle"
+            variant="ghost"
+            class="rounded-xl justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900"
+            :title="settingsStore.isDarkMode ? t('light_mode') : t('dark_mode')"
+            @click="toggleTheme"
+          >
+            <component :is="settingsStore.isDarkMode ? Sun : Moon" class="w-4 h-4" />
+          </Button>
+          <Button
+            data-testid="benchmark-button"
+            variant="ghost"
+            class="rounded-xl justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900"
+            title="Banc d'Essai"
+            @click="navigateTo('/benchmark'); $emit('close-sidebar')"
+          >
+            <Activity class="w-4 h-4" />
+          </Button>
+        </div>
       </div>
-      <!-- Social Networks Links (Static) -->
-      <div class="flex flex-col justify-center pt-3 mt-2">
-        <Separator class="bg-slate-200/60 dark:bg-slate-800/40 mb-3" />
-        <div class="flex justify-center space-x-5">
+
+      <!-- Socials Section -->
+      <div class="flex flex-col items-center justify-center space-y-2.5 pt-1 pb-1">
+        <div class="flex items-center space-x-4">
           <a href="https://www.linkedin.com/in/garygitton" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-indigo-500 transition-colors" title="LinkedIn" data-testid="sidebar-linkedin-link">
             <Linkedin class="w-4 h-4" />
           </a>

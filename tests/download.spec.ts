@@ -35,6 +35,11 @@ test.describe('ChouetteGPT - BDD Download', () => {
       const sidebar = page.getByTestId('sidebar');
       const downloadBtn = sidebar.getByRole('button', { name: /Télécharger et activer/ });
       await downloadBtn.click();
+
+      // Accept download in the confirmation modal
+      const acceptBtn = page.getByRole('button', { name: /Accepter et Télécharger/i });
+      await expect(acceptBtn).toBeVisible({ timeout: 5000 });
+      await acceptBtn.click();
     });
 
     await test.step('Then le chat devient disponible une fois terminé', async () => {

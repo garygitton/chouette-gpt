@@ -57,15 +57,17 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
       const option = page.locator(`[data-testid^="model-option-"]`).filter({ hasText: modelName });
       await expect(option).toBeVisible();
       await option.click();
+      await expect(option).toBeHidden();
 
       // 3. Télécharger et activer
-      const downloadBtn = page.locator('button').filter({ hasText: 'Télécharger et activer' });
-      try {
-        await downloadBtn.waitFor({ state: 'visible', timeout: 2000 });
-        await downloadBtn.click();
-      } catch (e) {
-        // Bouton non visible, modèle déjà téléchargé ou en cours
-      }
+      const downloadBtn = page.getByTestId('sidebar').getByRole('button', { name: /Télécharger et activer/i });
+      await expect(downloadBtn).toBeVisible({ timeout: 5000 });
+      await downloadBtn.click();
+
+      // Accept download in the confirmation modal
+      const acceptBtn = page.getByRole('button', { name: /Accepter et Télécharger/i });
+      await expect(acceptBtn).toBeVisible({ timeout: 5000 });
+      await acceptBtn.click();
 
       // 4. Attendre que le statut passe à "Prêt"
       const statusBadge = page.getByTestId('model-status-badge');

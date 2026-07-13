@@ -2,6 +2,11 @@
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
+  <ModelDownloadDialog
+    v-model="chatContext.showDownloadConfirmation"
+    :model="chatContext.pendingModelForConfirmation"
+    @accept="chatContext.confirmDownload"
+  />
 </template>
 
 <script setup lang="ts">
@@ -43,28 +48,7 @@ onMounted(() => {
 
   settingsContext.initSettings()
 
-  let isInitializing = true
-
-  // Watch for model changes to automatically trigger downloads
-  watch(() => modelContext.currentModelId, (newId, oldId) => {
-    if (isInitializing) return
-    if (newId && newId !== oldId) {
-      chatContext.cancelDownload()
-      chatContext.downloadMultipleEngines([newId])
-    }
-  })
-
-  // Detect best model and trigger initial download
-  modelContext.detectBestModel().then(() => {
-    isInitializing = false
-    if (modelContext.currentModelId) {
-      // Defer the heavy download to allow the UI to finish rendering (Time To First Design)
-      setTimeout(() => {
-        if (typeof window !== 'undefined' && !window.location.search.includes('noAutoDownload')) {
-          chatContext.downloadMultipleEngines([modelContext.currentModelId!])
-        }
-      }, 1500)
-    }
-  })
+  // Detect best model and initialize
+  modelContext.detectBestModel()
 })
 </script>

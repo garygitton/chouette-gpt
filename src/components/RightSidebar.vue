@@ -10,10 +10,10 @@
     <!-- Token Consumption -->
     <div class="space-y-2">
       <div class="flex justify-between items-center text-sm">
-        <span class="font-medium text-slate-700 dark:text-slate-300">Tokens de session</span>
-        <span class="text-xs text-slate-500">{{ chatStore.sessionTokens }} / 8192</span>
+        <span class="font-medium text-slate-700 dark:text-slate-300">Tokens de conversation</span>
+        <span class="text-xs text-slate-500">{{ chatStore.conversationTokens }} / 8192</span>
       </div>
-      <Progress :model-value="(chatStore.sessionTokens / 8192) * 100" class="h-2" />
+      <Progress :model-value="(chatStore.conversationTokens / 8192) * 100" class="h-2" />
     </div>
 
 

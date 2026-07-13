@@ -1,4 +1,4 @@
-import defaultColors from 'tailwindcss/colors.js'
+import defaultColors from 'tailwindcss/colors'
 
 const colors = { ...defaultColors }
 delete (colors as any).lightBlue
