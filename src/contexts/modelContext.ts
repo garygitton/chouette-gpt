@@ -16,12 +16,12 @@ export function useProvideModel(deviceContext: DeviceContext) {
       usageCount: 0,
       status: ModelStatus.Available,
       ramRequired: 1024,
-      performanceScore: 30
+      performanceScore: 30,
+      description: 'Ultra-rapide & léger'
     },
     {
       id: 'onnx-community/Qwen2.5-0.5B-Instruct',
       name: 'Qwen2.5-0.5B-Instruct',
-      
       version: '2.5',
       parameters: '0.5B',
       totalSize: '350 MB',
@@ -30,7 +30,22 @@ export function useProvideModel(deviceContext: DeviceContext) {
       usageCount: 0,
       status: ModelStatus.Available,
       ramRequired: 2048,
-      performanceScore: 45
+      performanceScore: 45,
+      description: 'Rapide & polyvalent'
+    },
+    {
+      id: 'bobber/routangseng-qwen35-0.8b-abliterated-onnx',
+      name: 'Routangseng-Qwen3.5-0.8B-Abliterated',
+      version: '3.5',
+      parameters: '0.8B',
+      totalSize: '550 MB',
+      quantization: 'q4',
+      estimatedMemory: '900 MB',
+      usageCount: 0,
+      status: ModelStatus.Available,
+      ramRequired: 2048,
+      performanceScore: 50,
+      description: 'Débridé & direct'
     },
     {
       id: 'onnx-community/Llama-3.2-1B-Instruct-ONNX',
@@ -43,7 +58,8 @@ export function useProvideModel(deviceContext: DeviceContext) {
       usageCount: 0,
       status: ModelStatus.Available,
       ramRequired: 3072,
-      performanceScore: 55
+      performanceScore: 55,
+      description: 'Équilibré & précis'
     },
     {
       id: 'onnx-community/Qwen2.5-1.5B-Instruct',
@@ -56,7 +72,8 @@ export function useProvideModel(deviceContext: DeviceContext) {
       usageCount: 0,
       status: ModelStatus.Available,
       ramRequired: 4096,
-      performanceScore: 60
+      performanceScore: 60,
+      description: 'Puissant & logique'
     },
     {
       id: 'onnx-community/Llama-3.2-3B-Instruct-ONNX',
@@ -69,7 +86,8 @@ export function useProvideModel(deviceContext: DeviceContext) {
       usageCount: 0,
       status: ModelStatus.Available,
       ramRequired: 8192,
-      performanceScore: 70
+      performanceScore: 70,
+      description: 'Créatif & intelligent'
     },
     {
       id: 'onnx-community/Phi-3.5-mini-instruct-onnx-web',
@@ -82,7 +100,36 @@ export function useProvideModel(deviceContext: DeviceContext) {
       usageCount: 0,
       status: ModelStatus.Available,
       ramRequired: 8192,
-      performanceScore: 75
+      performanceScore: 75,
+      description: 'Raisonnement complexe'
+    },
+    {
+      id: 'onnx-community/NVIDIA-Nemotron-3-Nano-4B-BF16-ONNX',
+      name: 'NVIDIA-Nemotron-3-Nano-4B-Instruct',
+      version: '3.0',
+      parameters: '4B',
+      totalSize: '2.5 GB',
+      quantization: 'q4',
+      estimatedMemory: '4.5 GB',
+      usageCount: 0,
+      status: ModelStatus.Available,
+      ramRequired: 8192,
+      performanceScore: 80,
+      description: 'Mamba-2 hybride'
+    },
+    {
+      id: 'vmanvs/medgemma-q4f16-chunked',
+      name: 'MedGemma-4B-Instruct',
+      version: '1.5',
+      parameters: '4B',
+      totalSize: '2.6 GB',
+      quantization: 'q4',
+      estimatedMemory: '4.5 GB',
+      usageCount: 0,
+      status: ModelStatus.Available,
+      ramRequired: 8192,
+      performanceScore: 85,
+      description: 'Diagnostic médical'
     }
   ])
 

@@ -43,7 +43,8 @@
           </Button>
         </div>
       </div>
-      <p class="text-center text-[9.5px] text-slate-400 dark:text-slate-500 leading-normal max-w-2xl mx-auto mt-2">
+      <!-- Disclaimer on the border -->
+      <p class="absolute -top-[9px] left-5 bg-white dark:bg-[#0b0f19] px-2 text-[9.5px] text-slate-400 dark:text-slate-500 leading-normal z-10 pointer-events-none tracking-wide">
         {{ t('disclaimer') }}
       </p>
     </div>

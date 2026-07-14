@@ -32,7 +32,10 @@
           >
             <Menu class="w-5 h-5" />
           </Button>
-          <span class="font-black text-slate-800 dark:text-white tracking-tight text-lg">Chouette<span class="text-indigo-500">GPT</span></span>
+          <div class="flex items-center gap-1.5">
+            <img src="/logo.svg" alt="" class="w-6 h-6" />
+            <span class="font-black text-slate-800 dark:text-white tracking-tight text-lg">Chouette<span class="text-indigo-500">GPT</span></span>
+          </div>
           <div class="flex gap-1">
             <Button
               variant="ghost"

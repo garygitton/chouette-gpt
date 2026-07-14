@@ -5,6 +5,7 @@ import path from 'path';
 
 async function run() {
   console.log('Starting Playwright for video recording (Real Llama-1B WebGPU in English)...');
+  let skipSeconds = 0;
   
   // Launch headed Chromium with WebGPU flags
   const browser = await chromium.launch({
@@ -41,6 +42,7 @@ async function run() {
     window.localStorage.setItem('app_language', 'en');
   });
 
+  const startTime = Date.now();
   console.log('Navigating to app...');
   await page.goto('http://localhost:3008/?noAutoDownload=true', { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(2000);
@@ -55,22 +57,33 @@ async function run() {
   await qwenOption.click();
   await page.waitForTimeout(1500);
 
-  // 2. Pause Download (inside overlay modal)
-  console.log('Pausing Download...');
+  // 2. Pause Download (inside overlay modal) if it appears
+  console.log('Checking if download dialog is present...');
   const pauseBtn = page.getByRole('button', { name: 'Mettre en pause' }).first();
-  await pauseBtn.click();
-  await page.waitForTimeout(1500);
+  try {
+    await pauseBtn.waitFor({ state: 'visible', timeout: 3000 });
+    console.log('Pausing Download...');
+    await pauseBtn.click();
+    await page.waitForTimeout(1500);
 
-  // 4. Resume Download
-  console.log('Resuming Download...');
-  const resumeBtn = page.getByRole('button', { name: 'Reprendre' }).first();
-  await resumeBtn.click();
+    // 4. Resume Download
+    console.log('Resuming Download...');
+    const resumeBtn = page.getByRole('button', { name: 'Reprendre' }).first();
+    await resumeBtn.click();
+  } catch (e) {
+    console.log('Download dialog did not appear (model likely already cached). Skipping pause/resume.');
+  }
   
   // 5. Wait for download & WebGPU compilation (can take up to 2-3 mins if uncached)
   console.log('Waiting for WebGPU initialization & model load (Qwen-0.5B)...');
   const readyBadge = page.getByText(/Prêt à l'emploi/i).first();
   await readyBadge.waitFor({ state: 'visible', timeout: 180000 });
   console.log('Qwen-0.5B successfully loaded in VRAM!');
+  
+  const readyTime = Date.now();
+  skipSeconds = Math.max(0, (readyTime - startTime) / 1000 - 1.5);
+  console.log(`Model is ready. Skipping first ${skipSeconds.toFixed(2)} seconds of initialization in the final GIF.`);
+  
   await page.waitForTimeout(2000);
 
   // 6. Chat turn 1 (English)
@@ -131,9 +144,9 @@ async function run() {
   const inputPath = path.join(videoDir, videoFiles[0].name);
   const outputPath = path.resolve('public/demo.gif');
 
-  console.log(`Converting ${inputPath} to ${outputPath} using ffmpeg...`);
-  // Convert WebM to GIF using high quality palette settings in ffmpeg
-  const ffmpegCmd = `ffmpeg -y -i "${inputPath}" -vf "fps=12,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" "${outputPath}"`;
+  console.log(`Converting ${inputPath} to ${outputPath} using ffmpeg (skipping first ${skipSeconds.toFixed(2)}s)...`);
+  // Convert WebM to GIF using high quality palette settings in ffmpeg and seeking to skip the initialization phase
+  const ffmpegCmd = `ffmpeg -y -ss ${skipSeconds.toFixed(2)} -i "${inputPath}" -vf "fps=12,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" "${outputPath}"`;
   
   execSync(ffmpegCmd);
   console.log('GIF generated successfully at public/demo.gif!');

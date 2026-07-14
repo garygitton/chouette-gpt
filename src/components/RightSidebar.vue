@@ -107,7 +107,17 @@
       </CollapsibleContent>
     </Collapsible>
 
-
+    <!-- Socials Section -->
+    <div class="mt-auto pt-6 flex flex-col items-center justify-center space-y-2.5 border-t border-slate-200 dark:border-slate-800">
+      <div class="flex items-center space-x-4">
+        <a href="https://www.linkedin.com/in/garygitton" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-indigo-500 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded" title="LinkedIn" aria-label="Profil LinkedIn de Gary Gitton" data-testid="sidebar-linkedin-link">
+          <Linkedin class="w-4 h-4" />
+        </a>
+        <a href="https://github.com/garygitton/chouette-gpt" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-indigo-500 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded" title="GitHub" aria-label="Dépôt GitHub du projet" data-testid="sidebar-github-link">
+          <Github class="w-4 h-4" />
+        </a>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -121,7 +131,7 @@ import { Progress } from '~/components/ui/progress'
 import { Slider } from '~/components/ui/slider'
 import { Textarea } from '~/components/ui/textarea'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '~/components/ui/collapsible'
-import { X, ChevronDown, ChevronUp, SlidersHorizontal, Check } from 'lucide-vue-next'
+import { X, ChevronDown, ChevronUp, SlidersHorizontal, Check, Linkedin, Github } from 'lucide-vue-next'
 
 const showSavedFeedback = ref(false)
 let feedbackTimeout: any = null

@@ -1,34 +1,32 @@
 <!-- @ds-ignore-file -->
 <template>
-  <div class="my-auto py-12 space-y-10 ui-message-slide-in">
+  <main class="my-auto py-12 space-y-10 ui-message-slide-in" aria-labelledby="dashboard-title">
     <!-- Main Glowing Logo Emblem -->
     <div class="text-center space-y-6">
       <div class="relative w-24 h-24 mx-auto rounded-3xl bg-gradient-to-tr from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-slate-200/50 dark:border-slate-800/50 flex items-center justify-center shadow-2xl backdrop-blur-xl group hover:border-indigo-500/30 transition-all duration-500">
-        <!-- Minimalist Typography Replacement for Logo -->
-        <div class="relative w-full h-full flex items-center justify-center font-black text-4xl text-transparent bg-clip-text bg-gradient-to-tr from-indigo-500 to-pink-500 transform group-hover:scale-110 transition-transform duration-500">
-          C
-        </div>
+        <!-- Animated SVG Logo -->
+        <img src="/logo.svg" alt="Logo" class="w-20 h-20 transform group-hover:scale-110 transition-transform duration-500" />
 
         <!-- Dynamic Ambient Light -->
         <div class="absolute inset-0 rounded-3xl bg-gradient-to-tr from-indigo-500 to-pink-500 blur-2xl opacity-15 group-hover:opacity-25 -z-10 transition-opacity duration-500"></div>
       </div>
 
       <div class="space-y-4">
-        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white flex items-center justify-center gap-3">
+        <h1 id="dashboard-title" class="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white flex items-center justify-center gap-3">
           <span>Chouette<span class="ui-title-gradient">GPT</span></span>
           <Badge variant="outline" class="bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800/50 py-1 px-2 text-xs font-bold uppercase tracking-widest mt-2 align-middle">
             Expérimental
           </Badge>
         </h1>
-        <p v-if="chatStore.isEngineReady" class="text-slate-500 dark:text-slate-400 text-base md:text-lg max-w-xl mx-auto font-normal leading-relaxed">
+        <p v-if="chatStore.isEngineReady" class="text-slate-600 dark:text-slate-300 text-base md:text-lg max-w-xl mx-auto font-normal leading-relaxed">
           {{ t('empty_chat_subtitle') }}
         </p>
-        <p v-else class="text-slate-500 dark:text-slate-400 text-base md:text-lg max-w-xl mx-auto font-normal leading-relaxed">
+        <p v-else class="text-slate-600 dark:text-slate-300 text-base md:text-lg max-w-xl mx-auto font-normal leading-relaxed">
           Votre assistant IA local, 100% privé et hors-ligne.
         </p>
         <div class="max-w-xl mx-auto text-xs text-left text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/20 p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 space-y-3 shadow-sm">
           <p class="leading-relaxed">
-            <strong class="text-slate-800 dark:text-slate-200">Objectif du projet :</strong> Ce laboratoire expérimental vise à tester les limites de l'inférence des modèles d'intelligence artificielle fonctionnant entièrement dans le navigateur web (WebGPU/WASM), sans serveurs distants.
+            <strong class="text-slate-800 dark:text-slate-200">{{ t('landing_objective_title') }}</strong> {{ t('landing_objective_desc') }}
           </p>
           <div class="flex items-start space-x-2.5 text-amber-600 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20 p-3 rounded-xl border border-amber-100/50 dark:border-amber-900/30">
             <p class="leading-relaxed font-medium">
@@ -58,7 +56,8 @@
       <div v-if="!chatStore.isEngineLoading" class="flex flex-col items-center space-y-3">
         <Button 
           @click="chatStore.downloadMultipleEngines([modelStore.currentModelId])" 
-          class="h-12 px-8 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-700 hover:to-pink-600 text-white shadow-lg shadow-indigo-500/25 transition-all hover:scale-105 font-bold flex items-center gap-2"
+          aria-label="Télécharger et activer l'IA"
+          class="h-12 px-8 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-700 hover:to-pink-600 text-white shadow-lg shadow-indigo-500/25 transition-all hover:scale-105 font-bold flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 dark:focus-visible:ring-offset-slate-900"
         >
           <Download class="w-5 h-5" />
           Télécharger et activer l'IA
@@ -87,8 +86,12 @@
         v-for="prompt in suggestedPrompts" 
         :key="prompt.text" 
         @click="$emit('send-prompt', prompt.text)" 
+        @keydown.enter="$emit('send-prompt', prompt.text)"
+        tabindex="0"
+        role="button"
+        :aria-label="'Essayer le prompt : ' + prompt.title"
         :data-testid="'suggested-prompt-' + prompt.title.toLowerCase().replace(/\s+/g, '-')"
-        class="group relative cursor-pointer text-left p-5 rounded-3xl border border-slate-200/50 dark:border-slate-800/50 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl transition-all duration-500 flex items-start space-x-4 overflow-hidden hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:hover:shadow-[0_8px_30px_rgba(99,102,241,0.15)] hover:border-indigo-500/50 dark:hover:border-indigo-500/50"
+        class="group relative cursor-pointer text-left p-5 rounded-3xl border border-slate-200/50 dark:border-slate-800/50 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl transition-all duration-500 flex items-start space-x-4 overflow-hidden hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:hover:shadow-[0_8px_30px_rgba(99,102,241,0.15)] hover:border-indigo-500/50 dark:hover:border-indigo-500/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
       >
         <!-- Animated border gradient -->
         <div class="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" style="padding: 1px; background: linear-gradient(to bottom right, #6366f1, #ec4899); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude;"></div>
@@ -116,7 +119,7 @@
         </div>
       </Card>
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup lang="ts">

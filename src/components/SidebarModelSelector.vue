@@ -16,10 +16,15 @@
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectItem v-for="model in modelStore.compatibleModels" :key="model.id" :value="model.id" :data-testid="'model-option-' + model.id" class="text-xs cursor-pointer">
-            <div class="flex items-center justify-between w-full gap-2">
-              <span class="font-medium">{{ model.name }}</span>
-              <Badge variant="secondary" class="text-[9px] px-1 py-0 h-4 bg-slate-100 dark:bg-slate-800 text-slate-500">{{ model.totalSize }}</Badge>
+          <SelectItem v-for="model in modelStore.compatibleModels" :key="model.id" :value="model.id" :data-testid="'model-option-' + model.id" class="cursor-pointer py-1.5">
+            <div class="flex flex-col items-start gap-0.5 w-full">
+              <div class="flex items-center justify-between w-full gap-2">
+                <span class="font-semibold text-xs text-slate-900 dark:text-slate-100">{{ model.name }}</span>
+                <Badge variant="secondary" class="text-[9px] px-1 py-0 h-4 bg-slate-100 dark:bg-slate-800 text-slate-500 font-normal border-none flex-shrink-0">{{ model.totalSize }}</Badge>
+              </div>
+              <span class="text-[10px] text-slate-400 dark:text-slate-500 font-normal leading-normal">
+                {{ model.description }}
+              </span>
             </div>
           </SelectItem>
         </SelectGroup>

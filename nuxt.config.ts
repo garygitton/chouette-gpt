@@ -37,7 +37,8 @@ export default defineNuxtConfig({
       '/**': {
         headers: {
           'Cross-Origin-Opener-Policy': 'same-origin',
-          'Cross-Origin-Embedder-Policy': 'require-corp'
+          'Cross-Origin-Embedder-Policy': 'require-corp',
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
         }
       },
       '/models/**': { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } }
@@ -45,7 +46,7 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: false },
   experimental: {
-    appManifest: false
+    appManifest: true
   },
   devServer: {
     port: parseInt(process.env.PORT || '3000')
@@ -126,5 +127,11 @@ export default defineNuxtConfig({
     }
   },
 
+  watchers: {
+    chokidar: {
+      usePolling: true,
+      interval: 1000
+    }
+  },
   compatibilityDate: '2024-04-03'
-})
+} as any)

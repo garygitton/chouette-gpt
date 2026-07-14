@@ -9,10 +9,13 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
   const models = [
     'SmolLM2-135M-Instruct',
     'Qwen2.5-0.5B-Instruct',
+    'Routangseng-Qwen3.5-0.8B-Abliterated',
     'Llama-3.2-1B-Instruct',
     'Qwen2.5-1.5B-Instruct',
     'Llama-3.2-3B-Instruct',
-    'Phi-3.5-mini-instruct'
+    'Phi-3.5-mini-instruct',
+    'NVIDIA-Nemotron-3-Nano-4B-Instruct',
+    'MedGemma-4B-Instruct'
   ];
 
   for (const modelName of models) {

@@ -29,7 +29,7 @@
           variant="secondary" 
           class="pointer-events-auto rounded-full shadow-lg border border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-xs h-8 px-4 font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400"
         >
-          <ArrowDown class="w-3.5 h-3.5 mr-1.5" />
+          <ArrowDown :class="'w-3.5 h-3.5 mr-1.5'" />
           Nouveaux messages
         </Button>
       </div>

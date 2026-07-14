@@ -5,12 +5,18 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
+    "build:gh-pages": "cross-env NUXT_APP_BASE_URL=/chouette-gpt/ nuxt generate",
+    "deploy": "pnpm run build:gh-pages && gh-pages -a --dotfiles -d dist",
     "dev": "nuxt dev",
-    "dev:log": "mkdir -p data/logs && nuxt dev > data/logs/dev.log 2>&1",
+    "dev:local": "cross-env HOST=chouette-gpt.localhost nuxt dev",
+    "dev:log": "cross-env node scripts/dev-logger.mjs",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "test:e2e": "playwright test",
+    "test:ui": "playwright test --project=ui-tests",
+    "test:gpu": "playwright test --project=webgpu-tests",
+    "clean": "rimraf .nuxt .output dist node_modules pnpm-lock.yaml && pnpm install",
     "download-models": "node scripts/download-models.mjs",
     "typecheck": "vue-tsc --noEmit"
   },
@@ -35,15 +41,22 @@
   "devDependencies": {
     "@huggingface/hub": "^2.13.3",
     "@nuxt/devtools": "^4.0.0-alpha.7",
+    "@nuxt/kit": "^4.4.8",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@playwright/test": "^1.61.1",
+    "@vue/test-utils": "^2.4.11",
+    "cross-env": "^10.1.0",
+    "gh-pages": "^6.3.0",
+    "jsdom": "^29.1.1",
     "lucide-vue-next": "^1.0.0",
     "nuxt": "3.15.2",
     "puppeteer": "^25.3.0",
+    "rimraf": "^6.1.3",
     "shadcn-nuxt": "^2.7.4",
     "tailwindcss-animate": "^1.0.7",
     "terser": "^5.48.0",
     "typescript": "^5.7.3",
+    "vitest": "^4.1.10",
     "vue-tsc": "^3.3.7"
   }
 }

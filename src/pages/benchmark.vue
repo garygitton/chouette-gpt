@@ -6,10 +6,10 @@
       <div class="text-center space-y-4">
         <h1 class="text-3xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white flex items-center justify-center gap-3">
           <Activity class="w-10 h-10 text-indigo-500" />
-          Benchmark <span class="ui-title-gradient">Hardware</span>
+          Benchmark <span class="ui-title-gradient">{{ t('bench_title') }}</span>
         </h1>
         <p class="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
-          Ce banc d'essai permet de torturer votre machine en mesurant les performances d'inférence en temps réel entre votre processeur (WASM) et votre carte graphique (WebGPU).
+          {{ t('bench_subtitle') }}
         </p>
       </div>
 
@@ -17,10 +17,10 @@
       <Card class="p-6 bg-white dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 shadow-xl rounded-3xl">
         <div class="flex flex-col md:flex-row gap-4 items-end">
           <div class="flex-1 w-full space-y-2">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Modèle de Test</label>
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">{{ t('bench_model_label') }}</label>
             <Select v-model="selectedModel" :disabled="isRunning">
               <SelectTrigger class="h-12 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
-                <SelectValue placeholder="Choisir un modèle..." />
+                <SelectValue placeholder="{{ t('bench_model_placeholder') }}" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="HuggingFaceTB/SmolLM-135M-Instruct">SmolLM-135M-Instruct (Très Rapide)</SelectItem>
@@ -30,15 +30,15 @@
           </div>
 
           <div class="flex-1 w-full space-y-2">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Moteur de Test</label>
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">{{ t('bench_engine_label') }}</label>
             <Select v-model="selectedEngine" :disabled="isRunning">
               <SelectTrigger class="h-12 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
-                <SelectValue placeholder="Choisir le moteur..." />
+                <SelectValue placeholder="{{ t('bench_engine_placeholder') }}" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="both">Les deux (Comparaison)</SelectItem>
-                <SelectItem value="webgpu">GPU uniquement (WebGPU)</SelectItem>
-                <SelectItem value="wasm">CPU uniquement (WASM)</SelectItem>
+                <SelectItem value="both">{{ t('bench_engine_both') }}</SelectItem>
+                <SelectItem value="webgpu">{{ t('bench_engine_gpu') }}</SelectItem>
+                <SelectItem value="wasm">{{ t('bench_engine_cpu') }}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -50,7 +50,7 @@
           >
             <Play class="w-5 h-5 mr-2" v-if="!isRunning" />
             <Loader2 class="w-5 h-5 mr-2 animate-spin" v-else />
-            {{ isRunning ? 'Test en cours...' : 'Lancer le Stress Test' }}
+            {{ isRunning ? t('bench_running') : t('bench_start') }}
           </Button>
         </div>
       </Card>
@@ -66,23 +66,23 @@
               <h3 class="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100">
                 <Cpu class="w-6 h-6 text-indigo-500" /> GPU (WebGPU)
               </h3>
-              <Badge v-if="activeTest === 'webgpu'" class="bg-indigo-500 animate-pulse">En cours</Badge>
-              <Badge v-else-if="results.webgpu.done" class="bg-green-500">Terminé</Badge>
+              <Badge v-if="activeTest === 'webgpu'" class="bg-indigo-500 animate-pulse">{{ t('bench_in_progress') }}</Badge>
+              <Badge v-else-if="results.webgpu.done" class="bg-green-500">{{ t('bench_done') }}</Badge>
             </div>
             
             <div class="grid grid-cols-2 gap-4">
               <div class="space-y-1">
-                <p class="text-xs font-semibold text-slate-500 uppercase">Tokens / Sec</p>
+                <p class="text-xs font-semibold text-slate-500 uppercase">{{ t('bench_tokens_sec') }}</p>
                 <p class="text-3xl font-black text-indigo-600 dark:text-indigo-400 font-mono">{{ results.webgpu.tokensPerSec.toFixed(1) }}</p>
               </div>
               <div class="space-y-1">
-                <p class="text-xs font-semibold text-slate-500 uppercase">Temps d'Init.</p>
+                <p class="text-xs font-semibold text-slate-500 uppercase">{{ t('bench_init_time') }}</p>
                 <p class="text-xl font-bold text-slate-700 dark:text-slate-300 font-mono">{{ (results.webgpu.warmupMs / 1000).toFixed(2) }}s</p>
               </div>
             </div>
             
             <div class="text-sm text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-950 p-3 rounded-xl h-24 overflow-y-auto font-mono text-[10px]">
-              {{ results.webgpu.text || (activeTest === 'webgpu' ? chatStore.engineProgress.text : 'En attente...') }}
+              {{ results.webgpu.text || (activeTest === 'webgpu' ? chatStore.engineProgress.text : t('bench_waiting')) }}
             </div>
           </div>
         </Card>
@@ -95,23 +95,23 @@
               <h3 class="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100">
                 <Microchip class="w-6 h-6 text-pink-500" /> CPU (WASM)
               </h3>
-              <Badge v-if="activeTest === 'wasm'" class="bg-pink-500 animate-pulse">En cours</Badge>
-              <Badge v-else-if="results.wasm.done" class="bg-green-500">Terminé</Badge>
+              <Badge v-if="activeTest === 'wasm'" class="bg-pink-500 animate-pulse">{{ t('bench_in_progress') }}</Badge>
+              <Badge v-else-if="results.wasm.done" class="bg-green-500">{{ t('bench_done') }}</Badge>
             </div>
             
             <div class="grid grid-cols-2 gap-4">
               <div class="space-y-1">
-                <p class="text-xs font-semibold text-slate-500 uppercase">Tokens / Sec</p>
+                <p class="text-xs font-semibold text-slate-500 uppercase">{{ t('bench_tokens_sec') }}</p>
                 <p class="text-3xl font-black text-pink-600 dark:text-pink-400 font-mono">{{ results.wasm.tokensPerSec.toFixed(1) }}</p>
               </div>
               <div class="space-y-1">
-                <p class="text-xs font-semibold text-slate-500 uppercase">Temps d'Init.</p>
+                <p class="text-xs font-semibold text-slate-500 uppercase">{{ t('bench_init_time') }}</p>
                 <p class="text-xl font-bold text-slate-700 dark:text-slate-300 font-mono">{{ (results.wasm.warmupMs / 1000).toFixed(2) }}s</p>
               </div>
             </div>
             
             <div class="text-sm text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-950 p-3 rounded-xl h-24 overflow-y-auto font-mono text-[10px]">
-              {{ results.wasm.text || (activeTest === 'wasm' ? chatStore.engineProgress.text : 'En attente...') }}
+              {{ results.wasm.text || (activeTest === 'wasm' ? chatStore.engineProgress.text : t('bench_waiting')) }}
             </div>
           </div>
         </Card>
@@ -121,10 +121,10 @@
       <!-- Analysis / Comparison -->
       <Card v-if="selectedEngine === 'both' && results.webgpu.done && results.wasm.done" class="p-6 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50 rounded-3xl animate-in fade-in slide-in-from-bottom-4">
         <h3 class="text-lg font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-2 mb-2">
-          <Zap class="w-5 h-5" /> Analyse des performances
+          <Zap class="w-5 h-5" /> {{ t('bench_analysis_title') }}
         </h3>
         <p class="text-emerald-700 dark:text-emerald-300">
-          Le GPU (WebGPU) est <strong>{{ (results.webgpu.tokensPerSec / results.wasm.tokensPerSec).toFixed(1) }}x plus rapide</strong> que le CPU (WASM) pour la génération de texte sur ce modèle.
+          {{ t('bench_analysis_desc_gpu') }}<strong>{{ (results.webgpu.tokensPerSec / results.wasm.tokensPerSec).toFixed(1) }}{{ t('bench_analysis_desc_faster') }}</strong>{{ t('bench_analysis_desc_cpu') }}
         </p>
       </Card>
       
@@ -139,10 +139,10 @@
           </div>
           <div>
             <DialogTitle class="text-xl font-bold text-slate-900 dark:text-white">
-              Autoriser le test de performance ?
+              {{ t('bench_dialog_title') }}
             </DialogTitle>
             <DialogDescription class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Pour mesurer les performances, ChouetteGPT doit charger un modèle de test.
+              {{ t('bench_dialog_desc') }}
             </DialogDescription>
           </div>
         </DialogHeader>
@@ -157,7 +157,7 @@
               </p>
             </div>
             <div class="text-right">
-              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Taille de l'IA</p>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">{{ t('bench_ai_size') }}</p>
               <Badge class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border-indigo-200/50 font-mono font-bold mt-0.5">
                 {{ selectedModelSize }}
               </Badge>
@@ -171,9 +171,9 @@
                 <ShieldCheck class="w-4 h-4" />
               </div>
               <div>
-                <p class="font-bold text-slate-800 dark:text-slate-200">Test local & sécurisé</p>
+                <p class="font-bold text-slate-800 dark:text-slate-200">{{ t('bench_secure_test') }}</p>
                 <p class="text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
-                  Le calcul s'effectue entièrement sur votre matériel (CPU/GPU) via votre navigateur. Aucune donnée n'est collectée.
+                  {{ t('bench_secure_desc') }}
                 </p>
               </div>
             </div>
@@ -183,9 +183,9 @@
                 <Wifi class="w-4 h-4" />
               </div>
               <div>
-                <p class="font-bold text-slate-800 dark:text-slate-200">Connexion internet requise</p>
+                <p class="font-bold text-slate-800 dark:text-slate-200">{{ t('bench_wifi_req') }}</p>
                 <p class="text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
-                  Si le modèle de test ({{ selectedModelSize }}) n'est pas dans votre cache, il sera téléchargé. Nous vous recommandons d'utiliser le Wi-Fi.
+                  {{ t('bench_wifi_desc_1') }}{{ selectedModelSize }}{{ t('bench_wifi_desc_2') }}
                 </p>
               </div>
             </div>
@@ -215,8 +215,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '~/components/ui/dialog'
 import { Activity, Play, Cpu, Cpu as Microchip, Loader2, Zap, ShieldCheck, Wifi } from 'lucide-vue-next'
 import { useChat } from '~/contexts/chatContext'
+import { useI18n } from '~/composables/useI18n'
 
 const chatStore = useChat()
+const { t } = useI18n()
 
 const selectedModel = ref('HuggingFaceTB/SmolLM-135M-Instruct')
 const selectedEngine = ref<'both' | 'webgpu' | 'wasm'>('both')
@@ -233,7 +235,7 @@ const selectedModelName = computed(() => {
 const selectedModelSize = computed(() => {
   if (selectedModel.value === 'HuggingFaceTB/SmolLM-135M-Instruct') return '150 MB'
   if (selectedModel.value === 'Xenova/Qwen1.5-0.5B-Chat') return '350 MB'
-  return 'Inconnue'
+  return t('bench_unknown')
 })
 
 const results = reactive({
@@ -309,7 +311,7 @@ async function executeBenchmark() {
     
   } catch (err) {
     console.error('Benchmark failed', err)
-    alert('Le test a échoué. Regardez la console pour plus de détails.')
+    alert(t('bench_fail'))
   } finally {
     activeTest.value = null
     isRunning.value = false

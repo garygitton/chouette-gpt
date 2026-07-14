@@ -1,9 +1,12 @@
 <template>
-  <div class="flex flex-col h-full">
+  <aside class="flex flex-col h-full" aria-label="Menu principal">
     <!-- Header (Mobile only) -->
     <div v-if="isMobile" class="flex items-center justify-between mb-4">
-      <span class="font-extrabold text-lg text-slate-800 dark:text-white tracking-tight">Chouette<span class="text-indigo-500">GPT</span></span>
-      <Button variant="ghost" size="icon" @click="$emit('close-sidebar')">
+      <div class="flex items-center gap-1.5">
+        <img src="/logo.svg" alt="" class="w-6 h-6" />
+        <span class="font-extrabold text-lg text-slate-800 dark:text-white tracking-tight">Chouette<span class="text-indigo-500">GPT</span></span>
+      </div>
+      <Button variant="ghost" size="icon" @click="$emit('close-sidebar')" aria-label="Fermer le menu">
         <X class="w-5 h-5" />
       </Button>
     </div>
@@ -50,15 +53,16 @@
             : 'hover:bg-slate-100/50 dark:hover:bg-slate-900/30 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 rounded-xl hover:-translate-x-0.5'
         ]"
       >
-        <NuxtLink :to="{ path: '/', query: { ...route.query, id: conv.id } }" class="flex items-center space-x-3 flex-1 min-w-0" @click="$emit('close-sidebar')">
+        <NuxtLink :to="{ path: '/', query: { ...route.query, id: conv.id } }" class="flex items-center space-x-3 flex-1 min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-md" @click="$emit('close-sidebar')">
           <MessageSquare class="w-4 h-4 flex-shrink-0" :class="route.query.id === conv.id ? 'text-indigo-500' : 'text-slate-400 dark:text-slate-500'" />
           <span class="truncate text-xs tracking-tight">{{ conv.title || 'Conversation sans titre' }}</span>
         </NuxtLink>
         <Button
           variant="ghost"
           size="icon"
-          class="h-6 w-6 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20"
+          class="h-6 w-6 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 focus-visible:ring-2 focus-visible:ring-red-500"
           :class="isMobile ? '' : 'opacity-0 group-hover:opacity-100 transition-all hover:text-red-600 dark:hover:text-red-400'"
+          aria-label="Supprimer la conversation"
           @click.prevent="deleteConv(conv.id)"
         >
           <Trash2 class="w-4 h-4" />
@@ -75,7 +79,7 @@
         <!-- Language Selector -->
         <LanguageSelector size="sm" />
 
-        <div class="grid grid-cols-4 gap-1">
+        <nav class="grid grid-cols-5 gap-1" aria-label="Paramètres et préférences">
           <Button
             data-testid="settings-button"
             variant="ghost"
@@ -107,27 +111,24 @@
             data-testid="benchmark-button"
             variant="ghost"
             class="rounded-xl justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900"
-            title="Banc d'Essai"
+            :title="t('sidebar_benchmark')"
             @click="navigateTo('/benchmark'); $emit('close-sidebar')"
           >
             <Activity class="w-4 h-4" />
           </Button>
-        </div>
-      </div>
-
-      <!-- Socials Section -->
-      <div class="flex flex-col items-center justify-center space-y-2.5 pt-1 pb-1">
-        <div class="flex items-center space-x-4">
-          <a href="https://www.linkedin.com/in/garygitton" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-indigo-500 transition-colors" title="LinkedIn" data-testid="sidebar-linkedin-link">
-            <Linkedin class="w-4 h-4" />
-          </a>
-          <a href="https://github.com/garygitton/chouette-gpt" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-indigo-500 transition-colors" title="GitHub" data-testid="sidebar-github-link">
-            <Github class="w-4 h-4" />
-          </a>
-        </div>
+          <Button
+            data-testid="brand-assets-button"
+            variant="ghost"
+            class="rounded-xl justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900"
+            :title="t('brand_assets')"
+            @click="navigateTo('/brand-assets'); $emit('close-sidebar')"
+          >
+            <Briefcase class="w-4 h-4" />
+          </Button>
+        </nav>
       </div>
     </div>
-  </div>
+  </aside>
 </template>
 
 <script setup lang="ts">
@@ -147,7 +148,7 @@ import { Separator } from '~/components/ui/separator'
 import { Badge } from '~/components/ui/badge'
 import {
   X, PlusCircle, Search, MessageSquare, Trash2,
-  Settings, ShieldCheck, Sun, Moon, Globe, Activity, Linkedin, Github
+  Settings, ShieldCheck, Sun, Moon, Globe, Activity, Briefcase
 } from 'lucide-vue-next'
 
 const props = defineProps({
