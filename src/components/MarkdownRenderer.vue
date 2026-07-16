@@ -3,7 +3,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onMounted, ref } from 'vue'
+import { computed, watch, onMounted, ref, toRef } from 'vue'
+import { refThrottled } from '@vueuse/core'
 import { Marked } from 'marked'
 import markedKatex from 'marked-katex-extension'
 
@@ -15,6 +16,9 @@ marked.use(markedKatex({ throwOnError: false }))
 let hljs: any = null
 let mermaid: any = null
 const depsLoaded = ref(false)
+
+const contentRef = toRef(props, 'content')
+const throttledContent = refThrottled(contentRef, 50)
 
 // Register custom code block renderer for premium editor look and feel
 marked.use({
@@ -69,7 +73,7 @@ marked.use({
 const htmlContent = computed(() => {
   // Dependency tracking for reactivity when deps are loaded
   depsLoaded.value
-  return marked.parse(props.content, { async: false }) as string
+  return marked.parse(throttledContent.value, { async: false }) as string
 })
 
 const renderMermaid = () => {
@@ -80,8 +84,10 @@ const renderMermaid = () => {
   }
 }
 
+let mermaidTimeout: any = null
 watch(htmlContent, () => {
-  setTimeout(renderMermaid, 100)
+  if (mermaidTimeout) clearTimeout(mermaidTimeout)
+  mermaidTimeout = setTimeout(renderMermaid, 100)
 })
 
 onMounted(async () => {

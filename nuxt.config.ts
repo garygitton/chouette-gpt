@@ -87,13 +87,26 @@ export default defineNuxtConfig({
         { 'http-equiv': 'Expires', content: '0' }
       ],
       link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }
       ]
     }
   },
   css: ['~/assets/css/main.css'],
   vite: {
-    plugins: [],
+    plugins: [
+      {
+        name: 'fix-vue-mime',
+        configureServer(server) {
+          server.middlewares.use((req, res, next) => {
+            if (req.url && req.url.includes('.vue')) {
+              res.setHeader('Content-Type', 'text/javascript')
+            }
+            next()
+          })
+        }
+      }
+    ],
     ...(process.env.NODE_ENV === 'production' ? {
       build: {
         modulePreload: false,
@@ -118,7 +131,7 @@ export default defineNuxtConfig({
     server: {
       allowedHosts: ['.localhost'],
       watch: {
-        usePolling: true
+        usePolling: false
       },
       headers: {
         'Cross-Origin-Opener-Policy': 'same-origin',
@@ -129,7 +142,7 @@ export default defineNuxtConfig({
 
   watchers: {
     chokidar: {
-      usePolling: true,
+      usePolling: false,
       interval: 1000
     }
   },

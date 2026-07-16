@@ -15,15 +15,15 @@
       <div class="hidden md:flex absolute top-4 left-4 right-4 z-20 justify-between pointer-events-none">
         <div class="pointer-events-auto">
         </div>
-        <div class="pointer-events-auto shadow-sm">
-          <Button data-testid="toggle-right-sidebar-btn" variant="ghost" size="icon" @click="isRightSidebarOpen = !isRightSidebarOpen" class="bg-white/50 dark:bg-[#0b0f19]/50 backdrop-blur-sm border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-            <Settings2 class="w-5 h-5 text-slate-600 dark:text-slate-300" />
+        <div class="pointer-events-auto shadow-sm group">
+          <Button data-testid="toggle-right-sidebar-btn" variant="ghost" size="icon" @click="isRightSidebarOpen = !isRightSidebarOpen" class="bg-white/60 dark:bg-[#0b0f19]/60 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/60 hover:bg-white dark:hover:bg-slate-800 transition-all duration-300 hover:shadow-md hover:scale-105">
+            <Settings2 class="w-5 h-5 text-slate-600 dark:text-slate-300 group-hover:rotate-45 transition-transform duration-300" />
           </Button>
         </div>
       </div>
 
       <!-- Mobile Top Bar -->
-      <header class="md:hidden flex-none flex flex-col p-3 border-b border-slate-200 dark:border-slate-800/60 bg-white/80 dark:bg-[#0b0f19]/80 backdrop-blur-md z-20 space-y-3">
+      <header class="md:hidden flex-none flex flex-col p-3 border-b border-slate-200/50 dark:border-slate-800/50 bg-white/70 dark:bg-[#0b0f19]/70 backdrop-blur-xl z-20 space-y-3 shadow-sm transition-colors duration-300">
         <div class="flex items-center justify-between">
           <Button
             variant="ghost"
@@ -33,7 +33,7 @@
             <Menu class="w-5 h-5" />
           </Button>
           <div class="flex items-center gap-1.5">
-            <img src="/logo.svg" alt="" class="w-6 h-6" />
+            <img :src="'/logo.svg'" alt="" class="w-6 h-6" />
             <span class="font-black text-slate-800 dark:text-white tracking-tight text-lg">Chouette<span class="text-indigo-500">GPT</span></span>
           </div>
           <div class="flex gap-1">
@@ -64,9 +64,11 @@
     </div>
 
     <!-- Desktop Right Sidebar -->
-    <aside v-show="isRightSidebarOpen" data-testid="right-sidebar" class="hidden md:flex flex-col w-[320px] border-l border-slate-200 dark:border-slate-800/60 bg-slate-100/50 dark:bg-[#070a12]/80 h-full flex-shrink-0">
-      <RightSidebar :isMobile="false" />
-    </aside>
+    <Transition name="slide-right">
+      <aside v-show="isRightSidebarOpen" data-testid="right-sidebar" class="hidden md:flex flex-col w-[320px] border-l border-slate-200/60 dark:border-slate-800/60 bg-slate-100/50 dark:bg-[#070a12]/80 h-full flex-shrink-0 transition-transform duration-300 ease-in-out">
+        <RightSidebar :isMobile="false" />
+      </aside>
+    </Transition>
 
     <!-- Modals & Overlays (Absolute to avoid flex-flow breaking) -->
     <div class="absolute inset-0 pointer-events-none">
@@ -144,3 +146,17 @@ async function newChat() {
   router.push({ path: '/', query: { ...route.query, id } })
 }
 </script>
+
+<style scoped>
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-right-enter-from,
+.slide-right-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
+  margin-right: -320px; /* Collapse layout space smoothly */
+}
+</style>

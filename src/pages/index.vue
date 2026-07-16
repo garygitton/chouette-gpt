@@ -30,7 +30,7 @@
           class="pointer-events-auto rounded-full shadow-lg border border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-xs h-8 px-4 font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400"
         >
           <ArrowDown :class="'w-3.5 h-3.5 mr-1.5'" />
-          Nouveaux messages
+          {{ t('new_messages_notification') }}
         </Button>
       </div>
     </Transition>
@@ -55,6 +55,7 @@ import { ref, computed, watch, nextTick } from 'vue'
 import { useChat } from '~/contexts/chatContext'
 import { useConversation } from '~/contexts/conversationContext'
 import { useModel } from '~/contexts/modelContext'
+import { useI18n } from '~/composables/useI18n'
 import ChatMessage from '~/components/ChatMessage.vue'
 import LandingDashboard from '~/components/LandingDashboard.vue'
 import ChatInputArea from '~/components/ChatInputArea.vue'
@@ -66,6 +67,7 @@ const router = useRouter()
 const chatStore = useChat()
 const convStore = useConversation()
 const modelStore = useModel()
+const { t } = useI18n()
 
 const input = ref('')
 const scrollContainer = ref<HTMLElement | null>(null)

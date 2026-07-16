@@ -1,30 +1,35 @@
 <!-- @ds-ignore-file -->
 <template>
-  <main class="my-auto py-12 space-y-10 ui-message-slide-in" aria-labelledby="dashboard-title">
+  <main class="my-auto py-12 space-y-10 ui-message-slide-in relative" aria-labelledby="dashboard-title">
+    
+    <!-- Ambient Background Glow -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden -z-10">
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-indigo-500/10 dark:bg-indigo-500/5 blur-[120px] rounded-full"></div>
+    </div>
+
     <!-- Main Glowing Logo Emblem -->
     <div class="text-center space-y-6">
-      <div class="relative w-24 h-24 mx-auto rounded-3xl bg-gradient-to-tr from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-slate-200/50 dark:border-slate-800/50 flex items-center justify-center shadow-2xl backdrop-blur-xl group hover:border-indigo-500/30 transition-all duration-500">
+      <div class="relative w-28 h-28 mx-auto flex items-center justify-center group animate-slide-up-fade [animation-delay:50ms] [animation-fill-mode:both]">
+        <!-- Breathing Aura -->
+        <div class="absolute inset-0 bg-indigo-500/20 dark:bg-indigo-500/10 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-700 animate-pulse"></div>
         <!-- Animated SVG Logo -->
-        <img src="/logo.svg" alt="Logo" class="w-20 h-20 transform group-hover:scale-110 transition-transform duration-500" />
-
-        <!-- Dynamic Ambient Light -->
-        <div class="absolute inset-0 rounded-3xl bg-gradient-to-tr from-indigo-500 to-pink-500 blur-2xl opacity-15 group-hover:opacity-25 -z-10 transition-opacity duration-500"></div>
+        <img :src="'/logo.svg'" alt="Logo" class="relative z-10 w-24 h-24 transform group-hover:scale-110 transition-transform duration-500 drop-shadow-xl" />
       </div>
 
       <div class="space-y-4">
-        <h1 id="dashboard-title" class="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white flex items-center justify-center gap-3">
+        <h1 id="dashboard-title" class="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white flex items-center justify-center gap-3 animate-slide-up-fade [animation-delay:100ms] [animation-fill-mode:both]">
           <span>Chouette<span class="ui-title-gradient">GPT</span></span>
           <Badge variant="outline" class="bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800/50 py-1 px-2 text-xs font-bold uppercase tracking-widest mt-2 align-middle">
             Expérimental
           </Badge>
         </h1>
-        <p v-if="chatStore.isEngineReady" class="text-slate-600 dark:text-slate-300 text-base md:text-lg max-w-xl mx-auto font-normal leading-relaxed">
+        <p v-if="chatStore.isEngineReady" class="text-slate-600 dark:text-slate-300 text-base md:text-lg max-w-xl mx-auto font-normal leading-relaxed animate-slide-up-fade [animation-delay:150ms] [animation-fill-mode:both]">
           {{ t('empty_chat_subtitle') }}
         </p>
-        <p v-else class="text-slate-600 dark:text-slate-300 text-base md:text-lg max-w-xl mx-auto font-normal leading-relaxed">
+        <p v-else class="text-slate-600 dark:text-slate-300 text-base md:text-lg max-w-xl mx-auto font-normal leading-relaxed animate-slide-up-fade [animation-delay:150ms] [animation-fill-mode:both]">
           Votre assistant IA local, 100% privé et hors-ligne.
         </p>
-        <div class="max-w-xl mx-auto text-xs text-left text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/20 p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 space-y-3 shadow-sm">
+        <div class="max-w-xl mx-auto text-xs text-left text-slate-500 dark:text-slate-400 bg-slate-50/80 dark:bg-slate-950/40 backdrop-blur-md p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 space-y-3 shadow-sm animate-slide-up-fade [animation-delay:200ms] [animation-fill-mode:both]">
           <p class="leading-relaxed">
             <strong class="text-slate-800 dark:text-slate-200">{{ t('landing_objective_title') }}</strong> {{ t('landing_objective_desc') }}
           </p>
@@ -36,7 +41,7 @@
         </div>
         
         <!-- Trust Badges -->
-        <div v-if="!chatStore.isEngineReady" class="flex flex-wrap justify-center gap-3 pt-2 pb-2">
+        <div v-if="!chatStore.isEngineReady" class="flex flex-wrap justify-center gap-3 pt-2 pb-2 animate-slide-up-fade [animation-delay:250ms] [animation-fill-mode:both]">
           <Badge variant="outline" class="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50 py-1.5 px-3">
             <Shield class="w-3.5 h-3.5 mr-1.5" /> 100% Privé
           </Badge>
@@ -51,27 +56,31 @@
     </div>
 
     <!-- Minimalist Call To Action for Onboarding -->
-    <!-- Minimalist Call To Action for Onboarding -->
-    <div v-if="!chatStore.isEngineReady" class="flex flex-col items-center justify-center max-w-md mx-auto py-6 space-y-4">
-      <div v-if="!chatStore.isEngineLoading" class="flex flex-col items-center space-y-3">
+    <div v-if="!chatStore.isEngineReady" class="flex flex-col items-center justify-center max-w-md mx-auto py-6 space-y-4 animate-slide-up-fade [animation-delay:300ms] [animation-fill-mode:both]">
+      <div class="flex flex-col items-center space-y-3 relative group">
+        <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-pink-500 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
         <Button 
           @click="chatStore.downloadMultipleEngines([modelStore.currentModelId])" 
+          :disabled="chatStore.isEngineLoading || chatStore.isEnginePaused"
           aria-label="Télécharger et activer l'IA"
-          class="h-12 px-8 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-700 hover:to-pink-600 text-white shadow-lg shadow-indigo-500/25 transition-all hover:scale-105 font-bold flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 dark:focus-visible:ring-offset-slate-900"
+          class="relative h-12 px-8 rounded-xl bg-gradient-to-r transition-all duration-300 font-bold flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 dark:focus-visible:ring-offset-slate-900"
+          :class="chatStore.isEngineLoading || chatStore.isEnginePaused 
+            ? 'from-slate-400 to-slate-500 text-slate-100 cursor-not-allowed opacity-90' 
+            : 'from-indigo-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white shadow-[0_0_30px_-5px_rgba(99,102,241,0.4)] hover:shadow-[0_0_40px_-5px_rgba(99,102,241,0.6)] hover:-translate-y-0.5 hover:scale-105'"
         >
-          <Download class="w-5 h-5" />
-          Télécharger et activer l'IA
+          <Loader2 v-if="chatStore.isEngineLoading" class="w-5 h-5 animate-spin" />
+          <Pause v-else-if="chatStore.isEnginePaused" class="w-5 h-5" />
+          <Download v-else class="w-5 h-5" />
+          
+          {{ 
+            chatStore.isEngineLoading ? 'Téléchargement en cours...' : 
+            chatStore.isEnginePaused ? 'Téléchargement en pause' : 
+            'Télécharger et activer l\'IA' 
+          }}
         </Button>
         <p class="text-xs text-slate-400 dark:text-slate-500 text-center max-w-xs leading-relaxed">
           Modèle par défaut : <strong>{{ modelStore.currentModelName }}</strong> ({{ modelStore.currentModel?.totalSize }}).
         </p>
-      </div>
-
-      <div v-else class="flex flex-col items-center space-y-3">
-        <div class="flex items-center space-x-2 text-indigo-500 dark:text-indigo-400 text-sm font-semibold">
-          <Loader2 class="w-5 h-5 animate-spin" />
-          <span>Téléchargement et configuration en cours...</span>
-        </div>
       </div>
       
       <!-- Desktop & Mobile Hint -->
@@ -80,10 +89,45 @@
       </p>
     </div>
     
+    <!-- Model Active Intro Card -->
+    <div v-if="chatStore.isEngineReady" class="max-w-xl mx-auto p-5 rounded-3xl bg-indigo-50/10 dark:bg-indigo-950/5 border border-slate-200/50 dark:border-slate-800/50 text-left space-y-4 shadow-sm backdrop-blur-xl">
+      <div class="flex items-center gap-3 border-b border-slate-200/50 dark:border-slate-800/50 pb-3">
+        <div class="p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-500">
+          <Bot class="w-6 h-6 animate-pulse" />
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-850 dark:text-slate-100 text-base leading-snug">
+            {{ modelStore.currentModel?.name }}
+          </h2>
+          <p class="text-[10px] text-slate-400 dark:text-slate-500">
+            {{ modelStore.currentModel?.totalSize }} • {{ modelStore.currentModel?.quantization }} • {{ modelStore.currentModel?.estimatedMemory }} RAM est.
+          </p>
+        </div>
+      </div>
+      
+      <div class="text-xs space-y-2.5 text-slate-600 dark:text-slate-350 leading-relaxed">
+        <div class="flex items-start gap-2">
+          <span class="font-bold text-slate-700 dark:text-slate-200 flex-shrink-0 w-24">{{ tUI('who_i_am') }}</span>
+          <span>{{ tModel(modelStore.currentModelId, 'desc') }}</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <span class="font-bold text-slate-700 dark:text-slate-200 flex-shrink-0 w-24">{{ tUI('supported_languages') }}</span>
+          <span>{{ tModel(modelStore.currentModelId, 'lang') }}</span>
+        </div>
+        <div class="flex items-start gap-2 text-amber-600 dark:text-amber-400 font-medium">
+          <span class="font-bold flex-shrink-0 w-24 flex items-center gap-1">
+            <AlertTriangle class="w-3.5 h-3.5" />
+            {{ tUI('warning') }}
+          </span>
+          <span>{{ tModel(modelStore.currentModelId, 'warn') }}</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Suggested Prompts Grid -->
     <div v-if="chatStore.isEngineReady" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto w-full px-4">
       <Card
-        v-for="prompt in suggestedPrompts" 
+        v-for="(prompt, index) in suggestedPrompts" 
         :key="prompt.text" 
         @click="$emit('send-prompt', prompt.text)" 
         @keydown.enter="$emit('send-prompt', prompt.text)"
@@ -91,10 +135,11 @@
         role="button"
         :aria-label="'Essayer le prompt : ' + prompt.title"
         :data-testid="'suggested-prompt-' + prompt.title.toLowerCase().replace(/\s+/g, '-')"
-        class="group relative cursor-pointer text-left p-5 rounded-3xl border border-slate-200/50 dark:border-slate-800/50 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl transition-all duration-500 flex items-start space-x-4 overflow-hidden hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:hover:shadow-[0_8px_30px_rgba(99,102,241,0.15)] hover:border-indigo-500/50 dark:hover:border-indigo-500/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+        class="group relative cursor-pointer text-left p-5 rounded-3xl border border-slate-200/50 dark:border-slate-800/50 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl transition-all duration-500 flex items-start space-x-4 overflow-hidden hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_12px_40px_-10px_rgb(0,0,0,0.1)] dark:hover:shadow-[0_12px_40px_-10px_rgba(99,102,241,0.2)] hover:border-indigo-500/50 dark:hover:border-indigo-500/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 animate-slide-up-fade"
+        :style="`animation-delay: ${300 + index * 100}ms; animation-fill-mode: both;`"
       >
         <!-- Animated border gradient -->
-        <div class="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" style="padding: 1px; background: linear-gradient(to bottom right, #6366f1, #ec4899); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude;"></div>
+        <div class="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none gradient-border-mask"></div>
         
         <!-- Ambient Glow -->
         <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
@@ -128,9 +173,10 @@ import { useI18n } from '~/composables/useI18n'
 import { useDevice } from '~/contexts/deviceContext'
 import { useModel } from '~/contexts/modelContext'
 import { useChat } from '~/contexts/chatContext'
-import { Globe, Code, Sparkles, Mail, ArrowRight, ArrowLeft, Menu, Shield, WifiOff, EyeOff, Download, Loader2 } from 'lucide-vue-next'
+import { Globe, Code, Sparkles, Mail, ArrowRight, ArrowLeft, Menu, Shield, WifiOff, EyeOff, Download, Loader2, Bot, AlertTriangle, Pause } from 'lucide-vue-next'
 import { Card } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
+import { useModelI18n } from '~/composables/useModelI18n'
 
 defineEmits(['send-prompt'])
 
@@ -138,6 +184,7 @@ const { t } = useI18n()
 const deviceStore = useDevice()
 const modelStore = useModel()
 const chatStore = useChat()
+const { tModel, tUI } = useModelI18n()
 
 onMounted(async () => {
   if (!deviceStore.deviceInfo) {
@@ -178,3 +225,28 @@ const suggestedPrompts = computed(() => [
   }
 ])
 </script>
+
+<style scoped>
+@keyframes slide-up-fade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up-fade {
+  animation: slide-up-fade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.gradient-border-mask {
+  padding: 1px;
+  background: linear-gradient(to bottom right, #6366f1, #ec4899);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+</style>

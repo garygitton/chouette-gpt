@@ -1,11 +1,11 @@
 # Development Dockerfile
-FROM node:20-slim
+FROM node:22-slim
 
 # Install necessary OS dependencies
 RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
 
 # Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@9 --activate
 
 WORKDIR /app
 
@@ -13,6 +13,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies
+ENV PUPPETEER_SKIP_DOWNLOAD=true
 RUN pnpm install
 
 # Copy application files

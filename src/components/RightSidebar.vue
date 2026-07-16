@@ -1,150 +1,47 @@
 <template>
-  <div class="flex flex-col h-full bg-slate-50 dark:bg-[#070a12] p-4 space-y-6 overflow-y-auto">
-    <div class="flex items-center justify-between mb-2">
-      <h2 class="font-semibold text-slate-800 dark:text-slate-200">Paramètres</h2>
+  <div class="right-sidebar">
+    <div class="right-sidebar-header">
+      <h2>{{ t('settings') }}</h2>
       <Button v-if="isMobile" variant="ghost" size="icon" @click="$emit('close-sidebar')">
-        <X class="w-5 h-5" />
+        <X class="icon-x" />
       </Button>
     </div>
 
     <!-- Token Consumption -->
-    <div class="space-y-2">
-      <div class="flex justify-between items-center text-sm">
-        <span class="font-medium text-slate-700 dark:text-slate-300">Tokens de conversation</span>
-        <span class="text-xs text-slate-500">{{ chatStore.conversationTokens }} / 8192</span>
+    <div class="right-sidebar-section">
+      <div class="token-info">
+        <span class="token-label">Tokens de conversation</span>
+        <span class="token-count">{{ chatStore.conversationTokens }} / 8192</span>
       </div>
-      <Progress :model-value="(chatStore.conversationTokens / 8192) * 100" class="h-2" />
+      <Progress :model-value="(chatStore.conversationTokens / 8192) * 100" class="progress-bar" />
     </div>
 
-
-
-    <!-- System Prompt -->
-    <div class="space-y-2">
-      <div class="flex items-center justify-between">
-        <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Prompt Système</label>
-        <Transition
-          enter-active-class="transition duration-300 ease-out"
-          enter-from-class="transform translate-y-1 opacity-0"
-          enter-to-class="transform translate-y-0 opacity-100"
-          leave-active-class="transition duration-500 ease-in"
-          leave-from-class="transform translate-y-0 opacity-100"
-          leave-to-class="transform translate-y-1 opacity-0"
-        >
-          <span v-if="showSavedFeedback" data-testid="system-prompt-saved-feedback" class="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-            <Check class="w-3.5 h-3.5" /> Enregistré
-          </span>
-        </Transition>
-      </div>
-      <Textarea 
-        data-testid="system-prompt-textarea"
-        v-model="settingsStore.systemPrompt" 
-        placeholder="Comportement global de l'assistant..." 
-        class="h-24 resize-none text-sm transition-all duration-300"
-        :class="{
-          'border-emerald-500 focus-visible:ring-emerald-500 focus-visible:border-emerald-500 ring-2 ring-emerald-500/20': showSavedFeedback
-        }"
-        @blur="triggerSavedFeedback"
-      />
-    </div>
-
-    <!-- Collapsible Advanced Parameters -->
-    <Collapsible v-slot="{ open }" v-model:open="isAdvancedOpen" class="w-full pt-4 border-t border-slate-200 dark:border-slate-800">
-      <CollapsibleTrigger class="flex items-center justify-between w-full font-semibold text-sm text-slate-700 dark:text-slate-300 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors py-2">
-        <span class="flex items-center">
-          <SlidersHorizontal class="w-4 h-4 mr-2 text-indigo-500" />
-          Paramètres avancés
-        </span>
-        <ChevronUp v-if="open" class="w-4 h-4 text-slate-500" />
-        <ChevronDown v-else class="w-4 h-4 text-slate-500" />
-      </CollapsibleTrigger>
-
-      <CollapsibleContent class="space-y-6 pt-4">
-        <!-- Basic Parameters -->
-        <div class="space-y-6">
-          <div class="flex items-center justify-between">
-            <h3 class="text-xs uppercase font-bold text-slate-500 tracking-wider">Configuration base</h3>
-            <Button variant="ghost" size="sm" class="h-6 px-2 text-xs text-slate-400 hover:text-slate-600" @click="settingsStore.resetSettings()">
-              Réinitialiser
-            </Button>
-          </div>
-          
-          <div class="space-y-3">
-            <div class="flex justify-between text-sm">
-              <span>Temperature</span>
-              <span class="text-slate-500 font-mono font-semibold">{{ settingsStore.temperature }}</span>
-            </div>
-            <Slider v-model="temperatureArray" :min="0" :max="2" :step="0.1" />
-          </div>
-
-          <div class="space-y-3">
-            <div class="flex justify-between text-sm">
-              <span>Top P</span>
-              <span class="text-slate-500 font-mono font-semibold">{{ settingsStore.topP }}</span>
-            </div>
-            <Slider v-model="topPArray" :min="0" :max="1" :step="0.05" />
-          </div>
-
-          <div class="space-y-3">
-            <div class="flex justify-between text-sm">
-              <span>Max Tokens</span>
-              <span class="text-slate-500 font-mono font-semibold">{{ settingsStore.maxTokens }}</span>
-            </div>
-            <Slider v-model="maxTokensArray" :min="256" :max="4096" :step="256" />
-          </div>
-        </div>
-
-        <!-- Advanced Parameters -->
-        <div class="space-y-6 pt-4 border-t border-slate-200 dark:border-slate-800 pb-8">
-          <h3 class="text-xs uppercase font-bold text-slate-500 tracking-wider">Ajustements fins</h3>
-          <div class="space-y-3">
-            <div class="flex justify-between text-sm">
-              <span>Top K</span>
-              <span class="text-slate-500 font-mono font-semibold">{{ settingsStore.topK }}</span>
-            </div>
-            <Slider v-model="topKArray" :min="0" :max="100" :step="1" />
-          </div>
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
-
-    <!-- Socials Section -->
-    <div class="mt-auto pt-6 flex flex-col items-center justify-center space-y-2.5 border-t border-slate-200 dark:border-slate-800">
-      <div class="flex items-center space-x-4">
-        <a href="https://www.linkedin.com/in/garygitton" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-indigo-500 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded" title="LinkedIn" aria-label="Profil LinkedIn de Gary Gitton" data-testid="sidebar-linkedin-link">
-          <Linkedin class="w-4 h-4" />
-        </a>
-        <a href="https://github.com/garygitton/chouette-gpt" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-indigo-500 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded" title="GitHub" aria-label="Dépôt GitHub du projet" data-testid="sidebar-github-link">
-          <Github class="w-4 h-4" />
-        </a>
-      </div>
+    <div class="accordion-container">
+      <SettingsGeneral :active-section="activeSection" @toggle="toggleSection" />
+      <SettingsSampling :active-section="activeSection" @toggle="toggleSection" />
+      <SettingsAdvanced :active-section="activeSection" @toggle="toggleSection" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, watch } from 'vue'
 import { useSettings } from '~/contexts/settingsContext'
 import { useModel } from '~/contexts/modelContext'
 import { useChat } from '~/contexts/chatContext'
+import { useI18n } from '~/composables/useI18n'
 import { Button } from '~/components/ui/button'
 import { Progress } from '~/components/ui/progress'
-import { Slider } from '~/components/ui/slider'
-import { Textarea } from '~/components/ui/textarea'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '~/components/ui/collapsible'
-import { X, ChevronDown, ChevronUp, SlidersHorizontal, Check, Linkedin, Github } from 'lucide-vue-next'
+import { X } from 'lucide-vue-next'
+import SettingsGeneral from '~/components/sidebar/SettingsGeneral.vue'
+import SettingsSampling from '~/components/sidebar/SettingsSampling.vue'
+import SettingsAdvanced from '~/components/sidebar/SettingsAdvanced.vue'
 
-const showSavedFeedback = ref(false)
-let feedbackTimeout: any = null
+const activeSection = ref<'general' | 'sampling' | 'limits' | null>('general')
 
-function triggerSavedFeedback() {
-  showSavedFeedback.value = true
-  if (feedbackTimeout) clearTimeout(feedbackTimeout)
-  feedbackTimeout = setTimeout(() => {
-    showSavedFeedback.value = false
-  }, 2000)
+function toggleSection(sec: string) {
+  activeSection.value = activeSection.value === sec ? null : sec as 'general' | 'sampling' | 'limits'
 }
-
-const isAdvancedOpen = ref(false)
 
 const props = defineProps<{
   isMobile?: boolean
@@ -157,23 +54,256 @@ const emit = defineEmits<{
 const settingsStore = useSettings()
 const modelStore = useModel()
 const chatStore = useChat()
+const { t } = useI18n()
 
-// Sliders require arrays
-const temperatureArray = computed({
-  get: () => [settingsStore.temperature],
-  set: (val) => { settingsStore.temperature = val[0] }
-})
-const topPArray = computed({
-  get: () => [settingsStore.topP],
-  set: (val) => { settingsStore.topP = val[0] }
-})
-const maxTokensArray = computed({
-  get: () => [settingsStore.maxTokens],
-  set: (val) => { settingsStore.maxTokens = val[0] }
-})
-const topKArray = computed({
-  get: () => [settingsStore.topK],
-  set: (val) => { settingsStore.topK = val[0] }
-})
+// Automatically turn off creative mode for models that do not support sampling
+watch(() => modelStore.currentModelId, () => {
+  if (modelStore.currentModel?.supportsSampling === false) {
+    settingsStore.doSample = false
+  }
+}, { immediate: true })
 
 </script>
+
+<style scoped>
+.right-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  background-color: #f8fafc;
+  padding: 1rem;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+:global(.dark) .right-sidebar {
+  background-color: #070a12;
+}
+
+.right-sidebar > * + * {
+  margin-top: 1.5rem;
+}
+
+.right-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.right-sidebar-header h2 {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+:global(.dark) .right-sidebar-header h2 {
+  color: #e2e8f0;
+}
+
+.icon-x {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.right-sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.token-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.token-label {
+  font-weight: 500;
+  color: #334155;
+}
+
+:global(.dark) .token-label {
+  color: #cbd5e1;
+}
+
+.token-count {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.progress-bar {
+  height: 0.5rem;
+}
+
+/* Accordion Styles */
+:deep(.accordion-container) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+:deep(.accordion-item) {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background-color: #ffffff;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+:global(.dark) :deep(.accordion-item) {
+  border-color: #1e293b;
+  background-color: #0b0f19;
+}
+
+:deep(.accordion-item:hover) {
+  border-color: #cbd5e1;
+}
+
+:global(.dark) :deep(.accordion-item:hover) {
+  border-color: #334155;
+}
+
+:deep(.accordion-trigger) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #334155;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+:global(.dark) :deep(.accordion-trigger) {
+  color: #cbd5e1;
+}
+
+:deep(.accordion-trigger:hover) {
+  background-color: #f8fafc;
+}
+
+:global(.dark) :deep(.accordion-trigger:hover) {
+  background-color: #0f172a;
+}
+
+:deep(.accordion-trigger.active) {
+  border-bottom: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+}
+
+:global(.dark) :deep(.accordion-trigger.active) {
+  border-bottom-color: #1e293b;
+  background-color: #0f172a;
+}
+
+:deep(.accordion-title) {
+  display: flex;
+  align-items: center;
+}
+
+:deep(.icon-sliders) {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  color: #6366f1;
+}
+
+:deep(.icon-chevron) {
+  width: 1rem;
+  height: 1rem;
+  color: #64748b;
+}
+
+:deep(.accordion-content) {
+  padding: 1rem;
+  background-color: #ffffff;
+}
+
+:global(.dark) :deep(.accordion-content) {
+  background-color: #0b0f19;
+}
+
+:deep(.reset-button) {
+  height: 1.5rem;
+  padding: 0 0.5rem;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+:deep(.reset-button:hover) {
+  color: #475569;
+}
+
+:deep(.parameter-item) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+:deep(.parameter-info) {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+
+:deep(.parameter-value) {
+  color: #64748b;
+  font-family: monospace;
+  font-weight: 600;
+}
+
+:deep(.system-prompt-header) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+:deep(.system-prompt-header label) {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #334155;
+}
+
+:global(.dark) :deep(.system-prompt-header label) {
+  color: #cbd5e1;
+}
+
+:deep(.saved-feedback) {
+  font-size: 11px;
+  font-weight: 500;
+  color: #059669;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+:global(.dark) :deep(.saved-feedback) {
+  color: #34d399;
+}
+
+:deep(.icon-check) {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+:deep(.system-prompt-textarea) {
+  height: 6rem;
+  resize: none;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+:deep(.saved-feedback-active) {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
+}
+
+</style>

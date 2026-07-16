@@ -13,7 +13,7 @@
           <ArrowLeft class="w-5 h-5 text-slate-500" />
         </Button>
         <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-          Confidentialité & <span class="ui-title-gradient">Sécurité</span>
+          {{ t('privacy_title') }}
         </h1>
       </div>
 
@@ -21,7 +21,7 @@
       <Card class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-[#0b0f19]/70 backdrop-blur-xl shadow-lg">
         <CardContent class="pt-6">
           <p class="text-lg text-slate-700 dark:text-slate-200 leading-relaxed">
-            ChouetteGPT est conçu avec un principe fondamental : <strong class="text-indigo-500 font-extrabold">vos données vous appartiennent.</strong> Aucune information ne quitte votre appareil. Tout est calculé localement par votre navigateur.
+            {{ t('privacy_intro') }}
           </p>
         </CardContent>
       </Card>
@@ -35,9 +35,9 @@
               <Cpu class="w-6 h-6" />
             </div>
             <div class="space-y-1">
-              <h3 class="font-bold text-slate-900 dark:text-white text-base">100% Local</h3>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base">{{ t('pillar_local_title') }}</h3>
               <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                Toute l'inférence de l'IA est exécutée directement sur votre machine. Les modèles sont téléchargés dans votre navigateur et s'y exécutent grâce à WebAssembly et WebGPU.
+                {{ t('pillar_local_desc') }}
               </p>
             </div>
           </CardContent>
@@ -50,9 +50,9 @@
               <Server class="w-6 h-6" />
             </div>
             <div class="space-y-1">
-              <h3 class="font-bold text-slate-900 dark:text-white text-base">Aucun Serveur Backend</h3>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base">{{ t('pillar_server_title') }}</h3>
               <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                Cette application est hébergée de manière statique. Il n'y a pas de base de données backend, pas d'API, pas de serveur capable de lire ou stocker vos requêtes.
+                {{ t('pillar_server_desc') }}
               </p>
             </div>
           </CardContent>
@@ -65,9 +65,9 @@
               <FolderDown class="w-6 h-6" />
             </div>
             <div class="space-y-1">
-              <h3 class="font-bold text-slate-900 dark:text-white text-base">Stockage Privé</h3>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base">{{ t('pillar_storage_title') }}</h3>
               <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                Vos conversations sont sauvegardées dans la base de données locale de votre navigateur (IndexedDB). Si vous effacez vos données de navigation, tout disparaît instantanément.
+                {{ t('pillar_storage_desc') }}
               </p>
             </div>
           </CardContent>
@@ -80,9 +80,9 @@
               <WifiOff class="w-6 h-6" />
             </div>
             <div class="space-y-1">
-              <h3 class="font-bold text-slate-900 dark:text-white text-base">Mode Hors-ligne</h3>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base">{{ t('pillar_offline_title') }}</h3>
               <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                Une fois le modèle initialement téléchargé, vous pouvez vous déconnecter d'Internet. L'application continuera de fonctionner parfaitement, de façon autonome.
+                {{ t('pillar_offline_desc') }}
               </p>
             </div>
           </CardContent>
@@ -93,22 +93,22 @@
       <Card class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-[#0b0f19]/70 backdrop-blur-xl shadow-lg">
         <CardHeader class="flex flex-row items-center space-x-2 pb-2">
           <ShieldCheck class="w-6 h-6 text-indigo-500" />
-          <CardTitle class="text-lg">Nos Engagements Qualité</CardTitle>
+          <CardTitle class="text-lg">{{ t('guarantees_title') }}</CardTitle>
         </CardHeader>
 
         <CardContent class="pt-4">
           <ul class="space-y-3.5">
             <li class="flex items-start space-x-3 text-slate-700 dark:text-slate-300">
               <CheckCircle class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-              <span><strong>Aucun compte requis :</strong> Pas d'inscription, pas d'adresse e-mail, pas de mot de passe à fournir.</span>
+              <span>{{ t('guarantee_no_account') }}</span>
             </li>
             <li class="flex items-start space-x-3 text-slate-700 dark:text-slate-300">
               <CheckCircle class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-              <span><strong>Aucune télémétrie intrusive :</strong> Nous ne trackons pas votre utilisation, ni vos clics, ni vos habitudes d'utilisation.</span>
+              <span>{{ t('guarantee_no_telemetry') }}</span>
             </li>
             <li class="flex items-start space-x-3 text-slate-700 dark:text-slate-300">
               <CheckCircle class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-              <span><strong>Aucune donnée partagée :</strong> Vos conversations ne sont jamais envoyées à OpenAI, Google, Anthropic, ou tout autre tiers pour entraînement ou analyse.</span>
+              <span>{{ t('guarantee_no_share') }}</span>
             </li>
           </ul>
         </CardContent>
@@ -120,9 +120,9 @@
           <Lock class="w-5 h-5" />
         </div>
         <div class="space-y-1">
-          <h3 class="font-bold text-slate-900 dark:text-white text-base">Vous êtes anonyme et en sécurité</h3>
+          <h3 class="font-bold text-slate-900 dark:text-white text-base">{{ t('security_banner_title') }}</h3>
           <p class="text-sm text-slate-500 dark:text-slate-400 leading-normal">
-            Utilisez ChouetteGPT en toute sérénité pour traiter vos données sensibles, votre code propriétaire ou vos pensées personnelles. Personne ne vous surveille.
+            {{ t('security_banner_desc') }}
           </p>
         </div>
       </div>
@@ -137,6 +137,8 @@ import { useRoute, useRouter } from '#imports'
 import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
 import { ArrowLeft, Cpu, Server, FolderDown, WifiOff, ShieldCheck, CheckCircle, Lock } from 'lucide-vue-next'
+import { useI18n } from '~/composables/useI18n'
 
 const router = useRouter()
+const { t } = useI18n()
 </script>

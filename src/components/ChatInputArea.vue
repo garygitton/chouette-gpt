@@ -1,22 +1,37 @@
 <template>
   <div class="w-full space-y-3">
+    <!-- Model Warning / Info Banner -->
+    <Transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="transform -translate-y-2 opacity-0"
+      enter-to-class="transform translate-y-0 opacity-100"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="transform translate-y-0 opacity-100"
+      leave-to-class="transform -translate-y-2 opacity-0"
+    >
+      <div v-if="chatStore.isEngineReady" class="text-[11px] text-amber-600 dark:text-amber-400 bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/20 px-3.5 py-2.5 rounded-2xl flex items-start gap-2 shadow-sm">
+        <AlertTriangle class="w-4 h-4 flex-shrink-0 mt-0.5" />
+        <span class="leading-relaxed">
+          <strong class="font-semibold">{{ modelStore.currentModel?.name }}</strong> : {{ tModel(modelStore.currentModelId, 'warn') }}
+        </span>
+      </div>
+    </Transition>
+
     <!-- Solid input container -->
     <div class="relative group/input rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111827] focus-within:ring-2 focus-within:ring-indigo-500/50 focus-within:border-indigo-500/70 transition-all duration-200 shadow-sm">
       <div class="p-3.5 pb-1">
-          <!-- @inline-style-ignore-next -->
-          <textarea 
-            data-testid="chat-textarea"
-            ref="inputEl"
-            v-model="input" 
-            @keydown="handleKeydown"
-            @paste="handlePaste"
-            @drop.prevent="handleDrop"
-            rows="1"
-            :placeholder="props.disabled ? 'Téléchargez un modèle pour commencer...' : t('chat_placeholder')"
-            :disabled="props.disabled"
-            class="w-full bg-transparent border-0 outline-none focus:ring-0 text-slate-800 dark:text-slate-100 resize-none max-h-48 text-sm placeholder-slate-400 dark:placeholder-slate-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            style="field-sizing: content;"
-          ></textarea>
+        <textarea 
+          data-testid="chat-textarea"
+          ref="inputEl"
+          v-model="input" 
+          @keydown="handleKeydown"
+          @paste="handlePaste"
+          @drop.prevent="handleDrop"
+          rows="1"
+          :placeholder="props.disabled ? 'Téléchargez un modèle pour commencer...' : t('chat_placeholder')"
+          :disabled="props.disabled"
+          class="w-full bg-transparent border-0 outline-none focus:ring-0 text-slate-800 dark:text-slate-100 resize-none max-h-48 text-sm placeholder-slate-400 dark:placeholder-slate-500 disabled:opacity-50 disabled:cursor-not-allowed [field-sizing:content]"
+        ></textarea>
         <div class="flex items-center justify-between px-4 pb-3.5 border-t border-slate-100/50 dark:border-slate-800/40 pt-3">
           <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-slate-400 dark:text-slate-500 font-medium">
             <span>{{ input.length }} {{ t('char') }}</span>
@@ -56,9 +71,10 @@ import { ref, computed } from 'vue'
 import { useChat } from '~/contexts/chatContext'
 import { useModel } from '~/contexts/modelContext'
 import { useI18n } from '~/composables/useI18n'
+import { useModelI18n } from '~/composables/useModelI18n'
 
 import { Button } from '~/components/ui/button'
-import { Send, Square } from 'lucide-vue-next'
+import { Send, Square, AlertTriangle } from 'lucide-vue-next'
 
 const props = defineProps({
   modelValue: { type: String, default: '' },
@@ -70,6 +86,7 @@ const emit = defineEmits(['update:modelValue', 'submit'])
 const chatStore = useChat()
 const modelStore = useModel()
 const { t } = useI18n()
+const { tModel } = useModelI18n()
 
 const inputEl = ref<HTMLTextAreaElement | null>(null)
 

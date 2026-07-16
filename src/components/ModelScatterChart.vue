@@ -24,6 +24,10 @@ const props = defineProps<{
   models: ModelInfo[]
 }>()
 
+const emit = defineEmits<{
+  (e: 'select-model', modelId: string): void
+}>()
+
 const getCategory = (ram: number) => {
   if (ram < 2000) return 'Ultra-Léger'
   if (ram <= 4096) return 'Équilibré'
@@ -44,6 +48,7 @@ const chartData = computed(() => {
       x: m.ramRequired,
       y: m.performanceScore || 0,
       modelName: m.name,
+      modelId: m.id,
       size: m.totalSize
     })
   })
@@ -59,9 +64,19 @@ const chartData = computed(() => {
   }
 })
 
-const chartOptions = {
+const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
+  onClick: (event: any, elements: any[], chart: any) => {
+    if (elements.length > 0) {
+      const datasetIndex = elements[0].datasetIndex
+      const index = elements[0].index
+      const dataPoint = chart.data.datasets[datasetIndex].data[index]
+      if (dataPoint && dataPoint.modelId) {
+        emit('select-model', dataPoint.modelId)
+      }
+    }
+  },
   plugins: {
     legend: {
       position: 'top' as const,
@@ -108,5 +123,5 @@ const chartOptions = {
       max: 100
     }
   }
-}
+}))
 </script>
