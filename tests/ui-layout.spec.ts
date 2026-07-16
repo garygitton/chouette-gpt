@@ -2,6 +2,16 @@ import { test, expect } from '@playwright/test';
 
 test.describe('UI & Experimental Mentions', () => {
   test.beforeEach(async ({ page }) => {
+    // Bypass onboarding modal and use mock LLM mode to prevent capability-check issues
+    await page.addInitScript(() => {
+      try {
+        window.localStorage.setItem('chouette-onboarding-seen', 'true');
+        (window as any).__mock_llm = true;
+      } catch (e) {
+        // Ignore storage access errors
+      }
+    });
+
     // Abort third-party network requests to keep tests fast and offline-capable
     await page.route(/hits\.seeyoufarm\.com/, route => route.abort());
     await page.route(/shields\.io/, route => route.abort());
@@ -10,7 +20,6 @@ test.describe('UI & Experimental Mentions', () => {
   test('should display experimental badges and disclaimers on the dashboard', async ({ page }) => {
     // Navigate to the app (mock mode to bypass heavy model loading)
     await page.goto('/?mock=true');
-    await page.waitForLoadState('networkidle');
 
     // 1. Verify the "Expérimental" badge is present next to the title
     const experimentalBadge = page.locator('text=Expérimental').first();
@@ -30,13 +39,12 @@ test.describe('UI & Experimental Mentions', () => {
   });
 
   test('should display the experimental disclaimer in the chat interface', async ({ page }) => {
-    await page.goto('/?mock=true&autoDownload=false');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/?mock=true&autoDownload=false&showAllModels=true');
 
     // Select the model so the chat interface is visible 
     await page.waitForSelector('text=Modèle IA Local');
     await page.click('button[role="combobox"]');
-    await page.getByRole('option', { name: /SmolLM/i }).click({ force: true });
+    await page.getByRole('option', { name: /Qwen2.5/i }).first().click({ force: true });
 
     // Wait for the Select dropdown animation to finish
     await page.waitForTimeout(500);

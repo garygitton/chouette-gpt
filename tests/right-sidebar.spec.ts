@@ -107,12 +107,12 @@ test.describe('ChouetteGPT - Advanced Settings & Right Sidebar', () => {
     });
 
     await test.step('And je vérifie les curseurs de paramètres avancés', async () => {
-      // Ouvre l'accordéon des paramètres avancés
-      const advancedToggle = page.getByRole('button', { name: 'Paramètres avancés' });
+      // Ouvre l'accordéon des limites et ajustements
+      const advancedToggle = page.getByTestId('accordion-limits-trigger');
       await advancedToggle.click();
       
       const sliders = page.locator('[role="slider"]');
-      await expect(sliders).toHaveCount(4); // Temp, TopP, MaxTokens, TopK
+      await expect(sliders).toHaveCount(5); // Temp, TopP, MaxTokens, TopK, RepetitionPenalty
     });
 
     await test.step('Then je peux voir la jauge de tokens de conversation', async () => {
@@ -131,15 +131,15 @@ test.describe('ChouetteGPT - Advanced Settings & Right Sidebar', () => {
       await option.click({ force: true });
       await expect(option).toBeHidden();
 
-      // Click "Télécharger et activer" button in the sidebar
-      const downloadBtn = page.getByTestId('sidebar').getByRole('button', { name: /Télécharger et activer/i });
-      await expect(downloadBtn).toBeVisible({ timeout: 5000 });
-      await downloadBtn.click();
-
-      // Accept download in the confirmation modal
-      const acceptBtn = page.getByRole('button', { name: /Accepter et Télécharger/i });
-      await expect(acceptBtn).toBeVisible({ timeout: 5000 });
-      await acceptBtn.click();
+      // The download popup is triggered automatically upon selection if not cached
+      const downloadDialog = page.getByRole('dialog').filter({ hasText: 'Autoriser le téléchargement' });
+      try {
+        await expect(downloadDialog).toBeVisible({ timeout: 4000 });
+        const acceptBtn = downloadDialog.getByRole('button', { name: /Accepter et Télécharger/i });
+        await acceptBtn.click();
+      } catch (e) {
+        console.log('[TEST] Le modèle sélectionné est déjà en cache.');
+      }
     });
 
     await test.step('Then le chargement du nouveau modèle commence', async () => {

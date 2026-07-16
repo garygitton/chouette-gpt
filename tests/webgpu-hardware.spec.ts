@@ -6,7 +6,7 @@ test.describe('ChouetteGPT - Real WebGPU hardware acceleration', () => {
   // Downloading a 150MB model locally might take 30-120 seconds depending on bandwidth
   test.setTimeout(300000); 
 
-  test('Should load SmolLM in WebGPU and generate response', async ({ page, context }) => {
+  test('Should load Qwen2.5-0.5B in WebGPU and generate response', async ({ page, context }) => {
     // 0. Bypass onboarding modal
     await page.addInitScript(() => {
       try {
@@ -29,36 +29,32 @@ test.describe('ChouetteGPT - Real WebGPU hardware acceleration', () => {
        await route.continue();
     });
 
-    // 1. Load the app in real mode (no mock bypass)
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    // 1. Load the app in real mode (no mock bypass) with showAllModels=true to bypass domain filters
+    await page.goto('/?showAllModels=true', { waitUntil: 'domcontentloaded' });
     
     // 2. Wait for Nuxt/Vite to compile and mount the app (Cold Start)
     await page.waitForSelector('[data-testid="sidebar"]', { state: 'attached', timeout: 60000 });
     await page.waitForTimeout(2000);
 
-    // 3. Switch model to SmolLM-135M to speed up the test
+    // 3. Switch model to Qwen2.5-0.5B to speed up the test
     const combobox = page.getByRole('combobox').first();
     await combobox.waitFor({ state: 'visible', timeout: 30000 });
     
     // Click to open dropdown
     await combobox.click();
     
-    // Select SmolLM2
-    const smolOption = page.getByRole('option', { name: /SmolLM2/i });
-    await smolOption.click();
+    // Select Qwen2.5-0.5B
+    const qwenOption = page.getByRole('option', { name: /Qwen2.5-0.5B/i });
+    await qwenOption.click();
 
-    // Click "Télécharger et activer" to start the loading/download process
-    const downloadBtn = page.getByRole('button', { name: 'Télécharger et activer' }).first();
+    // Accept download in the automatic confirmation modal
+    const downloadDialog = page.getByRole('dialog').filter({ hasText: 'Autoriser le téléchargement' });
     try {
-      await downloadBtn.waitFor({ state: 'visible', timeout: 5000 });
-      await downloadBtn.click();
-      
-      // Accept download in the confirmation modal
-      const acceptBtn = page.getByRole('button', { name: /Accepter et Télécharger/i });
-      await expect(acceptBtn).toBeVisible({ timeout: 5000 });
+      await expect(downloadDialog).toBeVisible({ timeout: 5000 });
+      const acceptBtn = downloadDialog.getByRole('button', { name: /Accepter et Télécharger/i });
       await acceptBtn.click();
     } catch (e) {
-      console.log('Download button not visible or already downloading/ready');
+      console.log('Download dialog not visible or already downloading/ready');
     }
 
     // 4. Wait for the engine to finish downloading and loading into VRAM
@@ -118,8 +114,8 @@ test.describe('ChouetteGPT - Real WebGPU hardware acceleration', () => {
        await route.continue();
      });
 
-    // 1. Load the app in real mode (no mock bypass)
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    // 1. Load the app in real mode (no mock bypass) with showAllModels=true to bypass domain filters
+    await page.goto('/?showAllModels=true', { waitUntil: 'domcontentloaded' });
     
     // 2. Wait for Nuxt/Vite to compile and mount the app (Cold Start)
     await page.waitForSelector('[data-testid="sidebar"]', { state: 'attached', timeout: 60000 });
@@ -136,18 +132,14 @@ test.describe('ChouetteGPT - Real WebGPU hardware acceleration', () => {
     const llamaOption = page.getByRole('option', { name: /Llama-3.2-1B/i }).first();
     await llamaOption.click();
 
-    // Click "Télécharger et activer" to start the loading/download process
-    const downloadBtn = page.getByRole('button', { name: 'Télécharger et activer' }).first();
+    // Accept download in the automatic confirmation modal
+    const downloadDialog = page.getByRole('dialog').filter({ hasText: 'Autoriser le téléchargement' });
     try {
-      await downloadBtn.waitFor({ state: 'visible', timeout: 5000 });
-      await downloadBtn.click();
-      
-      // Accept download in the confirmation modal
-      const acceptBtn = page.getByRole('button', { name: /Accepter et Télécharger/i });
-      await expect(acceptBtn).toBeVisible({ timeout: 5000 });
+      await expect(downloadDialog).toBeVisible({ timeout: 5000 });
+      const acceptBtn = downloadDialog.getByRole('button', { name: /Accepter et Télécharger/i });
       await acceptBtn.click();
     } catch (e) {
-      console.log('Download button not visible or already downloading/ready');
+      console.log('Download dialog not visible or already downloading/ready');
     }
 
     // 4. Wait for the engine to finish downloading and loading into VRAM

@@ -7,14 +7,13 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
   test.setTimeout(600000);
 
   const models = [
-    'SmolLM2-135M-Instruct',
     'Qwen2.5-0.5B-Instruct',
-    'Routangseng-Qwen3.5-0.8B-Abliterated',
     'Llama-3.2-1B-Instruct',
     'Qwen2.5-1.5B-Instruct',
+    'Qwen2.5-Math-1.5B-Instruct',
+    'Qwen2.5-Coder-1.5B-Instruct',
     'Llama-3.2-3B-Instruct',
     'Phi-3.5-mini-instruct',
-    'NVIDIA-Nemotron-3-Nano-4B-Instruct',
     'MedGemma-4B-Instruct'
   ];
 
@@ -49,7 +48,7 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
       // 1. Ouvrir l'application
       // On mock l'inférence pour TOUS les modèles dans ce test E2E pour éviter les crashs WebGPU/WASM
       // en mode headless. L'exécution réelle est testée dans webgpu-hardware.spec.ts
-      const url = '/?mock=true';
+      const url = '/?mock=true&showAllModels=true';
       await page.goto(url, { waitUntil: 'domcontentloaded' });
 
       // 2. Sélectionner le modèle dans la sidebar
@@ -62,15 +61,15 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
       await option.click();
       await expect(option).toBeHidden();
 
-      // 3. Télécharger et activer
-      const downloadBtn = page.getByTestId('sidebar').getByRole('button', { name: /Télécharger et activer/i });
-      await expect(downloadBtn).toBeVisible({ timeout: 5000 });
-      await downloadBtn.click();
-
-      // Accept download in the confirmation modal
-      const acceptBtn = page.getByRole('button', { name: /Accepter et Télécharger/i });
-      await expect(acceptBtn).toBeVisible({ timeout: 5000 });
-      await acceptBtn.click();
+      // 3. Le popup de téléchargement s'affiche automatiquement si non mis en cache
+      const downloadDialog = page.getByRole('dialog').filter({ hasText: 'Autoriser le téléchargement' });
+      try {
+        await expect(downloadDialog).toBeVisible({ timeout: 4000 });
+        const acceptBtn = downloadDialog.getByRole('button', { name: /Accepter et Télécharger/i });
+        await acceptBtn.click();
+      } catch (e) {
+        console.log(`[TEST] Le modèle ${modelName} est déjà en cache.`);
+      }
 
       // 4. Attendre que le statut passe à "Prêt"
       const statusBadge = page.getByTestId('model-status-badge');

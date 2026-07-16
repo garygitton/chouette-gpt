@@ -12,7 +12,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 1,
   workers: process.env.CI ? 2 : undefined,
   outputDir: 'data/test-results',
-  reporter: [['list'], ['html', { outputFolder: 'data/playwright-report' }]],
+  reporter: [['list'], ['html', { outputFolder: 'data/playwright-report', open: 'never' }]],
   use: {
     baseURL: process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}/`,
     viewport: { width: 1280, height: 800 },
@@ -20,6 +20,9 @@ export default defineConfig({
     actionTimeout: 300000,
     navigationTimeout: 300000,
     screenshot: 'only-on-failure',
+    launchOptions: {
+      args: ['--host-resolver-rules=MAP chouette-gpt.localhost 127.0.0.1'],
+    },
   },
   projects: [
     {
@@ -33,9 +36,9 @@ export default defineConfig({
       use: { headless: false },
     }
   ],
-  webServer: {
+  webServer: process.env.BASE_URL ? undefined : {
     command: process.env.CI ? `npx -y serve dist -l ${process.env.PORT || 3000}` : 'npm run dev',
-    url: process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}/`,
+    url: `http://localhost:${process.env.PORT || 3000}/`,
     reuseExistingServer: !process.env.CI,
     timeout: 300000,
   }
