@@ -54,10 +54,6 @@ jobs:
         env:
           CI: true
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-        with:
-          static_site_generator: nuxt
 
       - name: Static HTML export with Nuxt
         run: pnpm run generate

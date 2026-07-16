@@ -76,6 +76,7 @@ export default defineNuxtConfig({
   ],
   spaLoadingTemplate: './spa-loading-template.html',
   app: {
+    baseURL: process.env.NUXT_APP_BASE_URL || '/',
     head: {
       title: 'ChouetteGPT',
       meta: [
