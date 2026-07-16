@@ -99,6 +99,8 @@ self.onmessage = async (event: MessageEvent) => {
         if (forceDevice === 'webgpu') throw gpuError;
 
         console.warn('[Transformers Worker] WebGPU initialization failed, falling back to WASM/CPU:', gpuError);
+        downloadTotals = {};
+        downloadLoaded = {};
         generator = await pipeline('text-generation', modelId, {
           device: 'wasm',
           dtype: dtype || 'q4',
