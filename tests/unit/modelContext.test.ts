@@ -1,5 +1,12 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { ref, reactive } from 'vue'
+
+vi.mock('#imports', () => ({
+  useRoute: () => ({
+    query: {}
+  })
+}))
+
 import { useProvideModel } from '../../src/contexts/modelContext'
 
 describe('ModelContext Capability Filtering', () => {

@@ -3,7 +3,8 @@ import { MessageRole } from '~/domain/chat/MessageRole'
 import type { ConversationContext } from './conversationContext'
 import type { ModelContext } from './modelContext'
 import type { SettingsContext } from './settingsContext'
-
+import { executeBenchmark } from '~/utils/benchmark'
+import { estimateTokens, isModelCached } from '~/utils/chatUtils'
 export function useProvideChat(modelContext: ModelContext, convContext: ConversationContext, settingsContext: SettingsContext) {
   const isGenerating = ref(false)
   const isEngineLoading = ref(false)
@@ -17,8 +18,6 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
   let currentGenerationId = 0
   let downloadQueue: string[] = []
   let engineLoadSessionId = 0
-  let estimateTokens = (text: string) => Math.ceil((text || '').length / 4)
-
   const conversationTokens = computed(() => {
     let total = 0
     if (settingsContext.systemPrompt && settingsContext.systemPrompt.trim().length > 0) {
@@ -72,23 +71,6 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
       }
     }
   })
-
-  async function isModelCached(modelId: string): Promise<boolean> {
-    if (typeof window === 'undefined' || !window.caches) return false
-    try {
-      const cacheNames = await window.caches.keys()
-      const tfCacheNames = cacheNames.filter(name => name.includes('transformers') || name.includes('huggingface'))
-      for (const cacheName of tfCacheNames) {
-        const cache = await window.caches.open(cacheName)
-        const keys = await cache.keys()
-        const isCached = keys.some(request => request.url.includes(modelId))
-        if (isCached) return true
-      }
-    } catch (e) {
-      console.error('Error checking cache', e)
-    }
-    return false
-  }
 
 
   async function initEngine(modelId: string, progressPrefix = '', sessionId?: number) {
@@ -414,7 +396,7 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
     modelId: string, 
     device: 'webgpu' | 'wasm',
     onProgress: (info: { text: string, tokens: number, elapsedMs: number, warmupMs: number }) => void
-  ): Promise<{ warmupMs: number, tokensPerSec: number, totalTokens: number, text: string }> {
+  ) {
     if (worker) {
       worker.terminate()
       worker = null
@@ -423,90 +405,16 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
     isEngineLoading.value = true
     engineProgress.value = { text: 'Initialisation Benchmark...', progress: 0 }
 
-    const activeSessionId = ++engineLoadSessionId
-    const t0 = performance.now()
-
-    worker = new Worker(new URL('../workers/transformers.worker.ts', import.meta.url), { type: 'module' })
-    
-    await new Promise<void>((resolve, reject) => {
-      worker!.onmessage = (event) => {
-        if (engineLoadSessionId !== activeSessionId) {
-          reject(new Error('Session cancelled'))
-          return
-        }
-        const { type, payload } = event.data
+    try {
+      return await executeBenchmark(modelId, device, modelContext, onProgress, (type, payload) => {
         if (type === 'progress') {
           engineProgress.value = { text: payload.text, progress: payload.progress }
-        } else if (type === 'init_done') {
-          resolve()
-        } else if (type === 'init_error') {
-          reject(new Error(payload))
         }
-      }
-      const model = modelContext.models.find(m => m.id === modelId)
-      const dtype = model?.quantization || 'q4'
-      worker!.postMessage({ type: 'init', payload: { modelId, forceDevice: device, dtype } })
-    })
-
-    const t1 = performance.now()
-    const warmupMs = t1 - t0
-
-    isEngineLoading.value = false
-    isEngineReady.value = true
-
-    // Give an initial progress update for warmup time
-    onProgress({ text: '', tokens: 0, elapsedMs: 0, warmupMs })
-
-    // Now generate
-    const prompt = [{ role: MessageRole.User, content: 'Raconte moi une histoire.' }]
-    const t2 = performance.now()
-    let text = ''
-    
-    generationIdCounter++
-    const genId = generationIdCounter
-    currentGenerationId = genId
-
-    await new Promise<void>((resolve, reject) => {
-      worker!.onmessage = (event) => {
-        const { type, payload, generationId } = event.data
-        if (generationId !== genId) return
-        
-        if (type === 'generate_chunk') {
-          text += payload
-          const currentElapsed = performance.now() - t2
-          onProgress({ 
-            text, 
-            tokens: estimateTokens(text), 
-            elapsedMs: currentElapsed,
-            warmupMs 
-          })
-        } else if (type === 'generate_done') {
-          resolve()
-        } else if (type === 'generate_error') {
-          reject(new Error(payload))
-        }
-      }
-      worker!.postMessage({ 
-        type: 'generate', 
-        payload: { 
-          messages: prompt, 
-          generationId: genId,
-          temperature: 0.7,
-          maxTokens: 50
-        } 
       })
-    })
-
-    const t3 = performance.now()
-    const genMs = t3 - t2
-    const totalTokens = estimateTokens(text)
-    const tokensPerSec = totalTokens / (genMs / 1000)
-
-    worker.terminate()
-    worker = null
-    isEngineReady.value = false
-
-    return { warmupMs, tokensPerSec, totalTokens, text }
+    } finally {
+      isEngineLoading.value = false
+      isEngineReady.value = false
+    }
   }
 
   async function stopGenerate() {

@@ -1,3 +1,4 @@
+// @ts-ignore
 import { pipeline, env, TextStreamer } from '@huggingface/transformers';
 
 // Configuration for local WASM and Models

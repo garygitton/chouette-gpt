@@ -97,8 +97,8 @@ export default defineNuxtConfig({
     plugins: [
       {
         name: 'fix-vue-mime',
-        configureServer(server) {
-          server.middlewares.use((req, res, next) => {
+        configureServer(server: any) {
+          server.middlewares.use((req: any, res: any, next: any) => {
             if (req.url && req.url.includes('.vue')) {
               res.setHeader('Content-Type', 'text/javascript')
             }
