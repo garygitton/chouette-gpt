@@ -1,0 +1,83 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  test-and-build:
+    name: Test and Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Build Nuxt App (for dev/test env)
+        run: pnpm run build
+
+      - name: Run Typecheck
+        run: pnpm run typecheck
+
+      - name: Run Unit Tests
+        run: pnpm run test:unit
+
+      - name: Run E2E Playwright Tests
+        run: pnpm exec playwright test --project=ui-tests
+        env:
+          CI: true
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          static_site_generator: nuxt
+
+      - name: Static HTML export with Nuxt
+        run: pnpm run generate
+        env:
+          NUXT_APP_BASE_URL: /chouette-gpt/
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    name: Deploy to Pages
+    needs: test-and-build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
