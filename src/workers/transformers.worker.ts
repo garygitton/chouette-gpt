@@ -21,11 +21,15 @@ self.onmessage = async (event: MessageEvent) => {
   const { type, payload } = event.data;
 
   if (type === 'init') {
-    const { modelId, forceDevice } = payload;
+    const { modelId, forceDevice, dtype } = payload;
     downloadTotals = {};
     downloadLoaded = {};
 
     try {
+      let lastBytes = 0;
+      let lastTime = performance.now();
+      let isReadingCache = false;
+      
       const progressCb = (progress: any) => {
         if (progress.status === 'initiate') {
           downloadTotals[progress.file] = 0;
@@ -53,12 +57,29 @@ self.onmessage = async (event: MessageEvent) => {
           overallProgress = loadedBytes / totalBytes;
         }
 
+        const now = performance.now();
+        if (now - lastTime > 250) {
+          const bytesDiff = loadedBytes - lastBytes;
+          const timeDiffSec = (now - lastTime) / 1000;
+          const bytesPerSec = bytesDiff / timeDiffSec;
+          
+          // Si la vitesse dépasse 250 MB/s, c'est obligatoirement une lecture depuis le cache (disque dur)
+          isReadingCache = bytesPerSec > 250 * 1024 * 1024;
+          
+          lastBytes = loadedBytes;
+          lastTime = now;
+        }
+
         let text = 'Préparation...';
         if (progress.status === 'ready') {
           text = 'Modèle chargé !';
           overallProgress = 1;
         } else if (fileCount > 0 && totalBytes > 0) {
-          text = `Téléchargement (${(loadedBytes / 1024 / 1024).toFixed(1)} MB / ${(totalBytes / 1024 / 1024).toFixed(1)} MB)`;
+          if (isReadingCache) {
+             text = `Vérification du cache... (${Math.round(overallProgress * 100)}%)`;
+          } else {
+             text = `Téléchargement (${(loadedBytes / 1024 / 1024).toFixed(1)} MB / ${(totalBytes / 1024 / 1024).toFixed(1)} MB)`;
+          }
         } else if (fileCount > 0) {
           text = `Téléchargement en cours...`;
         }
@@ -70,7 +91,7 @@ self.onmessage = async (event: MessageEvent) => {
       try {
         generator = await pipeline('text-generation', modelId, {
           device: forceDevice || 'webgpu',
-          dtype: 'q4',
+          dtype: dtype || 'q4',
           progress_callback: progressCb
         });
       } catch (gpuError) {
@@ -79,7 +100,7 @@ self.onmessage = async (event: MessageEvent) => {
         console.warn('[Transformers Worker] WebGPU initialization failed, falling back to WASM/CPU:', gpuError);
         generator = await pipeline('text-generation', modelId, {
           device: 'wasm',
-          dtype: 'q4',
+          dtype: dtype || 'q4',
           progress_callback: progressCb
         });
         activeDevice = 'wasm';
@@ -112,7 +133,7 @@ self.onmessage = async (event: MessageEvent) => {
   }
 
   if (type === 'generate') {
-    const { messages, generationId, temperature, topP, maxTokens } = payload;
+    const { messages, generationId, temperature, topP, maxTokens, topK, repetitionPenalty } = payload;
     if (!generator) {
       self.postMessage({ type: 'generate_error', payload: 'Generator not initialized', generationId });
       return;
@@ -139,6 +160,8 @@ self.onmessage = async (event: MessageEvent) => {
         max_new_tokens: maxTokens || 512,
         temperature: tempVal,
         top_p: topP !== undefined ? topP : 0.9,
+        top_k: topK !== undefined ? topK : 50,
+        repetition_penalty: repetitionPenalty !== undefined ? repetitionPenalty : 1.0,
         do_sample: doSample,
         streamer
       });

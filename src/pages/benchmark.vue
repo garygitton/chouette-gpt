@@ -20,11 +20,12 @@
             <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">{{ t('bench_model_label') }}</label>
             <Select v-model="selectedModel" :disabled="isRunning">
               <SelectTrigger class="h-12 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
-                <SelectValue placeholder="{{ t('bench_model_placeholder') }}" />
+                <SelectValue :placeholder="t('bench_model_placeholder')" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="HuggingFaceTB/SmolLM-135M-Instruct">SmolLM-135M-Instruct (Très Rapide)</SelectItem>
-                <SelectItem value="Xenova/Qwen1.5-0.5B-Chat">Qwen1.5-0.5B-Chat (Rapide)</SelectItem>
+                <SelectItem v-for="model in modelStore.models" :key="model.id" :value="model.id">
+                  {{ model.name }} ({{ model.totalSize }})
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -33,11 +34,11 @@
             <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">{{ t('bench_engine_label') }}</label>
             <Select v-model="selectedEngine" :disabled="isRunning">
               <SelectTrigger class="h-12 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
-                <SelectValue placeholder="{{ t('bench_engine_placeholder') }}" />
+                <SelectValue :placeholder="t('bench_engine_placeholder')" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="both">{{ t('bench_engine_both') }}</SelectItem>
-                <SelectItem value="webgpu">{{ t('bench_engine_gpu') }}</SelectItem>
+                <SelectItem value="both" :disabled="!hasWebGPU">{{ t('bench_engine_both') }}</SelectItem>
+                <SelectItem value="webgpu" :disabled="!hasWebGPU">{{ t('bench_engine_gpu') }}</SelectItem>
                 <SelectItem value="wasm">{{ t('bench_engine_cpu') }}</SelectItem>
               </SelectContent>
             </Select>
@@ -84,6 +85,15 @@
             <div class="text-sm text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-950 p-3 rounded-xl h-24 overflow-y-auto font-mono text-[10px]">
               {{ results.webgpu.text || (activeTest === 'webgpu' ? chatStore.engineProgress.text : t('bench_waiting')) }}
             </div>
+
+            <!-- WebGPU unavailable banner -->
+            <div v-if="!hasWebGPU" class="flex items-start gap-3 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 text-xs">
+              <span class="text-amber-500 mt-0.5 flex-shrink-0">⚠️</span>
+              <div>
+                <p class="font-bold text-amber-800 dark:text-amber-300">{{ t('bench_no_webgpu_title') }}</p>
+                <p class="text-amber-700 dark:text-amber-400 mt-0.5">{{ t('bench_no_webgpu_desc') }}</p>
+              </div>
+            </div>
           </div>
         </Card>
 
@@ -118,15 +128,27 @@
 
       </div>
       
-      <!-- Analysis / Comparison -->
-      <Card v-if="selectedEngine === 'both' && results.webgpu.done && results.wasm.done" class="p-6 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50 rounded-3xl animate-in fade-in slide-in-from-bottom-4">
-        <h3 class="text-lg font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-2 mb-2">
-          <Zap class="w-5 h-5" /> {{ t('bench_analysis_title') }}
-        </h3>
-        <p class="text-emerald-700 dark:text-emerald-300">
-          {{ t('bench_analysis_desc_gpu') }}<strong>{{ (results.webgpu.tokensPerSec / results.wasm.tokensPerSec).toFixed(1) }}{{ t('bench_analysis_desc_faster') }}</strong>{{ t('bench_analysis_desc_cpu') }}
-        </p>
-      </Card>
+      <!-- Analysis / Comparison & Share Panel -->
+      <div v-if="selectedEngine === 'both' && results.webgpu.done && results.wasm.done" class="space-y-6">
+        <Card class="p-6 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50 rounded-3xl animate-in fade-in slide-in-from-bottom-4">
+          <h3 class="text-lg font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-2 mb-2">
+            <Zap class="w-5 h-5" /> {{ t('bench_analysis_title') }}
+          </h3>
+          <p class="text-emerald-700 dark:text-emerald-300">
+            {{ t('bench_analysis_desc_gpu') }}<strong>{{ (results.webgpu.tokensPerSec / results.wasm.tokensPerSec).toFixed(1) }}{{ t('bench_analysis_desc_faster') }}</strong>{{ t('bench_analysis_desc_cpu') }}
+          </p>
+        </Card>
+
+        <!-- Social Share Buttons -->
+        <div class="flex flex-wrap gap-4 justify-center py-2">
+          <Button @click="shareBenchmarkTwitter" class="bg-[#1d9bf0] hover:bg-[#1a8cd8] text-white rounded-xl text-xs font-bold shadow-md shadow-sky-500/15 h-11 px-6">
+            <Twitter class="w-4 h-4 mr-2 fill-white" /> Partager mon score sur X
+          </Button>
+          <Button @click="downloadBenchmarkBadge" variant="outline" class="rounded-xl border-indigo-300 dark:border-indigo-800 hover:bg-indigo-100/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold h-11 px-6 bg-white dark:bg-transparent">
+            <Download class="w-4 h-4 mr-2" /> Télécharger mon badge PNG
+          </Button>
+        </div>
+      </div>
       
     </div>
 
@@ -189,6 +211,7 @@
                 </p>
               </div>
             </div>
+
           </div>
         </div>
 
@@ -207,35 +230,52 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { Card } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
 import { Badge } from '~/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '~/components/ui/dialog'
-import { Activity, Play, Cpu, Cpu as Microchip, Loader2, Zap, ShieldCheck, Wifi } from 'lucide-vue-next'
+import { Activity, Play, Cpu, Cpu as Microchip, Loader2, Zap, ShieldCheck, Wifi, Twitter, Download } from 'lucide-vue-next'
 import { useChat } from '~/contexts/chatContext'
 import { useI18n } from '~/composables/useI18n'
+import { useModel } from '~/contexts/modelContext'
 
 const chatStore = useChat()
+const modelStore = useModel()
 const { t } = useI18n()
 
-const selectedModel = ref('HuggingFaceTB/SmolLM-135M-Instruct')
+// WebGPU availability detection (lightweight, no full adapter request)
+const hasWebGPU = ref(false)
+onMounted(async () => {
+  if ('gpu' in navigator) {
+    try {
+      const adapter = await (navigator as any).gpu.requestAdapter()
+      hasWebGPU.value = !!adapter
+    } catch {
+      hasWebGPU.value = false
+    }
+  }
+  // Auto-select CPU-only mode when WebGPU is unavailable
+  if (!hasWebGPU.value && selectedEngine.value !== 'wasm') {
+    selectedEngine.value = 'wasm'
+  }
+})
+
+const selectedModel = ref('onnx-community/SmolLM2-135M-Instruct-ONNX-MHA')
 const selectedEngine = ref<'both' | 'webgpu' | 'wasm'>('both')
 const isRunning = ref(false)
 const activeTest = ref<'webgpu' | 'wasm' | null>(null)
 const showBenchmarkConfirm = ref(false)
 
 const selectedModelName = computed(() => {
-  if (selectedModel.value === 'HuggingFaceTB/SmolLM-135M-Instruct') return 'SmolLM-135M-Instruct'
-  if (selectedModel.value === 'Xenova/Qwen1.5-0.5B-Chat') return 'Qwen1.5-0.5B-Chat'
-  return selectedModel.value
+  const model = modelStore.models.find(m => m.id === selectedModel.value)
+  return model ? model.name : selectedModel.value
 })
 
 const selectedModelSize = computed(() => {
-  if (selectedModel.value === 'HuggingFaceTB/SmolLM-135M-Instruct') return '150 MB'
-  if (selectedModel.value === 'Xenova/Qwen1.5-0.5B-Chat') return '350 MB'
-  return t('bench_unknown')
+  const model = modelStore.models.find(m => m.id === selectedModel.value)
+  return model ? model.totalSize : t('bench_unknown')
 })
 
 const results = reactive({
@@ -316,5 +356,87 @@ async function executeBenchmark() {
     activeTest.value = null
     isRunning.value = false
   }
+}
+
+function shareBenchmarkTwitter() {
+  const model = selectedModelName.value
+  const gpuScore = results.webgpu.tokensPerSec.toFixed(1)
+  const multiplier = (results.webgpu.tokensPerSec / results.wasm.tokensPerSec).toFixed(1)
+  const text = `Mon navigateur fait tourner localement l'IA à ${gpuScore} tok/s (${model}) grâce à WebGPU sur ChouetteGPT ! Le GPU est ${multiplier}x plus rapide que le CPU. Calculez votre score :`
+  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent('https://github.com/garygitton/chouette-gpt')}`
+  window.open(url, '_blank')
+}
+
+function downloadBenchmarkBadge() {
+  const canvas = document.createElement('canvas')
+  canvas.width = 1000
+  canvas.height = 600
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
+
+  // 1. Gradient Background
+  const grad = ctx.createLinearGradient(0, 0, 1000, 600)
+  grad.addColorStop(0, '#0b0f19') // slate-950
+  grad.addColorStop(1, '#1e1b4b') // indigo-950
+  ctx.fillStyle = grad
+  ctx.fillRect(0, 0, 1000, 600)
+
+  // 2. Inner border decoration
+  ctx.strokeStyle = 'rgba(99, 102, 241, 0.15)'
+  ctx.lineWidth = 10
+  ctx.beginPath()
+  ctx.roundRect(30, 30, 940, 540, 24)
+  ctx.stroke()
+
+  // Reset shadow
+  ctx.shadowColor = 'transparent'
+
+  // 3. Score display
+  // Header watermark
+  ctx.fillStyle = '#a5b4fc' // indigo-300
+  ctx.font = '900 16px sans-serif'
+  ctx.fillText('⚡ CHOUETTE GPT • BANC D\'ESSAI PERFORMANCE', 80, 90)
+
+  // Model Name
+  ctx.fillStyle = '#ffffff'
+  ctx.font = 'bold 36px sans-serif'
+  ctx.fillText(selectedModelName.value, 80, 160)
+
+  // GPU Tokens/s
+  ctx.fillStyle = '#6366f1' // Indigo-500
+  ctx.font = '900 96px sans-serif'
+  const gpuScore = results.webgpu.tokensPerSec.toFixed(1)
+  ctx.fillText(gpuScore, 80, 290)
+  
+  ctx.fillStyle = '#a5b4fc' // Light indigo
+  ctx.font = 'bold 20px sans-serif'
+  ctx.fillText('tok/s (WebGPU GPU)', 85 + ctx.measureText(gpuScore).width + 10, 240)
+
+  // CPU Tokens/s
+  ctx.fillStyle = '#ec4899' // Pink-500
+  ctx.font = '900 48px sans-serif'
+  const cpuScore = results.wasm.tokensPerSec.toFixed(1)
+  ctx.fillText(cpuScore, 80, 390)
+
+  ctx.fillStyle = '#fbcfe8' // Light pink
+  ctx.font = 'bold 16px sans-serif'
+  ctx.fillText('tok/s (WASM CPU)', 85 + ctx.measureText(cpuScore).width + 10, 370)
+
+  // Performance multiplier
+  ctx.fillStyle = '#10b981' // Emerald-500
+  ctx.font = 'bold 24px sans-serif'
+  const multiplier = (results.webgpu.tokensPerSec / results.wasm.tokensPerSec).toFixed(1)
+  ctx.fillText(`⚡ Le GPU (WebGPU) est ${multiplier}x plus rapide que le CPU !`, 80, 465)
+
+  // Footer link
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.3)'
+  ctx.font = 'bold 16px monospace'
+  ctx.fillText('chouette-gpt.localhost', 80, 525)
+
+  // Trigger download
+  const link = document.createElement('a')
+  link.href = canvas.toDataURL('image/png')
+  link.download = `chouettegpt_benchmark_${selectedModelName.value.replace(/\s+/g, '_')}_score.png`
+  link.click()
 }
 </script>

@@ -12,6 +12,8 @@ export function useProvideSettings() {
 
   const systemPrompt = ref('')
   const topK = ref(50)
+  const doSample = ref(true)
+  const repetitionPenalty = ref(1.0)
 
   // Initialize theme and LLM params from localStorage or system preference
   function initSettings() {
@@ -36,6 +38,10 @@ export function useProvideSettings() {
       if (tk) topK.value = parseInt(tk)
       const sp = localStorage.getItem('llm_system_prompt')
       if (sp) systemPrompt.value = sp
+      const ds = localStorage.getItem('llm_do_sample')
+      if (ds) doSample.value = ds === 'true'
+      const rp = localStorage.getItem('llm_repetition_penalty')
+      if (rp) repetitionPenalty.value = parseFloat(rp)
 
       // Social networks
       linkedin.value = localStorage.getItem('social_linkedin') || ''
@@ -63,6 +69,12 @@ export function useProvideSettings() {
   watch(systemPrompt, (val) => {
     if (typeof window !== 'undefined') localStorage.setItem('llm_system_prompt', val)
   })
+  watch(doSample, (val) => {
+    if (typeof window !== 'undefined') localStorage.setItem('llm_do_sample', val.toString())
+  })
+  watch(repetitionPenalty, (val) => {
+    if (typeof window !== 'undefined') localStorage.setItem('llm_repetition_penalty', val.toString())
+  })
   watch(linkedin, (val) => {
     if (typeof window !== 'undefined') localStorage.setItem('social_linkedin', val)
   })
@@ -87,11 +99,15 @@ export function useProvideSettings() {
     topP.value = 0.9
     maxTokens.value = 1024
     topK.value = 50
+    doSample.value = true
+    repetitionPenalty.value = 1.0
     if (typeof window !== 'undefined') {
       localStorage.removeItem('llm_temperature')
       localStorage.removeItem('llm_top_p')
       localStorage.removeItem('llm_max_tokens')
       localStorage.removeItem('llm_top_k')
+      localStorage.removeItem('llm_do_sample')
+      localStorage.removeItem('llm_repetition_penalty')
     }
   }
 
@@ -111,6 +127,8 @@ export function useProvideSettings() {
     topP,
     maxTokens,
     topK,
+    doSample,
+    repetitionPenalty,
     systemPrompt,
     linkedin,
     github,

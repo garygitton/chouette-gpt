@@ -40,6 +40,8 @@ export interface ModelInfo {
   ramRequired: number // MB
   performanceScore?: number // 0-100 score for scatter plot
   description: string
+  domains: string[]
+  supportsSampling?: boolean
 }
 
 export interface DeviceInfo {

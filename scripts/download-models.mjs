@@ -7,12 +7,14 @@ import { promisify } from 'util';
 const streamPipeline = promisify(pipeline);
 
 const models = [
-  'onnx-community/SmolLM2-135M-Instruct-ONNX-MHA',
   'onnx-community/Qwen2.5-0.5B-Instruct',
   'onnx-community/Llama-3.2-1B-Instruct-ONNX',
   'onnx-community/Qwen2.5-1.5B-Instruct',
+  'onnx-community/Qwen2.5-Math-1.5B-Instruct',
+  'onnx-community/Qwen2.5-Coder-1.5B-Instruct',
   'onnx-community/Llama-3.2-3B-Instruct-ONNX',
-  'onnx-community/Phi-3.5-mini-instruct-onnx-web'
+  'onnx-community/Phi-3.5-mini-instruct-onnx-web',
+  'vmanvs/medgemma-q4f16-chunked'
 ];
 
 async function downloadModel(modelId) {
@@ -32,9 +34,9 @@ async function downloadModel(modelId) {
     return;
   }
 
-  const allowedExtensions = ['.json', '.txt', '.onnx', '.wasm', '.bin', '.gguf'];
+  const allowedExtensions = ['.json', '.txt', '.onnx', '.wasm', '.bin', '.gguf', '.onnx_data'];
   const filesToDownload = files.filter(f => 
-    allowedExtensions.some(ext => f.endsWith(ext))
+    allowedExtensions.some(ext => f.endsWith(ext)) || f.includes('.onnx_data')
   );
 
   console.log(`Found ${filesToDownload.length} files to download.`);

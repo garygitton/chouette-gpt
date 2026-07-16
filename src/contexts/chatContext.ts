@@ -52,11 +52,24 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
     showDownloadConfirmation.value = false
   }
 
+  let isInitialModelChange = true
+
   // Reset engine status when selected model changes
   watch(() => modelContext.currentModelId, (newId, oldId) => {
     if (newId && newId !== oldId) {
       cancelDownload()
       isEngineReady.value = false
+
+      if (isInitialModelChange) {
+        isInitialModelChange = false
+        return
+      }
+
+      if (typeof window !== 'undefined') {
+        setTimeout(() => {
+          downloadMultipleEngines([newId])
+        }, 50)
+      }
     }
   })
 
@@ -167,7 +180,9 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
             reject(new Error(payload))
           }
         }
-        worker!.postMessage({ type: 'init', payload: { modelId } })
+        const model = modelContext.models.find(m => m.id === modelId)
+        const dtype = model?.quantization || 'q4'
+        worker!.postMessage({ type: 'init', payload: { modelId, dtype } })
       })
 
       if (engineLoadSessionId !== activeSessionId) return
@@ -230,6 +245,16 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
         }
       } catch (err) {
         console.error(`Failed to download ${modelId}`, err)
+        if (err instanceof Error && err.message === 'Session cancelled') {
+          // User paused explicitly
+        } else {
+          engineProgress.value = { 
+            text: "Interruption réseau. En attente...", 
+            progress: engineProgress.value.progress 
+          };
+          pauseDownload();
+        }
+        break;
       }
     }
 
@@ -299,26 +324,43 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
       const historyMessages = currentConv.messages.map((m: any) => ({ role: m.role, content: m.content }))
       historyMessages.pop() 
       
+      const activeDomain = modelContext.domains?.find((d: any) => d.id === modelContext.currentDomain)
+      let finalSystemPrompt = ''
+      if (activeDomain && activeDomain.prompt) {
+        finalSystemPrompt = activeDomain.prompt
+      }
+
       if (settingsContext.systemPrompt && settingsContext.systemPrompt.trim().length > 0) {
+        if (finalSystemPrompt) {
+          finalSystemPrompt += '\n\n' + settingsContext.systemPrompt.trim()
+        } else {
+          finalSystemPrompt = settingsContext.systemPrompt.trim()
+        }
+      }
+
+      if (finalSystemPrompt && finalSystemPrompt.trim().length > 0) {
         messages = historyMessages.map((m: any) => ({ ...m }))
         
         // For small models (like 135M/0.5B), system roles are often ignored if placed at the very beginning of a long conversation.
         // Injecting the system instructions into the latest user prompt ensures it is heavily weighted by the attention mechanism.
         const lastMsg = messages[messages.length - 1]
         if (lastMsg && lastMsg.role === MessageRole.User) {
-          lastMsg.content = `[Instructions Système : ${settingsContext.systemPrompt.trim()}]\n\n${lastMsg.content}`
+          lastMsg.content = `[Instructions Système : ${finalSystemPrompt.trim()}]\n\n${lastMsg.content}`
         } else {
-          messages.unshift({ role: MessageRole.System, content: settingsContext.systemPrompt.trim() })
+          messages.unshift({ role: MessageRole.System, content: finalSystemPrompt.trim() })
         }
       } else {
         messages = historyMessages.map((m: any) => ({ ...m }))
       }
 
+      const supportsSampling = modelContext.currentModel?.supportsSampling !== false
+
       const llmParams = {
-        temperature: settingsContext.temperature,
-        top_p: settingsContext.topP,
-        max_tokens: settingsContext.maxTokens,
-        top_k: settingsContext.topK
+        temperature: (supportsSampling && settingsContext.doSample) ? settingsContext.temperature : 0.0,
+        topP: (supportsSampling && settingsContext.doSample) ? settingsContext.topP : 1.0,
+        maxTokens: settingsContext.maxTokens,
+        topK: (supportsSampling && settingsContext.doSample) ? settingsContext.topK : 50,
+        repetitionPenalty: settingsContext.repetitionPenalty
       }
 
       let finalContent = ''
@@ -401,7 +443,9 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
           reject(new Error(payload))
         }
       }
-      worker!.postMessage({ type: 'init', payload: { modelId, forceDevice: device } })
+      const model = modelContext.models.find(m => m.id === modelId)
+      const dtype = model?.quantization || 'q4'
+      worker!.postMessage({ type: 'init', payload: { modelId, forceDevice: device, dtype } })
     })
 
     const t1 = performance.now()
