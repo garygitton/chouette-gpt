@@ -49,21 +49,26 @@ jobs:
       - name: Run Unit Tests
         run: pnpm run test:unit
 
-      - name: Run E2E Playwright Tests
+      - name: Run UI E2E Playwright Tests
         run: pnpm exec playwright test --project=ui-tests
         env:
           CI: true
-
 
       - name: Static HTML export with Nuxt
         run: pnpm run generate
         env:
           NUXT_APP_BASE_URL: /chouette-gpt/
 
+      - name: Run WASM Mock Playwright Tests
+        run: pnpm exec playwright test tests/mocked-wasm-inference.spec.ts --project=wasm-tests
+        env:
+          CI: true
+          # Note: BASE_URL overrides playwright config to serve from .output/public if we want, but CI=1 handles it already
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ./.output/public
 
   deploy:
     name: Deploy to Pages

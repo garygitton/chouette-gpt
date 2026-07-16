@@ -37,12 +37,12 @@ export default defineConfig({
     },
     {
       name: 'wasm-tests',
-      testMatch: '**/real-wasm-inference.spec.ts',
+      testMatch: ['**/real-wasm-inference.spec.ts', '**/mocked-wasm-inference.spec.ts'],
       use: { headless: false },
     }
   ],
   webServer: process.env.BASE_URL ? undefined : {
-    command: process.env.CI ? `npx -y serve dist -l ${process.env.PORT || 3000}` : 'npm run dev',
+    command: process.env.CI ? `npx -y serve .output/public -l ${process.env.PORT || 3000}` : 'npm run dev',
     url: `http://localhost:${process.env.PORT || 3000}/`,
     reuseExistingServer: !process.env.CI,
     timeout: 300000,

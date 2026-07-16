@@ -29,10 +29,7 @@ export default defineNuxtConfig({
   ssr: false,
   // @ts-ignore
   nitro: {
-    preset: 'github-pages',
-    output: {
-      publicDir: resolve(__dirname, 'dist')
-    },
+    preset: process.env.NODE_ENV === 'production' ? 'github-pages' : undefined,
     routeRules: {
       '/**': {
         headers: {
@@ -66,8 +63,6 @@ export default defineNuxtConfig({
     editorSupport: false
   },
   ignore: [
-    '**/.nuxt',
-    '**/.nuxt/**',
     '**/node_modules/**',
     '**/test-results/**',
     '**/playwright-report/**',
@@ -96,17 +91,6 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   vite: {
     plugins: [
-      {
-        name: 'fix-vue-mime',
-        configureServer(server: any) {
-          server.middlewares.use((req: any, res: any, next: any) => {
-            if (req.url && req.url.includes('.vue')) {
-              res.setHeader('Content-Type', 'text/javascript')
-            }
-            next()
-          })
-        }
-      }
     ],
     ...(process.env.NODE_ENV === 'production' ? {
       build: {

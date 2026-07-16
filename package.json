@@ -6,7 +6,7 @@
   "scripts": {
     "build": "nuxt build",
     "build:gh-pages": "cross-env NUXT_APP_BASE_URL=/chouette-gpt/ nuxt generate",
-    "deploy": "pnpm run build:gh-pages && gh-pages -a --dotfiles -d dist",
+    "deploy": "pnpm run build:gh-pages && gh-pages -a --dotfiles -d .output/public",
     "dev": "nuxt dev",
     "dev:local": "cross-env HOST=chouette-gpt.localhost nuxt dev",
     "dev:log": "cross-env node scripts/dev-logger.mjs",

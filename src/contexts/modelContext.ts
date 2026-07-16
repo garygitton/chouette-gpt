@@ -68,6 +68,21 @@ export function useProvideModel(deviceContext: DeviceContext) {
       supportsSampling: false
     },
     {
+      id: 'onnx-community/Qwen2.5-Coder-0.5B-Instruct',
+      name: 'Qwen2.5-Coder-0.5B-Instruct',
+      version: '2.5',
+      parameters: '0.5B',
+      totalSize: '350 MB',
+      quantization: 'q4',
+      estimatedMemory: '600 MB',
+      usageCount: 0,
+      status: ModelStatus.Available,
+      ramRequired: 2048,
+      performanceScore: 50,
+      description: 'Ultra-rapide pour le code',
+      domains: ['code']
+    },
+    {
       id: 'onnx-community/Qwen2.5-Coder-1.5B-Instruct',
       name: 'Qwen2.5-Coder-1.5B-Instruct',
       version: '2.5',
