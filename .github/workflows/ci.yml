@@ -32,7 +32,7 @@ jobs:
       - name: Run Unit Tests
         run: pnpm run test:unit
       - name: Run Playwright Tests
-        run: pnpm exec playwright test
+        run: pnpm exec playwright test --project=ui-tests
         env:
           CI: true
       - name: Upload Playwright Report
