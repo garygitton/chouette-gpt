@@ -3,9 +3,10 @@ import { MessageRole } from '~/domain/chat/MessageRole'
 import type { ConversationContext } from './conversationContext'
 import type { ModelContext } from './modelContext'
 import type { SettingsContext } from './settingsContext'
+import type { DeviceContext } from './deviceContext'
 import { executeBenchmark } from '~/utils/benchmark'
 import { estimateTokens, isModelCached } from '~/utils/chatUtils'
-export function useProvideChat(modelContext: ModelContext, convContext: ConversationContext, settingsContext: SettingsContext) {
+export function useProvideChat(modelContext: ModelContext, convContext: ConversationContext, settingsContext: SettingsContext, deviceContext: DeviceContext) {
   const isGenerating = ref(false)
   const isEngineLoading = ref(false)
   const isEngineReady = ref(false)
@@ -162,9 +163,14 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
             reject(new Error(payload))
           }
         }
+        worker!.onerror = (errorEvent) => {
+          console.error('[CHATSTORE] Worker error event:', errorEvent);
+          reject(new Error(errorEvent.message || 'Worker error'));
+        }
         const model = modelContext.models.find(m => m.id === modelId)
         const dtype = model?.quantization || 'q4'
-        worker!.postMessage({ type: 'init', payload: { modelId, dtype } })
+        const forceDevice = deviceContext.deviceInfo?.hasWebGPU ? undefined : 'wasm'
+        worker!.postMessage({ type: 'init', payload: { modelId, dtype, forceDevice } })
       })
 
       if (engineLoadSessionId !== activeSessionId) return

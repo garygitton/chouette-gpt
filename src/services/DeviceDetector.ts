@@ -9,7 +9,12 @@ export async function detectDevice(): Promise<DeviceInfo> {
   let hasWebGPU = false
   if ('gpu' in navigator) {
     try {
-      const adapter = await (navigator as any).gpu.requestAdapter()
+      // 2-second timeout to prevent requestAdapter from hanging on sandboxed/headless systems
+      const adapter = await Promise.race([
+        (navigator as any).gpu.requestAdapter(),
+        new Promise<null>((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000))
+      ]).catch(() => null)
+
       if (adapter && adapter.features.has('shader-f16')) {
         const device = await adapter.requestDevice({
           requiredFeatures: ['shader-f16']

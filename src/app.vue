@@ -30,7 +30,7 @@ provide(modelKey, modelContext)
 const conversationContext = useProvideConversation(modelContext)
 provide(conversationKey, conversationContext)
 
-const chatContext = useProvideChat(modelContext, conversationContext, settingsContext)
+const chatContext = useProvideChat(modelContext, conversationContext, settingsContext, deviceContext)
 provide(chatKey, chatContext)
 
 onErrorCaptured((err) => {
