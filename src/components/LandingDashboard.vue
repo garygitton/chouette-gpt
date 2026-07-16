@@ -13,7 +13,7 @@
         <!-- Breathing Aura -->
         <div class="absolute inset-0 bg-indigo-500/20 dark:bg-indigo-500/10 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-700 animate-pulse"></div>
         <!-- Animated SVG Logo -->
-        <img :src="'/logo.svg'" alt="Logo" class="relative z-10 w-24 h-24 transform group-hover:scale-110 transition-transform duration-500 drop-shadow-xl" />
+        <img src="/logo.svg" alt="Logo" class="relative z-10 w-24 h-24 transform group-hover:scale-110 transition-transform duration-500 drop-shadow-xl" />
       </div>
 
       <div class="space-y-4">

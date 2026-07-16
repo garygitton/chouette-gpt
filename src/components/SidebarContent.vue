@@ -3,7 +3,7 @@
     <!-- Header (Mobile only) -->
     <div v-if="isMobile" class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-1.5">
-        <img :src="'/logo.svg'" alt="" class="w-6 h-6" />
+        <img src="/logo.svg" alt="" class="w-6 h-6" />
         <span class="font-extrabold text-lg text-slate-800 dark:text-white tracking-tight">Chouette<span class="text-indigo-500">GPT</span></span>
       </div>
       <Button variant="ghost" size="icon" @click="$emit('close-sidebar')" aria-label="Fermer le menu">
