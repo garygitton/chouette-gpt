@@ -62,9 +62,15 @@ test.describe('ChouetteGPT - Real WASM Long Conversation E2E Test', () => {
     const artifactDir = '/home/gary/.gemini/antigravity-ide/brain/b37ea513-26dc-4a19-931b-de66c8a34d82';
 
     async function waitForGeneration(bubbleLocator: Locator, expectedSubstring?: string) {
-      // 1. Wait for send button to return to 'Envoyer' (not 'Interrompre')
+      // 1. Wait for send button to show 'Interrompre' (generation started)
+      try {
+        await expect(sendBtn).toHaveText(/Interrompre/i, { timeout: 15000 });
+      } catch (e) {
+        console.log('[TEST] Warning: did not see Interrompre text, checking if already finished.');
+      }
+      // 2. Wait for send button to return to 'Envoyer' (not 'Interrompre')
       await expect(sendBtn).toHaveText(/Envoyer/i, { timeout: 90000 });
-      // 2. Verify the bubble contains actual text and does not contain only '...'
+      // 3. Verify the bubble contains actual text and does not contain only '...'
       await expect(async () => {
         const text = await bubbleLocator.textContent();
         expect(text).not.toContain('...');
@@ -82,7 +88,7 @@ test.describe('ChouetteGPT - Real WASM Long Conversation E2E Test', () => {
     await sendBtn.click();
 
     // Wait for assistant response
-    const firstAssistantMsg = page.locator('.justify-start').last();
+    const firstAssistantMsg = page.locator('[data-testid="chat-message"][data-role="assistant"]').last().getByTestId('message-text');
     await expect(firstAssistantMsg).toBeVisible({ timeout: 25000 });
     await waitForGeneration(firstAssistantMsg);
 
@@ -96,7 +102,7 @@ test.describe('ChouetteGPT - Real WASM Long Conversation E2E Test', () => {
     await sendBtn.click();
 
     // Wait for assistant response to update
-    const secondAssistantMsg = page.locator('.justify-start').last();
+    const secondAssistantMsg = page.locator('[data-testid="chat-message"][data-role="assistant"]').last().getByTestId('message-text');
     await waitForGeneration(secondAssistantMsg, 'paris');
 
     console.log(`[TEST] Turn 2 Answer: ${await secondAssistantMsg.textContent()}`);
@@ -109,7 +115,7 @@ test.describe('ChouetteGPT - Real WASM Long Conversation E2E Test', () => {
     await sendBtn.click();
 
     // Wait for assistant response to update
-    const thirdAssistantMsg = page.locator('.justify-start').last();
+    const thirdAssistantMsg = page.locator('[data-testid="chat-message"][data-role="assistant"]').last().getByTestId('message-text');
     await waitForGeneration(thirdAssistantMsg, 'seine');
 
     console.log(`[TEST] Turn 3 Answer: ${await thirdAssistantMsg.textContent()}`);
