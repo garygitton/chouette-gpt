@@ -163,5 +163,6 @@ export default {
     system_prompt_label: 'System Prompt',
     saved_label: 'Saved',
     reset_btn: 'Reset',
-
+    force_wasm_label: 'Force CPU (WebAssembly) mode',
+    force_wasm_desc: 'Forces local execution on the processor instead of the graphics card. This is slower, but avoids GPU driver hangs and issues on certain systems.',
   } as Record<string, string>

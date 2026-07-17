@@ -163,5 +163,6 @@ export default {
     system_prompt_label: 'Prompt Système',
     saved_label: 'Enregistré',
     reset_btn: 'Réinitialiser',
-
+    force_wasm_label: 'Forcer le processeur (CPU / WASM)',
+    force_wasm_desc: "Force l'exécution locale sur le processeur au lieu de la carte graphique. C'est plus lent, mais cela évite les blocages et les bugs de pilote GPU sur certains systèmes.",
   } as Record<string, string>

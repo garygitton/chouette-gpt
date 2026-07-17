@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import { useSettings } from '~/contexts/settingsContext'
+import { useSettingsStore } from '~/stores/settingsStore'
 import fr from '~/locales/models/fr'
 import en from '~/locales/models/en'
 import es from '~/locales/models/es'
@@ -345,7 +345,7 @@ export const domainTranslations: Record<string, Record<string, DomainTranslation
 }
 
 export function useModelI18n() {
-  const settingsStore = useSettings()
+  const settingsStore = useSettingsStore()
 
   const currentLang = computed(() => settingsStore.language || 'fr')
 

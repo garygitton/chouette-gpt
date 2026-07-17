@@ -162,4 +162,6 @@ export default {
     system_prompt_label: 'सिस्टम प्रॉम्ट',
     saved_label: 'सहेजा गया',
     reset_btn: 'रीसेट',
+    force_wasm_label: 'Force CPU (WebAssembly) mode',
+    force_wasm_desc: 'Forces local execution on the processor instead of the graphics card. This is slower, but avoids GPU driver hangs and issues on certain systems.',
   } as Record<string, string>
