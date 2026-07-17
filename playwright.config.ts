@@ -38,12 +38,12 @@ export default defineConfig({
     {
       name: 'wasm-tests',
       testMatch: ['**/real-wasm-inference.spec.ts', '**/mocked-wasm-inference.spec.ts'],
-      use: { headless: false },
+      use: { headless: !process.env.CI },
     }
   ],
-  webServer: process.env.BASE_URL ? undefined : {
-    command: process.env.CI ? `npx -y serve .output/public -l ${process.env.PORT || 3000}` : 'npm run dev',
-    url: `http://localhost:${process.env.PORT || 3000}/`,
+  webServer: (process.env.BASE_URL && !process.env.BASE_URL.includes('localhost')) ? undefined : {
+    command: process.env.CI ? `pnpm exec serve .output/public -l ${process.env.PORT || 3000}` : 'npm run dev',
+    url: process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}/`,
     reuseExistingServer: !process.env.CI,
     timeout: 300000,
   }
