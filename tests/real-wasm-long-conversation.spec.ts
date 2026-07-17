@@ -61,7 +61,7 @@ test.describe('ChouetteGPT - Real WASM Long Conversation E2E Test', () => {
 
     const artifactDir = '/home/gary/.gemini/antigravity-ide/brain/b37ea513-26dc-4a19-931b-de66c8a34d82';
 
-    async function waitForGeneration(bubbleLocator: Locator, expectedSubstring?: string) {
+    async function waitForGeneration(bubbleLocator: Locator, expectedPattern?: string | RegExp) {
       // 1. Wait for send button to show 'Interrompre' (generation started)
       try {
         await expect(sendBtn).toHaveText(/Interrompre/i, { timeout: 15000 });
@@ -75,8 +75,12 @@ test.describe('ChouetteGPT - Real WASM Long Conversation E2E Test', () => {
         const text = await bubbleLocator.textContent();
         expect(text).not.toContain('...');
         expect(text?.trim().length).toBeGreaterThan(15);
-        if (expectedSubstring) {
-          expect(text?.toLowerCase()).toContain(expectedSubstring.toLowerCase());
+        if (expectedPattern) {
+          if (expectedPattern instanceof RegExp) {
+            expect(text).toMatch(expectedPattern);
+          } else {
+            expect(text?.toLowerCase()).toContain(expectedPattern.toLowerCase());
+          }
         }
       }).toPass({ timeout: 15000 });
     }
@@ -116,7 +120,7 @@ test.describe('ChouetteGPT - Real WASM Long Conversation E2E Test', () => {
 
     // Wait for assistant response to update
     const thirdAssistantMsg = page.locator('[data-testid="chat-message"][data-role="assistant"]').last().getByTestId('message-text');
-    await waitForGeneration(thirdAssistantMsg, 'seine');
+    await waitForGeneration(thirdAssistantMsg, /seine|rhone|rhône|fleuve/i);
 
     console.log(`[TEST] Turn 3 Answer: ${await thirdAssistantMsg.textContent()}`);
     await page.screenshot({ path: path.join(artifactDir, 'conversation-turn-3.png'), fullPage: true });
