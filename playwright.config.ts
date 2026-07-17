@@ -27,7 +27,7 @@ export default defineConfig({
   projects: [
     {
       name: 'ui-tests',
-      testIgnore: ['**/webgpu-hardware.spec.ts', '**/real-wasm-inference.spec.ts'],
+      testIgnore: ['**/webgpu-hardware.spec.ts', '**/real-wasm-inference.spec.ts', '**/real-wasm-long-conversation.spec.ts'],
       use: { headless: true },
     },
     {
