@@ -5,18 +5,18 @@
         <Cpu class="w-3.5 h-3.5 mr-1.5" />
         {{ tUI('local_ai_model') }}
       </span>
-      <Button variant="ghost" size="sm" class="h-6 w-6 p-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" @click="isChartModalOpen = true" :title="tUI('compare_performance')">
+      <Button variant="ghost" size="sm" class="h-6 w-6 p-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" :title="tUI('compare_performance')" @click="isChartModalOpen = true">
         <BarChart class="w-3.5 h-3.5" />
       </Button>
     </div>
     
     <!-- Standard Domain-based dropdown -->
-    <Select v-if="!modelStore.isShowAllModels" :model-value="modelStore.currentDomain" @update:model-value="handleDomainChange" @update:open="onOpenChange" :disabled="chatStore.isEngineLoading">
-      <SelectTrigger data-testid="model-select-trigger" class="h-9 w-full bg-white dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 text-xs shadow-sm flex items-center justify-between px-3">
+    <Select v-if="!modelStore.isShowAllModels" :model-value="modelStore.currentDomain" :disabled="chatStore.isEngineLoading" @update:model-value="handleDomainChange" @update:open="onOpenChange">
+      <SelectTrigger aria-label="Choisir un domaine" data-testid="model-select-trigger" class="h-9 w-full bg-white dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 text-xs shadow-sm flex items-center justify-between px-3">
         <div v-if="selectedDomain" class="flex items-center gap-2 truncate">
           <component :is="getIcon(selectedDomain.icon)" class="w-3.5 h-3.5 text-indigo-500 flex-shrink-0" />
           <span class="font-semibold text-slate-700 dark:text-slate-200">{{ tDomain(selectedDomain.id, 'name') }}</span>
-          <span class="text-[10px] text-slate-400 dark:text-slate-500 truncate">({{ selectedDomain.resolvedModel.name }})</span>
+          <span class="text-[10px] text-slate-500 dark:text-slate-500 truncate">({{ selectedDomain.resolvedModel.name }})</span>
         </div>
         <SelectValue v-else placeholder="Choisir un domaine" />
       </SelectTrigger>
@@ -40,8 +40,8 @@
     </Select>
 
     <!-- Developer/Test mode showing all models -->
-    <Select v-else :model-value="modelStore.currentModelId" @update:model-value="handleModelChange" @update:open="onOpenChange" :disabled="chatStore.isEngineLoading">
-      <SelectTrigger data-testid="model-select-trigger" class="h-9 w-full bg-white dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 text-xs shadow-sm flex items-center justify-between px-3">
+    <Select v-else :model-value="modelStore.currentModelId" :disabled="chatStore.isEngineLoading" @update:model-value="handleModelChange" @update:open="onOpenChange">
+      <SelectTrigger aria-label="Sélectionner un modèle" data-testid="model-select-trigger" class="h-9 w-full bg-white dark:bg-[#0b0f19] border-slate-200 dark:border-slate-800 text-xs shadow-sm flex items-center justify-between px-3">
         <div v-if="selectedModel" class="flex items-center gap-2 truncate">
           <Cpu class="w-3.5 h-3.5 text-indigo-500 flex-shrink-0" />
           <span class="font-semibold text-slate-700 dark:text-slate-200">{{ selectedModel.name }}</span>
@@ -64,7 +64,7 @@
     
     <!-- Model Actions -->
     <div v-if="!chatStore.isEngineReady && !chatStore.isEngineLoading && !chatStore.isEnginePaused" class="mt-3">
-      <Button @click="downloadEngine" class="w-full h-8 text-xs bg-blue-600 hover:bg-blue-700 text-white shadow-sm" :disabled="chatStore.isEngineLoading">
+      <Button class="w-full h-8 text-xs bg-blue-600 hover:bg-blue-700 text-white shadow-sm" :disabled="chatStore.isEngineLoading" @click="downloadEngine">
         <Download class="w-3.5 h-3.5 mr-1.5" />
         {{ tUI('download_activate') }}
       </Button>
@@ -88,7 +88,7 @@
     <div v-if="pendingModel" class="mt-2 p-2.5 bg-white dark:bg-[#0b0f19] rounded-lg border border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 dark:text-slate-400 space-y-1.5 shadow-sm">
       <div class="flex justify-between items-center">
         <span class="font-semibold text-slate-600 dark:text-slate-300">{{ tUI('engine') }}:</span>
-        <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ deviceStore.deviceInfo?.hasWebGPU ? 'GPU (WebGPU)' : 'CPU (WASM)' }}</span>
+        <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ (deviceStore.deviceInfo?.hasWebGPU && !settingsStore.forceWasm) ? 'GPU (WebGPU)' : 'CPU (WASM)' }}</span>
       </div>
       <div class="flex justify-between items-center">
         <span class="font-semibold text-slate-600 dark:text-slate-300">{{ tUI('ram_required') }}:</span>
@@ -132,8 +132,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useModel } from '~/contexts/modelContext'
-import { useChat } from '~/contexts/chatContext'
+import { useModelStore } from '~/stores/modelStore'
+import { useChatStore } from '~/stores/chatStore'
+import { useSettingsStore } from '~/stores/settingsStore'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
@@ -142,12 +143,13 @@ import ModelScatterChart from '~/components/ModelScatterChart.vue'
 import ModelSearchInput from '~/components/ModelSearchInput.vue'
 import { Progress } from '~/components/ui/progress'
 import { BarChart, Loader2, CheckCircle2, Cpu, Pause, Play, Download, Calculator, Code2, Stethoscope, Scale, PenTool, Languages, GraduationCap, TrendingUp, Coins, Search } from 'lucide-vue-next'
-import { useDevice } from '~/contexts/deviceContext'
+import { useDeviceStore } from '~/stores/deviceStore'
 import { useModelI18n } from '~/composables/useModelI18n'
 
-const modelStore = useModel()
-const chatStore = useChat()
-const deviceStore = useDevice()
+const modelStore = useModelStore()
+const chatStore = useChatStore()
+const deviceStore = useDeviceStore()
+const settingsStore = useSettingsStore()
 const { tUI, tDomain, currentLang } = useModelI18n()
 
 const isChartModalOpen = ref(false)
