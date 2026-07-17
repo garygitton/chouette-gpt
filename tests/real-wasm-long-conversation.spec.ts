@@ -61,6 +61,20 @@ test.describe('ChouetteGPT - Real WASM Long Conversation E2E Test', () => {
 
     const artifactDir = '/home/gary/.gemini/antigravity-ide/brain/b37ea513-26dc-4a19-931b-de66c8a34d82';
 
+    async function waitForGeneration(bubbleLocator: Locator, expectedSubstring?: string) {
+      // 1. Wait for send button to return to 'Envoyer' (not 'Interrompre')
+      await expect(sendBtn).toHaveText(/Envoyer/i, { timeout: 90000 });
+      // 2. Verify the bubble contains actual text and does not contain only '...'
+      await expect(async () => {
+        const text = await bubbleLocator.textContent();
+        expect(text).not.toContain('...');
+        expect(text?.trim().length).toBeGreaterThan(15);
+        if (expectedSubstring) {
+          expect(text?.toLowerCase()).toContain(expectedSubstring.toLowerCase());
+        }
+      }).toPass({ timeout: 15000 });
+    }
+
     // ---- TURN 1 ----
     console.log('[TEST] Turn 1: Sending greeting...');
     await textarea.fill('Bonjour ! Est-ce que tu me reçois ? Réponds brièvement.');
@@ -70,10 +84,7 @@ test.describe('ChouetteGPT - Real WASM Long Conversation E2E Test', () => {
     // Wait for assistant response
     const firstAssistantMsg = page.locator('.justify-start').last();
     await expect(firstAssistantMsg).toBeVisible({ timeout: 25000 });
-    await expect(async () => {
-      const text = await firstAssistantMsg.textContent();
-      expect(text?.length).toBeGreaterThan(5);
-    }).toPass({ timeout: 20000 });
+    await waitForGeneration(firstAssistantMsg);
 
     console.log(`[TEST] Turn 1 Answer: ${await firstAssistantMsg.textContent()}`);
     await page.screenshot({ path: path.join(artifactDir, 'conversation-turn-1.png'), fullPage: true });
@@ -86,11 +97,7 @@ test.describe('ChouetteGPT - Real WASM Long Conversation E2E Test', () => {
 
     // Wait for assistant response to update
     const secondAssistantMsg = page.locator('.justify-start').last();
-    await expect(async () => {
-      const text = await secondAssistantMsg.textContent();
-      expect(text?.length).toBeGreaterThan(5);
-      expect(text?.toLowerCase()).toContain('paris');
-    }).toPass({ timeout: 25000 });
+    await waitForGeneration(secondAssistantMsg, 'paris');
 
     console.log(`[TEST] Turn 2 Answer: ${await secondAssistantMsg.textContent()}`);
     await page.screenshot({ path: path.join(artifactDir, 'conversation-turn-2.png'), fullPage: true });
@@ -103,11 +110,7 @@ test.describe('ChouetteGPT - Real WASM Long Conversation E2E Test', () => {
 
     // Wait for assistant response to update
     const thirdAssistantMsg = page.locator('.justify-start').last();
-    await expect(async () => {
-      const text = await thirdAssistantMsg.textContent();
-      expect(text?.length).toBeGreaterThan(4);
-      expect(text?.toLowerCase()).toContain('seine');
-    }).toPass({ timeout: 25000 });
+    await waitForGeneration(thirdAssistantMsg, 'seine');
 
     console.log(`[TEST] Turn 3 Answer: ${await thirdAssistantMsg.textContent()}`);
     await page.screenshot({ path: path.join(artifactDir, 'conversation-turn-3.png'), fullPage: true });
