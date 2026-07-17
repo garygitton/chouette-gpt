@@ -1,10 +1,13 @@
-import { ref, computed, inject, reactive, type InjectionKey, watch } from 'vue'
+import { defineStore } from 'pinia'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from '#imports'
 import type { ModelInfo } from '~/types'
 import { ModelStatus } from '~/domain/model/ModelStatus'
-import type { DeviceContext } from './deviceContext'
+import { useDeviceStore } from './deviceStore'
 
-export function useProvideModel(deviceContext: DeviceContext) {
+export const useModelStore = defineStore('model', () => {
+  const deviceStore = useDeviceStore()
+
   const models = ref<ModelInfo[]>([
     {
       id: 'onnx-community/Qwen2.5-0.5B-Instruct',
@@ -144,12 +147,10 @@ export function useProvideModel(deviceContext: DeviceContext) {
     }
   ])
 
-
-
   const currentModelId = ref<string>('onnx-community/Qwen2.5-0.5B-Instruct')
   const currentDomain = ref<string>('general')
   const isDownloading = ref(false)
-  const deviceMemory = computed(() => deviceContext.deviceInfo ? deviceContext.deviceInfo.ramGB * 1024 : null)
+  const deviceMemory = computed(() => deviceStore.deviceInfo ? deviceStore.deviceInfo.ramGB * 1024 : null)
 
   const domains = [
     { id: 'general', name: 'Général', description: 'Polyvalent & créatif', icon: 'Cpu', prompt: '' },
@@ -172,7 +173,7 @@ export function useProvideModel(deviceContext: DeviceContext) {
 
   function getBestModelForDomain(domainId: string): ModelInfo {
     const ram = deviceMemory.value || 2048
-    const hasWebGPU = deviceContext.deviceInfo?.hasWebGPU ?? true
+    const hasWebGPU = deviceStore.deviceInfo?.hasWebGPU ?? true
     
     // First, try to find a compatible specialized model for this domain
     const domainModels = models.value.filter(m => 
@@ -215,7 +216,6 @@ export function useProvideModel(deviceContext: DeviceContext) {
     })
   })
 
-  // Track if we are in "show all models" mode (e.g. for testing all models)
   const isShowAllModels = computed(() => {
     return typeof window !== 'undefined' && window.location.href.includes('showAllModels=true')
   })
@@ -227,11 +227,8 @@ export function useProvideModel(deviceContext: DeviceContext) {
     return currentModel.value ? currentModel.value.name : 'Unknown'
   })
 
-  // compatibleModels filters models compatible with user's RAM.
-  // In standard mode, we only display the best model of each domain.
-  // In "show all models" developer/test mode, we return all compatible models.
   const compatibleModels = computed(() => {
-    const hasWebGPU = deviceContext.deviceInfo?.hasWebGPU ?? true
+    const hasWebGPU = deviceStore.deviceInfo?.hasWebGPU ?? true
     const allCompat = models.value.filter(model => {
       if (deviceMemory.value && deviceMemory.value < model.ramRequired) {
         return false
@@ -246,12 +243,10 @@ export function useProvideModel(deviceContext: DeviceContext) {
       return allCompat
     }
     
-    // Unique list of resolved models from compatibleDomains
     const bestModelIds = new Set(compatibleDomains.value.map(d => d.resolvedModel.id))
     return allCompat.filter(m => bestModelIds.has(m.id))
   })
 
-  // Watch currentDomain and update currentModelId
   watch([currentDomain, deviceMemory], () => {
     const bestModel = getBestModelForDomain(currentDomain.value)
     if (bestModel && currentModelId.value !== bestModel.id) {
@@ -259,7 +254,6 @@ export function useProvideModel(deviceContext: DeviceContext) {
     }
   }, { immediate: true })
 
-  // Synced: if currentModelId is changed manually, switch currentDomain if current model is not compatible with currentDomain
   watch(currentModelId, (newId) => {
     const model = models.value.find(m => m.id === newId)
     if (model) {
@@ -277,8 +271,8 @@ export function useProvideModel(deviceContext: DeviceContext) {
   async function detectBestModel() {
     if (typeof window === 'undefined') return;
 
-    if (!deviceContext.deviceInfo) {
-      await deviceContext.evaluateDevice()
+    if (!deviceStore.deviceInfo) {
+      await deviceStore.evaluateDevice()
     }
     
     currentDomain.value = 'general'
@@ -293,7 +287,7 @@ export function useProvideModel(deviceContext: DeviceContext) {
     }
   }
 
-  return reactive({
+  return {
     models,
     domains,
     currentDomain,
@@ -307,14 +301,5 @@ export function useProvideModel(deviceContext: DeviceContext) {
     updateModelStatus,
     detectBestModel,
     isShowAllModels
-  })
-}
-
-export type ModelContext = ReturnType<typeof useProvideModel>
-export const modelKey: InjectionKey<ModelContext> = Symbol('model')
-
-export function useModel() {
-  const context = inject(modelKey)
-  if (!context) throw new Error('useModel must be used within a provider')
-  return context
-}
+  }
+})

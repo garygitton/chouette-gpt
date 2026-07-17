@@ -1,8 +1,10 @@
-import { ref, watch, inject, reactive, type InjectionKey } from 'vue'
+import { defineStore } from 'pinia'
+import { ref, watch } from 'vue'
 
-export function useProvideSettings() {
+export const useSettingsStore = defineStore('settings', () => {
   const isDarkMode = ref(true)
   const temperature = ref(0.7)
+  const forceWasm = ref(false)
   const topP = ref(0.9)
   const maxTokens = ref(1024)
   const linkedin = ref('')
@@ -50,6 +52,10 @@ export function useProvideSettings() {
 
       // Language
       language.value = localStorage.getItem('app_language') || 'fr'
+
+      // Force WASM
+      const fw = localStorage.getItem('llm_force_wasm')
+      if (fw) forceWasm.value = fw === 'true'
     }
   }
 
@@ -87,6 +93,9 @@ export function useProvideSettings() {
   watch(language, (val) => {
     if (typeof window !== 'undefined') localStorage.setItem('app_language', val)
   })
+  watch(forceWasm, (val) => {
+    if (typeof window !== 'undefined') localStorage.setItem('llm_force_wasm', val.toString())
+  })
 
   function toggleTheme() {
     isDarkMode.value = !isDarkMode.value
@@ -101,6 +110,7 @@ export function useProvideSettings() {
     topK.value = 50
     doSample.value = true
     repetitionPenalty.value = 1.0
+    forceWasm.value = false
     if (typeof window !== 'undefined') {
       localStorage.removeItem('llm_temperature')
       localStorage.removeItem('llm_top_p')
@@ -108,6 +118,7 @@ export function useProvideSettings() {
       localStorage.removeItem('llm_top_k')
       localStorage.removeItem('llm_do_sample')
       localStorage.removeItem('llm_repetition_penalty')
+      localStorage.removeItem('llm_force_wasm')
     }
   }
 
@@ -121,7 +132,7 @@ export function useProvideSettings() {
     }
   }
 
-  return reactive({
+  return {
     isDarkMode,
     temperature,
     topP,
@@ -134,17 +145,9 @@ export function useProvideSettings() {
     github,
     website,
     language,
+    forceWasm,
     initSettings,
     resetSettings,
     toggleTheme
-  })
-}
-
-export type SettingsContext = ReturnType<typeof useProvideSettings>
-export const settingsKey: InjectionKey<SettingsContext> = Symbol('settings')
-
-export function useSettings() {
-  const context = inject(settingsKey)
-  if (!context) throw new Error('useSettings must be used within a provider')
-  return context
-}
+  }
+})

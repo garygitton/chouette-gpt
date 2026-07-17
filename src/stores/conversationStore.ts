@@ -1,9 +1,12 @@
-import { ref, inject, reactive, type InjectionKey } from 'vue'
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 import type { Conversation, Message } from '~/types'
 import { storage } from '~/services/ConversationStorage'
-import type { ModelContext } from './modelContext'
+import { useModelStore } from './modelStore'
 
-export function useProvideConversation(modelContext: ModelContext) {
+export const useConversationStore = defineStore('conversation', () => {
+  const modelStore = useModelStore()
+  
   const conversations = ref<Conversation[]>([])
   const currentConversationId = ref<string | null>(null)
   
@@ -15,10 +18,13 @@ export function useProvideConversation(modelContext: ModelContext) {
       }
     }
     conversations.value = all.filter(c => c.messages && c.messages.length > 0)
+    
+    if (!currentConversationId.value || !conversations.value.some(c => c.id === currentConversationId.value)) {
+      currentConversationId.value = conversations.value.length > 0 ? conversations.value[0].id : null
+    }
   }
 
   async function createNewConversation() {
-
     const id = Date.now().toString()
     const newConv: Conversation = {
       id,
@@ -26,7 +32,7 @@ export function useProvideConversation(modelContext: ModelContext) {
       messages: [],
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      modelId: modelContext.currentModelId
+      modelId: modelStore.currentModelId
     }
     await storage.save(newConv)
     conversations.value.unshift(newConv)
@@ -79,7 +85,7 @@ export function useProvideConversation(modelContext: ModelContext) {
     }
   }
 
-  return reactive({
+  return {
     conversations,
     currentConversationId,
     loadConversations,
@@ -88,14 +94,5 @@ export function useProvideConversation(modelContext: ModelContext) {
     persistConversation,
     deleteConversation,
     renameConversation
-  })
-}
-
-export type ConversationContext = ReturnType<typeof useProvideConversation>
-export const conversationKey: InjectionKey<ConversationContext> = Symbol('conversation')
-
-export function useConversation() {
-  const context = inject(conversationKey)
-  if (!context) throw new Error('useConversation must be used within a provider')
-  return context
-}
+  }
+})

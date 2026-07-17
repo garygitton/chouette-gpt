@@ -1,12 +1,21 @@
-import { ref, inject, reactive, computed, watch, type InjectionKey } from 'vue'
+import { defineStore } from 'pinia'
+import { ref, computed, watch } from 'vue'
+import * as Comlink from 'comlink'
 import { MessageRole } from '~/domain/chat/MessageRole'
-import type { ConversationContext } from './conversationContext'
-import type { ModelContext } from './modelContext'
-import type { SettingsContext } from './settingsContext'
-import type { DeviceContext } from './deviceContext'
+import { useConversationStore } from './conversationStore'
+import { useModelStore } from './modelStore'
+import { useSettingsStore } from './settingsStore'
+import { useDeviceStore } from './deviceStore'
 import { executeBenchmark } from '~/utils/benchmark'
 import { estimateTokens, isModelCached } from '~/utils/chatUtils'
-export function useProvideChat(modelContext: ModelContext, convContext: ConversationContext, settingsContext: SettingsContext, deviceContext: DeviceContext) {
+import type { TransformersWorkerAPI } from '~/workers/transformers.worker'
+
+export const useChatStore = defineStore('chat', () => {
+  const modelStore = useModelStore()
+  const convStore = useConversationStore()
+  const settingsStore = useSettingsStore()
+  const deviceStore = useDeviceStore()
+
   const isGenerating = ref(false)
   const isEngineLoading = ref(false)
   const isEngineReady = ref(false)
@@ -15,20 +24,22 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
   const actualDevice = ref<'webgpu' | 'wasm' | null>(null)
   
   let worker: Worker | null = null
+  let workerApi: Comlink.Remote<TransformersWorkerAPI> | null = null
+  
   let generationIdCounter = 0
   let currentGenerationId = 0
   let downloadQueue: string[] = []
   let engineLoadSessionId = 0
+
   const conversationTokens = computed(() => {
     let total = 0
-    if (settingsContext.systemPrompt && settingsContext.systemPrompt.trim().length > 0) {
-      total += estimateTokens(settingsContext.systemPrompt.trim())
+    if (settingsStore.systemPrompt && settingsStore.systemPrompt.trim().length > 0) {
+      total += estimateTokens(settingsStore.systemPrompt.trim())
     }
-    if (convContext.currentConversationId) {
-      const currentConv = convContext.conversations.find((c: any) => c.id === convContext.currentConversationId)
+    if (convStore.currentConversationId) {
+      const currentConv = convStore.conversations.find((c: any) => c.id === convStore.currentConversationId)
       if (currentConv && currentConv.messages) {
         for (const msg of currentConv.messages) {
-          
           total += estimateTokens(msg.content || '')
         }
       }
@@ -41,7 +52,7 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
   
   const pendingModelForConfirmation = computed(() => {
     if (!pendingDownloadModelId.value) return null
-    return modelContext.models.find(m => m.id === pendingDownloadModelId.value) || null
+    return modelStore.models.find(m => m.id === pendingDownloadModelId.value) || null
   })
 
   function confirmDownload() {
@@ -55,7 +66,7 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
   let isInitialModelChange = true
 
   // Reset engine status when selected model changes
-  watch(() => modelContext.currentModelId, (newId, oldId) => {
+  watch(() => modelStore.currentModelId, (newId, oldId) => {
     if (newId && newId !== oldId) {
       cancelDownload()
       isEngineReady.value = false
@@ -73,14 +84,13 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
     }
   })
 
-
   async function initEngine(modelId: string, progressPrefix = '', sessionId?: number) {
     if (isEngineReady.value && !progressPrefix) return
     isEnginePaused.value = false
 
-    const modelInfo = modelContext.models.find(m => m.id === modelId)
+    const modelInfo = modelStore.models.find(m => m.id === modelId)
 
-    let isMock = typeof window !== 'undefined' && 
+    const isMock = typeof window !== 'undefined' && 
       (window.location.href.includes('mock=true') || (window as any).__mock_llm);
       
     console.log('[CHATSTORE] initEngine:', { modelId, isMock, href: typeof window !== 'undefined' ? window.location.href : '' })
@@ -104,30 +114,19 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
       
       if (engineLoadSessionId !== activeSessionId) return;
 
-      worker = {
-        postMessage: async (msg: any) => {
-          if (msg.type === 'generate') {
-             const userPrompt = msg.payload.messages[msg.payload.messages.length - 1].content;
+      workerApi = {
+        generate: async (messages: any[], genId: number, params: any, onChunk: any) => {
+             const userPrompt = messages[messages.length - 1].content;
              const responseText = `Bonjour ! Je suis ChouetteGPT, un modèle d'IA local simulé (bouchonné) pour les tests E2E.\n\nVous m'avez demandé : "${userPrompt}".\n\nEst-ce que je peux vous aider pour autre chose ?`;
              
              const chunks = responseText.match(/.{1,4}/g) || [responseText];
              for (const chunk of chunks) {
                await new Promise(r => setTimeout(r, 20));
-               if (worker?.onmessage) {
-                 worker.onmessage({ data: { type: 'generate_chunk', payload: chunk, generationId: msg.payload.generationId } } as any);
-               }
+               await onChunk(chunk);
              }
-             if (worker?.onmessage) {
-               worker.onmessage({ data: { type: 'generate_done', generationId: msg.payload.generationId } } as any);
-             }
-          } else if (msg.type === 'interrupt') {
-             if (worker?.onmessage) {
-               worker.onmessage({ data: { type: 'interrupt_done' } } as any);
-             }
-          }
         },
-        terminate: () => {},
-        onmessage: null
+        interrupt: async () => {},
+        init: async () => ({ device: 'mock' })
       } as any;
       
       if (engineLoadSessionId === activeSessionId) {
@@ -146,34 +145,22 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
       if (engineLoadSessionId !== activeSessionId) return
 
       worker = new Worker(new URL('../workers/transformers.worker.ts', import.meta.url), { type: 'module' })
+      workerApi = Comlink.wrap<TransformersWorkerAPI>(worker)
       
-      await new Promise<void>((resolve, reject) => {
-        worker!.onmessage = (event) => {
-          if (engineLoadSessionId !== activeSessionId) {
-            reject(new Error('Session cancelled'))
-            return
-          }
-          const { type, payload } = event.data
-          if (type === 'progress') {
-            engineProgress.value = { text: progressPrefix + payload.text, progress: payload.progress }
-          } else if (type === 'init_done') {
-            actualDevice.value = payload?.device || 'webgpu'
-            resolve()
-          } else if (type === 'init_error') {
-            reject(new Error(payload))
-          }
-        }
-        worker!.onerror = (errorEvent) => {
-          console.error('[CHATSTORE] Worker error event:', errorEvent);
-          reject(new Error(errorEvent.message || 'Worker error'));
-        }
-        const model = modelContext.models.find(m => m.id === modelId)
-        const dtype = model?.quantization || 'q4'
-        const forceDevice = deviceContext.deviceInfo?.hasWebGPU ? undefined : 'wasm'
-        worker!.postMessage({ type: 'init', payload: { modelId, dtype, forceDevice } })
+      const onProgress = Comlink.proxy((payload: any) => {
+        if (engineLoadSessionId !== activeSessionId) return
+        engineProgress.value = { text: progressPrefix + payload.text, progress: payload.progress }
       })
 
+      const model = modelStore.models.find(m => m.id === modelId)
+      const dtype = model?.quantization || 'q4'
+      const forceDevice = (settingsStore.forceWasm || !deviceStore.deviceInfo?.hasWebGPU) ? 'wasm' : undefined
+      
+      const result = await workerApi.init(modelId, dtype, forceDevice, onProgress)
+      
       if (engineLoadSessionId !== activeSessionId) return
+
+      actualDevice.value = result.device as any
 
       if (isEngineLoading.value) { 
         isEngineReady.value = true;
@@ -228,6 +215,7 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
           if (worker) {
             worker.terminate()
             worker = null
+            workerApi = null
           }
           isEngineReady.value = false
         }
@@ -262,6 +250,7 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
     if (worker) {
       worker.terminate()
       worker = null
+      workerApi = null
     }
   }
 
@@ -273,36 +262,37 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
     if (worker) {
       worker.terminate()
       worker = null
+      workerApi = null
     }
     engineProgress.value = { text: 'Téléchargement annulé', progress: 0 }
   }
 
   async function generate(modelId: string, text: string) {
-    if (!convContext.currentConversationId) {
-      await convContext.createNewConversation()
+    if (!convStore.currentConversationId) {
+      await convStore.createNewConversation()
     }
-    const convId = convContext.currentConversationId!
+    const convId = convStore.currentConversationId!
     
-    await convContext.addMessage(convId, {
+    await convStore.addMessage(convId, {
       id: Date.now().toString(),
       role: MessageRole.User,
       content: text,
       timestamp: Date.now()
     })
 
-    if (!worker) {
+    if (!workerApi) {
       await initEngine(modelId)
     }
 
     const asstMsgId = (Date.now() + 1).toString()
-    await convContext.addMessage(convId, {
+    await convStore.addMessage(convId, {
       id: asstMsgId,
       role: MessageRole.Assistant,
       content: '',
       timestamp: Date.now()
     })
 
-    const currentConv = convContext.conversations.find((c: any) => c.id === convId)
+    const currentConv = convStore.conversations.find((c: any) => c.id === convId)
     if (!currentConv) return
 
     isGenerating.value = true
@@ -312,17 +302,17 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
       const historyMessages = currentConv.messages.map((m: any) => ({ role: m.role, content: m.content }))
       historyMessages.pop() 
       
-      const activeDomain = modelContext.domains?.find((d: any) => d.id === modelContext.currentDomain)
+      const activeDomain = modelStore.domains?.find((d: any) => d.id === modelStore.currentDomain)
       let finalSystemPrompt = ''
       if (activeDomain && activeDomain.prompt) {
         finalSystemPrompt = activeDomain.prompt
       }
 
-      if (settingsContext.systemPrompt && settingsContext.systemPrompt.trim().length > 0) {
+      if (settingsStore.systemPrompt && settingsStore.systemPrompt.trim().length > 0) {
         if (finalSystemPrompt) {
-          finalSystemPrompt += '\n\n' + settingsContext.systemPrompt.trim()
+          finalSystemPrompt += '\n\n' + settingsStore.systemPrompt.trim()
         } else {
-          finalSystemPrompt = settingsContext.systemPrompt.trim()
+          finalSystemPrompt = settingsStore.systemPrompt.trim()
         }
       }
 
@@ -341,56 +331,37 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
         messages = historyMessages.map((m: any) => ({ ...m }))
       }
 
-      const supportsSampling = modelContext.currentModel?.supportsSampling !== false
+      const supportsSampling = modelStore.currentModel?.supportsSampling !== false
 
       const llmParams = {
-        temperature: (supportsSampling && settingsContext.doSample) ? settingsContext.temperature : 0.0,
-        topP: (supportsSampling && settingsContext.doSample) ? settingsContext.topP : 1.0,
-        maxTokens: settingsContext.maxTokens,
-        topK: (supportsSampling && settingsContext.doSample) ? settingsContext.topK : 50,
-        repetitionPenalty: settingsContext.repetitionPenalty
+        temperature: (supportsSampling && settingsStore.doSample) ? settingsStore.temperature : 0.0,
+        topP: (supportsSampling && settingsStore.doSample) ? settingsStore.topP : 1.0,
+        maxTokens: settingsStore.maxTokens,
+        topK: (supportsSampling && settingsStore.doSample) ? settingsStore.topK : 50,
+        repetitionPenalty: settingsStore.repetitionPenalty
       }
 
-      let finalContent = ''
-
-      if (worker) {
+      if (workerApi) {
         generationIdCounter++
         currentGenerationId = generationIdCounter
         
-        await new Promise<void>((resolve, reject) => {
-          let fullContent = ''
-          
-          worker!.onmessage = (event) => {
-            const { type, payload, generationId } = event.data
-            
-            if (generationId !== currentGenerationId) return
-            
-            if (type === 'generate_chunk') {
-              fullContent += payload
-              const msg = currentConv.messages.find((m: any) => m.id === asstMsgId)
-              if (msg) msg.content = fullContent
-              finalContent = fullContent
-            } else if (type === 'generate_done') {
-              resolve()
-            } else if (type === 'generate_error') {
-              reject(new Error(payload))
-            } else if (type === 'interrupt_done') {
-              resolve()
-            }
-          }
-          
-          worker!.postMessage({ 
-            type: 'generate', 
-            payload: { 
-              messages, 
-              generationId: currentGenerationId,
-              ...llmParams
-            } 
-          })
+        let fullContent = ''
+        
+        const onChunk = Comlink.proxy((payloadText: string) => {
+          fullContent += payloadText
+          const msg = currentConv.messages.find((m: any) => m.id === asstMsgId)
+          if (msg) msg.content = fullContent
         })
+
+        await workerApi.generate(
+          messages, 
+          currentGenerationId,
+          llmParams,
+          onChunk
+        )
       }
       
-      await convContext.persistConversation(convId)
+      await convStore.persistConversation(convId)
     } catch (error) {
       console.error('Generation error', error)
     } finally {
@@ -406,13 +377,15 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
     if (worker) {
       worker.terminate()
       worker = null
+      workerApi = null
     }
     isEngineReady.value = false
     isEngineLoading.value = true
     engineProgress.value = { text: 'Initialisation Benchmark...', progress: 0 }
 
     try {
-      return await executeBenchmark(modelId, device, modelContext, onProgress, (type, payload) => {
+      // NOTE: benchmark.ts expects modelStore directly
+      return await executeBenchmark(modelId, device, modelStore as any, onProgress, (type, payload) => {
         if (type === 'progress') {
           engineProgress.value = { text: payload.text, progress: payload.progress }
         }
@@ -424,13 +397,13 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
   }
 
   async function stopGenerate() {
-    if (worker) {
-      worker.postMessage({ type: 'interrupt' })
+    if (workerApi) {
+      await workerApi.interrupt()
       isGenerating.value = false
     }
   }
 
-  return reactive({
+  return {
     isGenerating,
     isEngineLoading,
     isEngineReady,
@@ -449,14 +422,5 @@ export function useProvideChat(modelContext: ModelContext, convContext: Conversa
     pendingModelForConfirmation,
     confirmDownload,
     isModelCached
-  })
-}
-
-export type ChatContext = ReturnType<typeof useProvideChat>
-export const chatKey: InjectionKey<ChatContext> = Symbol('chat')
-
-export function useChat() {
-  const context = inject(chatKey)
-  if (!context) throw new Error('useChat must be used within a provider')
-  return context
-}
+  }
+})
