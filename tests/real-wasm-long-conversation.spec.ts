@@ -23,7 +23,8 @@ test.describe('ChouetteGPT - Real WASM Long Conversation E2E Test', () => {
   });
 
   test('Should run a long conversation on the live production site', async ({ page }) => {
-    const targetUrl = 'https://garygitton.github.io/chouette-gpt/?showAllModels=true';
+    const baseUrl = process.env.BASE_URL || 'https://garygitton.github.io/chouette-gpt/';
+    const targetUrl = `${baseUrl.endsWith('/') ? baseUrl : baseUrl + '/'}?showAllModels=true`;
     console.log(`[TEST] Navigating to: ${targetUrl}`);
     await page.goto(targetUrl, { waitUntil: 'domcontentloaded' });
 
