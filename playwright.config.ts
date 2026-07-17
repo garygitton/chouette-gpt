@@ -37,7 +37,7 @@ export default defineConfig({
     },
     {
       name: 'wasm-tests',
-      testMatch: ['**/real-wasm-inference.spec.ts', '**/mocked-wasm-inference.spec.ts'],
+      testMatch: ['**/real-wasm-inference.spec.ts', '**/mocked-wasm-inference.spec.ts', '**/real-wasm-long-conversation.spec.ts'],
       use: { headless: !process.env.CI },
     }
   ],
