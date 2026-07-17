@@ -38,7 +38,7 @@ export default defineConfig({
     {
       name: 'wasm-tests',
       testMatch: ['**/real-wasm-inference.spec.ts', '**/mocked-wasm-inference.spec.ts', '**/real-wasm-long-conversation.spec.ts'],
-      use: { headless: !process.env.CI },
+      use: { headless: !!process.env.CI },
     }
   ],
   webServer: (process.env.BASE_URL && !process.env.BASE_URL.includes('localhost')) ? undefined : {
