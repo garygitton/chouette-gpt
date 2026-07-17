@@ -3,7 +3,7 @@
   <div class="flex-1 flex flex-col relative h-full bg-white dark:bg-[#0b0f19]">
 
     <!-- Chat Feed Container -->
-    <div ref="scrollContainer" class="flex-1 overflow-y-auto px-4 md:px-8 pt-4 pb-36" @scroll="onScroll">
+    <div ref="scrollContainer" class="flex-1 overflow-y-auto px-4 md:px-8 pt-4 pb-28 md:pb-36" @scroll="onScroll">
       <div class="max-w-3xl w-full mx-auto flex flex-col justify-between">
         <LandingDashboard v-if="!currentConversation || currentConversation.messages.length === 0" @send-prompt="sendPrompt" />
         
@@ -23,11 +23,11 @@
       leave-from-class="transform translate-y-0 opacity-100"
       leave-to-class="transform translate-y-4 opacity-0"
     >
-      <div v-if="!isAtBottom && currentConversation?.messages?.length" class="absolute bottom-36 left-0 right-0 flex justify-center pointer-events-none z-10">
+      <div v-if="!isAtBottom && currentConversation?.messages?.length" class="absolute bottom-28 md:bottom-36 left-0 right-0 flex justify-center pointer-events-none z-10">
         <Button 
-          @click="forceScrollToBottom" 
           variant="secondary" 
-          class="pointer-events-auto rounded-full shadow-lg border border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-xs h-8 px-4 font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400"
+          class="pointer-events-auto rounded-full shadow-lg border border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-xs h-8 px-4 font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400" 
+          @click="forceScrollToBottom"
         >
           <ArrowDown :class="'w-3.5 h-3.5 mr-1.5'" />
           {{ t('new_messages_notification') }}
@@ -40,8 +40,8 @@
       <div class="max-w-3xl mx-auto pointer-events-auto">
         <ChatInputArea 
           v-model="input" 
-          @submit="submit" 
-          :disabled="!chatStore.isEngineReady"
+          :disabled="!chatStore.isEngineReady" 
+          @submit="submit"
         />
       </div>
     </div>
@@ -52,9 +52,9 @@
 import { useRoute, useRouter } from '#imports'
 import { ref, computed, watch, nextTick } from 'vue'
 
-import { useChat } from '~/contexts/chatContext'
-import { useConversation } from '~/contexts/conversationContext'
-import { useModel } from '~/contexts/modelContext'
+import { useChatStore } from '~/stores/chatStore'
+import { useConversationStore } from '~/stores/conversationStore'
+import { useModelStore } from '~/stores/modelStore'
 import { useI18n } from '~/composables/useI18n'
 import ChatMessage from '~/components/ChatMessage.vue'
 import LandingDashboard from '~/components/LandingDashboard.vue'
@@ -64,9 +64,9 @@ import { ArrowDown } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
-const chatStore = useChat()
-const convStore = useConversation()
-const modelStore = useModel()
+const chatStore = useChatStore()
+const convStore = useConversationStore()
+const modelStore = useModelStore()
 const { t } = useI18n()
 
 const input = ref('')

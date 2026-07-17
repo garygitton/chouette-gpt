@@ -1,19 +1,19 @@
 <!-- @ds-ignore-file -->
 <template>
-  <main class="my-auto py-12 space-y-10 ui-message-slide-in relative" aria-labelledby="dashboard-title">
+  <div class="my-auto py-12 space-y-10 ui-message-slide-in relative" aria-labelledby="dashboard-title">
     
     <!-- Ambient Background Glow -->
     <div class="absolute inset-0 pointer-events-none overflow-hidden -z-10">
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-indigo-500/10 dark:bg-indigo-500/5 blur-[120px] rounded-full"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-indigo-500/10 dark:bg-indigo-500/5 blur-[120px] rounded-full"/>
     </div>
 
     <!-- Main Glowing Logo Emblem -->
     <div class="text-center space-y-6">
       <div class="relative w-28 h-28 mx-auto flex items-center justify-center group animate-slide-up-fade [animation-delay:50ms] [animation-fill-mode:both]">
         <!-- Breathing Aura -->
-        <div class="absolute inset-0 bg-indigo-500/20 dark:bg-indigo-500/10 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-700 animate-pulse"></div>
+        <div class="absolute inset-0 bg-indigo-500/20 dark:bg-indigo-500/10 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-700 animate-pulse"/>
         <!-- Animated SVG Logo -->
-        <img src="/logo.svg" alt="Logo" class="relative z-10 w-24 h-24 transform group-hover:scale-110 transition-transform duration-500 drop-shadow-xl" />
+        <img src="~/assets/logo.svg" alt="Logo" class="relative z-10 w-24 h-24 transform group-hover:scale-110 transition-transform duration-500 drop-shadow-xl" >
       </div>
 
       <div class="space-y-4">
@@ -58,15 +58,15 @@
     <!-- Minimalist Call To Action for Onboarding -->
     <div v-if="!chatStore.isEngineReady" class="flex flex-col items-center justify-center max-w-md mx-auto py-6 space-y-4 animate-slide-up-fade [animation-delay:300ms] [animation-fill-mode:both]">
       <div class="flex flex-col items-center space-y-3 relative group">
-        <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-pink-500 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
+        <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-pink-500 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-500"/>
         <Button 
-          @click="chatStore.downloadMultipleEngines([modelStore.currentModelId])" 
-          :disabled="chatStore.isEngineLoading || chatStore.isEnginePaused"
+          :disabled="chatStore.isEngineLoading || chatStore.isEnginePaused" 
           aria-label="Télécharger et activer l'IA"
           class="relative h-12 px-8 rounded-xl bg-gradient-to-r transition-all duration-300 font-bold flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 dark:focus-visible:ring-offset-slate-900"
           :class="chatStore.isEngineLoading || chatStore.isEnginePaused 
             ? 'from-slate-400 to-slate-500 text-slate-100 cursor-not-allowed opacity-90' 
             : 'from-indigo-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white shadow-[0_0_30px_-5px_rgba(99,102,241,0.4)] hover:shadow-[0_0_40px_-5px_rgba(99,102,241,0.6)] hover:-translate-y-0.5 hover:scale-105'"
+          @click="chatStore.downloadMultipleEngines([modelStore.currentModelId])"
         >
           <Loader2 v-if="chatStore.isEngineLoading" class="w-5 h-5 animate-spin" />
           <Pause v-else-if="chatStore.isEnginePaused" class="w-5 h-5" />
@@ -129,20 +129,20 @@
       <Card
         v-for="(prompt, index) in suggestedPrompts" 
         :key="prompt.text" 
-        @click="$emit('send-prompt', prompt.text)" 
-        @keydown.enter="$emit('send-prompt', prompt.text)"
-        tabindex="0"
+        tabindex="0" 
         role="button"
         :aria-label="'Essayer le prompt : ' + prompt.title"
         :data-testid="'suggested-prompt-' + prompt.title.toLowerCase().replace(/\s+/g, '-')"
         class="group relative cursor-pointer text-left p-5 rounded-3xl border border-slate-200/50 dark:border-slate-800/50 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl transition-all duration-500 flex items-start space-x-4 overflow-hidden hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_12px_40px_-10px_rgb(0,0,0,0.1)] dark:hover:shadow-[0_12px_40px_-10px_rgba(99,102,241,0.2)] hover:border-indigo-500/50 dark:hover:border-indigo-500/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 animate-slide-up-fade"
         :style="`animation-delay: ${300 + index * 100}ms; animation-fill-mode: both;`"
+        @click="$emit('send-prompt', prompt.text)"
+        @keydown.enter="$emit('send-prompt', prompt.text)"
       >
         <!-- Animated border gradient -->
-        <div class="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none gradient-border-mask"></div>
+        <div class="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none gradient-border-mask"/>
         
         <!-- Ambient Glow -->
-        <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"/>
 
         <div class="relative z-10 p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-800/80 group-hover:bg-white dark:group-hover:bg-slate-800 transition-all duration-300 flex-shrink-0 shadow-sm group-hover:shadow-md group-hover:shadow-indigo-500/10">
           <component :is="prompt.icon" class="w-5 h-5 transform group-hover:scale-110 transition-transform duration-300" :class="prompt.iconClass" />
@@ -164,15 +164,15 @@
         </div>
       </Card>
     </div>
-  </main>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useI18n } from '~/composables/useI18n'
-import { useDevice } from '~/contexts/deviceContext'
-import { useModel } from '~/contexts/modelContext'
-import { useChat } from '~/contexts/chatContext'
+import { useDeviceStore } from '~/stores/deviceStore'
+import { useModelStore } from '~/stores/modelStore'
+import { useChatStore } from '~/stores/chatStore'
 import { Globe, Code, Sparkles, Mail, ArrowRight, ArrowLeft, Menu, Shield, WifiOff, EyeOff, Download, Loader2, Bot, AlertTriangle, Pause } from 'lucide-vue-next'
 import { Card } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
@@ -181,9 +181,9 @@ import { useModelI18n } from '~/composables/useModelI18n'
 defineEmits(['send-prompt'])
 
 const { t } = useI18n()
-const deviceStore = useDevice()
-const modelStore = useModel()
-const chatStore = useChat()
+const deviceStore = useDeviceStore()
+const modelStore = useModelStore()
+const chatStore = useChatStore()
 const { tModel, tUI } = useModelI18n()
 
 onMounted(async () => {
