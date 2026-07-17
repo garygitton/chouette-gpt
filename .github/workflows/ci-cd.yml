@@ -63,7 +63,7 @@ jobs:
         run: pnpm exec playwright test tests/mocked-wasm-inference.spec.ts --project=wasm-tests
         env:
           CI: true
-          # Note: BASE_URL overrides playwright config to serve from .output/public if we want, but CI=1 handles it already
+          BASE_URL: http://localhost:3000/chouette-gpt/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
