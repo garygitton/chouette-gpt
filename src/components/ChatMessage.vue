@@ -1,5 +1,10 @@
 <template>
-  <div class="w-full flex ui-message-slide-in" :class="[message.role === 'user' ? 'justify-end' : 'justify-start']">
+  <div 
+    class="w-full flex ui-message-slide-in" 
+    :class="[message.role === 'user' ? 'justify-end' : 'justify-start']"
+    data-testid="chat-message"
+    :data-role="message.role"
+  >
     <div 
       class="flex items-start space-x-3.5 max-w-[85%] md:max-w-[78%]"
       :class="[message.role === 'user' ? 'flex-row-reverse space-x-reverse' : 'flex-row']"
@@ -43,7 +48,7 @@
           ]"
         >
           <!-- Message text -->
-          <div class="leading-relaxed break-words">
+          <div class="leading-relaxed break-words" data-testid="message-text">
             <div v-if="message.role === 'user'" class="whitespace-pre-wrap font-normal">{{ message.content }}</div>
             <MarkdownRenderer 
               v-else 
