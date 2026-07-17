@@ -26,9 +26,9 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { useSettings } from '~/contexts/settingsContext'
-import { useModel } from '~/contexts/modelContext'
-import { useChat } from '~/contexts/chatContext'
+import { useSettingsStore } from '~/stores/settingsStore'
+import { useModelStore } from '~/stores/modelStore'
+import { useChatStore } from '~/stores/chatStore'
 import { useI18n } from '~/composables/useI18n'
 import { Button } from '~/components/ui/button'
 import { Progress } from '~/components/ui/progress'
@@ -51,9 +51,9 @@ const emit = defineEmits<{
   'close-sidebar': []
 }>()
 
-const settingsStore = useSettings()
-const modelStore = useModel()
-const chatStore = useChat()
+const settingsStore = useSettingsStore()
+const modelStore = useModelStore()
+const chatStore = useChatStore()
 const { t } = useI18n()
 
 // Automatically turn off creative mode for models that do not support sampling

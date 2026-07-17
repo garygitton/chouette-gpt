@@ -5,7 +5,7 @@ import path from 'path';
 
 async function run() {
   console.log('Starting Playwright for video recording (Real Llama-1B WebGPU in English)...');
-  let skipSeconds = 0;
+  let skipSeconds;
   
   // Launch headed Chromium with WebGPU flags
   const browser = await chromium.launch({

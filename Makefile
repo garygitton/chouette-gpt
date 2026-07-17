@@ -5,21 +5,29 @@
 # testing, and deploying the Chouette-GPT project.
 # ==============================================================================
 
-.PHONY: help dev build deploy test tests clean
+.PHONY: help dev watch start stop setup build deploy test tests clean
 
 help: ## 📚 Display help and available commands
 	@echo "🦉 Available Chouette-GPT commands:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-dev: ## 🚀 Start the local development server (Nuxt/Vite)
+dev: ## 🚀 Start the local development server (Nuxt/Vite) on a random port
 	@echo "Starting development server..."
 	PORT=$$(python3 -c "import socket; s=socket.socket(); s.bind(('', 0)); print(s.getsockname()[1]); s.close()") pnpm run dev
 
-start: ## 🚀 Start the reverse proxy and local development server
-	@echo "Starting the reverse proxy..."
-	docker compose -f /home/gary/Projects/repositories/workspaces/pcspecialist/docker-compose.yml up -d traefik
-	@echo "Starting development server on port 3014 for Traefik..."
+watch: ## 🚀 Start the local development server with hot-reload (alias to start)
+	$(MAKE) start
+
+start: ## 🚀 Start the local development server on port 3014
+	@echo "Starting development server on port 3014..."
 	BROWSER=none HOST=0.0.0.0 PORT=3014 pnpm run dev
+
+stop: ## 🛑 Stop the server (kills port 3014)
+	@echo "Stopping Chouette-GPT server on port 3014..."
+	-fuser -k 3014/tcp 2>/dev/null || true
+
+setup: ## 🛠️ Setup dependencies
+	pnpm install
 
 build: ## 📦 Generate static application files (/dist folder)
 	@echo "Generating static files for GitHub Pages..."

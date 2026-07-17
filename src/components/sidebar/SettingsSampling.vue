@@ -2,10 +2,10 @@
 <!-- Section 2: Paramètres Créatifs (Sampling) -->
       <div class="accordion-item" data-testid="accordion-sampling">
         <button 
-          @click="emit('toggle', 'sampling')" 
-          class="accordion-trigger"
+          class="accordion-trigger" 
           :class="{ 'active': activeSection === 'sampling' }"
           data-testid="accordion-sampling-trigger"
+          @click="emit('toggle', 'sampling')"
         >
           <span class="accordion-title">
             <Sparkles class="icon-sliders text-pink-500" />
@@ -30,10 +30,10 @@
               <button 
                 type="button" 
                 :disabled="!supportsSampling"
-                @click="settingsStore.doSample = !settingsStore.doSample"
                 class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:cursor-not-allowed"
                 :class="[settingsStore.doSample ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-slate-800']"
                 data-testid="creative-mode-toggle"
+                @click="settingsStore.doSample = !settingsStore.doSample"
               >
                 <span 
                   class="pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform duration-200 ease-in-out"
@@ -64,16 +64,12 @@
       </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useSettings } from '~/contexts/settingsContext'
-import { useModel } from '~/contexts/modelContext'
-import { useChat } from '~/contexts/chatContext'
+import { computed } from 'vue'
+import { useSettingsStore } from '~/stores/settingsStore'
+import { useModelStore } from '~/stores/modelStore'
 import { useI18n } from '~/composables/useI18n'
-import { Button } from '~/components/ui/button'
-import { Progress } from '~/components/ui/progress'
 import { Slider } from '~/components/ui/slider'
-import { Textarea } from '~/components/ui/textarea'
-import { X, ChevronDown, ChevronUp, SlidersHorizontal, Check, Linkedin, Github, Sparkles } from 'lucide-vue-next'
+import { ChevronDown, ChevronUp, Sparkles } from 'lucide-vue-next'
 
 const props = defineProps<{
   activeSection: string | null
@@ -83,14 +79,9 @@ const emit = defineEmits<{
   (e: 'toggle', section: string): void
 }>()
 
-const settingsStore = useSettings()
-const modelStore = useModel()
-const chatStore = useChat()
+const settingsStore = useSettingsStore()
+const modelStore = useModelStore()
 const { t } = useI18n()
-
-// Only include what's needed for the section
-
-
 
 const supportsSampling = computed(() => {
   return modelStore.currentModel?.supportsSampling !== false
@@ -104,8 +95,5 @@ const topPArray = computed({
   get: () => [settingsStore.topP],
   set: (val) => { settingsStore.topP = val[0] }
 })
-
-
-
 
 </script>

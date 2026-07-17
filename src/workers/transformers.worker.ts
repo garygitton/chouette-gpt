@@ -1,55 +1,56 @@
 // @ts-ignore
 import { pipeline, env, TextStreamer } from '@huggingface/transformers';
+import * as Comlink from 'comlink';
 
 // Configuration for local WASM and Models
 env.allowLocalModels = false;
-// Allow remote models from Hugging Face Hub (cached by the browser)
 env.allowRemoteModels = true;
 env.useBrowserCache = true;
 if (env.backends.onnx.wasm) {
-  // Optimize WASM multi-threading ONLY if supported
   if (typeof navigator !== 'undefined' && navigator.hardwareConcurrency && typeof crossOriginIsolated !== 'undefined' && crossOriginIsolated) {
     env.backends.onnx.wasm.numThreads = Math.min(navigator.hardwareConcurrency || 4, 4);
   }
 }
 
-let generator: any = null;
-let currentGenerationId = 0;
-let downloadTotals: Record<string, number> = {};
-let downloadLoaded: Record<string, number> = {};
+class TransformersAPI {
+  private generator: any = null;
+  private currentGenerationId: number = 0;
+  private downloadTotals: Record<string, number> = {};
+  private downloadLoaded: Record<string, number> = {};
 
-self.onmessage = async (event: MessageEvent) => {
-  const { type, payload } = event.data;
-
-  if (type === 'init') {
-    const { modelId, forceDevice, dtype } = payload;
-    downloadTotals = {};
-    downloadLoaded = {};
-
+  async init(
+    modelId: string,
+    dtype: string | undefined,
+    forceDevice: string | undefined,
+    onProgress: (payload: { text: string; progress: number }) => void
+  ): Promise<{ device: string }> {
     try {
+      this.downloadTotals = {};
+      this.downloadLoaded = {};
+
       let lastBytes = 0;
       let lastTime = performance.now();
       let isReadingCache = false;
-      
+
       const progressCb = (progress: any) => {
         if (progress.status === 'initiate') {
-          downloadTotals[progress.file] = 0;
-          downloadLoaded[progress.file] = 0;
+          this.downloadTotals[progress.file] = 0;
+          this.downloadLoaded[progress.file] = 0;
         } else if (progress.status === 'progress') {
-          if (progress.total) downloadTotals[progress.file] = progress.total;
-          if (progress.loaded) downloadLoaded[progress.file] = progress.loaded;
+          if (progress.total) this.downloadTotals[progress.file] = progress.total;
+          if (progress.loaded) this.downloadLoaded[progress.file] = progress.loaded;
         } else if (progress.status === 'done') {
-          if (downloadTotals[progress.file]) {
-            downloadLoaded[progress.file] = downloadTotals[progress.file];
+          if (this.downloadTotals[progress.file]) {
+            this.downloadLoaded[progress.file] = this.downloadTotals[progress.file];
           }
         }
 
         let totalBytes = 0;
         let loadedBytes = 0;
         let fileCount = 0;
-        for (const file in downloadTotals) {
-          totalBytes += downloadTotals[file] || 0;
-          loadedBytes += downloadLoaded[file] || 0;
+        for (const file in this.downloadTotals) {
+          totalBytes += this.downloadTotals[file] || 0;
+          loadedBytes += this.downloadLoaded[file] || 0;
           fileCount++;
         }
 
@@ -64,7 +65,6 @@ self.onmessage = async (event: MessageEvent) => {
           const timeDiffSec = (now - lastTime) / 1000;
           const bytesPerSec = bytesDiff / timeDiffSec;
           
-          // Si la vitesse dépasse 250 MB/s, c'est obligatoirement une lecture depuis le cache (disque dur)
           isReadingCache = bytesPerSec > 250 * 1024 * 1024;
           
           lastBytes = loadedBytes;
@@ -85,10 +85,9 @@ self.onmessage = async (event: MessageEvent) => {
           text = `Téléchargement en cours...`;
         }
 
-        self.postMessage({ type: 'progress', payload: { text, progress: overallProgress } });
+        onProgress({ text, progress: overallProgress });
       };
 
-      // Determine device capability inside the worker context
       let targetDevice = forceDevice;
       if (!targetDevice) {
         let hasWorkerWebGPU = false;
@@ -96,7 +95,13 @@ self.onmessage = async (event: MessageEvent) => {
           try {
             const adapter = await (navigator as any).gpu.requestAdapter();
             if (adapter && adapter.features && adapter.features.has('shader-f16')) {
-              hasWorkerWebGPU = true;
+              const device = await adapter.requestDevice({
+                requiredFeatures: ['shader-f16']
+              });
+              if (device) {
+                hasWorkerWebGPU = true;
+                device.destroy();
+              }
             }
           } catch (e) {
             hasWorkerWebGPU = false;
@@ -107,19 +112,19 @@ self.onmessage = async (event: MessageEvent) => {
 
       let activeDevice = targetDevice;
       try {
-        generator = await pipeline('text-generation', modelId, {
-          device: targetDevice,
-          dtype: dtype || 'q4',
+        this.generator = await pipeline('text-generation', modelId, {
+          device: targetDevice as any,
+          dtype: (dtype || 'q4') as any,
           progress_callback: progressCb
         });
-      } catch (gpuError) {
+      } catch (gpuError: any) {
         if (targetDevice === 'webgpu') {
           console.warn('[Transformers Worker] WebGPU initialization failed in worker, falling back to WASM/CPU:', gpuError);
-          downloadTotals = {};
-          downloadLoaded = {};
-          generator = await pipeline('text-generation', modelId, {
-            device: 'wasm',
-            dtype: dtype || 'q4',
+          this.downloadTotals = {};
+          this.downloadLoaded = {};
+          this.generator = await pipeline('text-generation', modelId, {
+            device: 'wasm' as any,
+            dtype: (dtype || 'q4') as any,
             progress_callback: progressCb
           });
           activeDevice = 'wasm';
@@ -128,13 +133,11 @@ self.onmessage = async (event: MessageEvent) => {
         }
       }
 
-      self.postMessage({ type: 'init_done', payload: { device: activeDevice } });
+      return { device: activeDevice };
     } catch (e: any) {
       console.error('[Transformers Worker] Init error:', e);
       let errorMsg = e.message || String(e);
 
-      // If we got a JSON parse error, it's highly likely a 502/404 HTML error page was cached.
-      // We must clear the browser's Cache API to allow recovery on the next attempt.
       if (e instanceof SyntaxError || errorMsg.includes('JSON') || errorMsg.includes('Unexpected token')) {
         try {
           const keys = await caches.keys();
@@ -149,53 +152,51 @@ self.onmessage = async (event: MessageEvent) => {
           console.error('[Transformers Worker] Failed to clear cache', cacheErr);
         }
       }
-
-      self.postMessage({ type: 'init_error', payload: errorMsg });
+      throw new Error(errorMsg);
     }
   }
 
-  if (type === 'generate') {
-    const { messages, generationId, temperature, topP, maxTokens, topK, repetitionPenalty } = payload;
-    if (!generator) {
-      self.postMessage({ type: 'generate_error', payload: 'Generator not initialized', generationId });
-      return;
+  async generate(
+    messages: any[],
+    generationId: number,
+    params: { temperature?: number, topP?: number, maxTokens?: number, topK?: number, repetitionPenalty?: number },
+    onChunk: (text: string) => void
+  ): Promise<void> {
+    if (!this.generator) {
+      throw new Error('Generator not initialized');
     }
 
-    currentGenerationId = generationId;
+    this.currentGenerationId = generationId;
 
-    try {
-      // Build streamer
-      const streamer = new TextStreamer(generator.tokenizer, {
-        skip_prompt: true,
-        callback_function: (text: string) => {
-          if (currentGenerationId === generationId) {
-            self.postMessage({ type: 'generate_chunk', payload: text, generationId });
-          }
+    const streamer = new TextStreamer(this.generator.tokenizer, {
+      skip_prompt: true,
+      callback_function: (text: string) => {
+        if (this.currentGenerationId === generationId) {
+          onChunk(text);
         }
-      });
+      }
+    });
 
-      const tempVal = temperature !== undefined ? temperature : 0.7;
-      const doSample = tempVal > 0;
-      console.log('[Transformers Worker] Generating with messages:', messages);
+    const tempVal = params.temperature !== undefined ? params.temperature : 0.7;
+    const doSample = tempVal > 0;
+    console.log('[Transformers Worker] Generating with messages:', messages);
 
-      await generator(messages, {
-        max_new_tokens: maxTokens || 512,
-        temperature: tempVal,
-        top_p: topP !== undefined ? topP : 0.9,
-        top_k: topK !== undefined ? topK : 50,
-        repetition_penalty: repetitionPenalty !== undefined ? repetitionPenalty : 1.0,
-        do_sample: doSample,
-        streamer
-      });
-
-      self.postMessage({ type: 'generate_done', generationId });
-    } catch (e: any) {
-      self.postMessage({ type: 'generate_error', payload: e.message, generationId });
-    }
+    await this.generator(messages, {
+      max_new_tokens: params.maxTokens || 512,
+      temperature: tempVal,
+      top_p: params.topP !== undefined ? params.topP : 0.9,
+      top_k: params.topK !== undefined ? params.topK : 50,
+      repetition_penalty: params.repetitionPenalty !== undefined ? params.repetitionPenalty : 1.0,
+      do_sample: doSample,
+      streamer
+    });
   }
 
-  if (type === 'interrupt') {
-    currentGenerationId = -1; // stop streamer logic
-    self.postMessage({ type: 'interrupt_done' });
+  async interrupt(): Promise<void> {
+    this.currentGenerationId = -1;
   }
 }
+
+Comlink.expose(new TransformersAPI());
+
+export type TransformersWorkerAPI = InstanceType<typeof TransformersAPI>;

@@ -14,8 +14,8 @@
         class="faq-item"
       >
         <button 
-          @click="toggleFaq(idx)" 
-          class="faq-trigger"
+          class="faq-trigger" 
+          @click="toggleFaq(idx)"
         >
           <span>{{ item.q }}</span>
           <span 

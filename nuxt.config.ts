@@ -5,9 +5,6 @@ import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
   srcDir: 'src/',
-  dir: {
-    public: '../public'
-  },
   alias: {
     '#tailwind-config/theme/colors': resolve(__dirname, './tailwind-colors.ts')
   },
@@ -43,7 +40,7 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: false },
   experimental: {
-    appManifest: true
+    appManifest: false
   },
   devServer: {
     port: parseInt(process.env.PORT || '3000')
@@ -51,7 +48,10 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
     'shadcn-nuxt',
-    '@nuxt/devtools'
+    '@nuxt/devtools',
+    '@nuxt/eslint',
+    '@vite-pwa/nuxt',
+    '@pinia/nuxt'
   ],
   shadcn: {
     prefix: '',
@@ -129,6 +129,39 @@ export default defineNuxtConfig({
     chokidar: {
       usePolling: false,
       interval: 1000
+    }
+  },
+  pwa: {
+    registerType: 'autoUpdate',
+    manifest: {
+      name: 'ChouetteGPT',
+      short_name: 'ChouetteGPT',
+      theme_color: '#ffffff',
+      background_color: '#ffffff',
+      display: 'standalone',
+      orientation: 'portrait',
+      scope: '/',
+      start_url: '/',
+      icons: [
+        {
+          src: '/favicon.svg',
+          sizes: 'any',
+          type: 'image/svg+xml'
+        }
+      ]
+    },
+    workbox: {
+      navigateFallback: '/',
+      globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2}'],
+      maximumFileSizeToCacheInBytes: 10000000 // Increase cache size to 10MB to accommodate larger WASM chunks if needed
+    },
+    client: {
+      installPrompt: true,
+      periodicSyncForUpdates: 3600
+    },
+    devOptions: {
+      enabled: false,
+      type: 'module'
     }
   },
   compatibilityDate: '2024-04-03'

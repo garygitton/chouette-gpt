@@ -2,9 +2,9 @@
 <!-- Section 4: Réseaux Sociaux -->
       <div class="accordion-item">
         <button 
-          @click="emit('toggle', 'socials')" 
-          class="accordion-trigger"
+          class="accordion-trigger" 
           :class="{ 'active': activeSection === 'socials' }"
+          @click="emit('toggle', 'socials')"
         >
           <span class="accordion-title">
             <Github class="icon-sliders text-slate-700 dark:text-slate-300" />
@@ -29,16 +29,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useSettings } from '~/contexts/settingsContext'
-import { useModel } from '~/contexts/modelContext'
-import { useChat } from '~/contexts/chatContext'
 import { useI18n } from '~/composables/useI18n'
-import { Button } from '~/components/ui/button'
-import { Progress } from '~/components/ui/progress'
-import { Slider } from '~/components/ui/slider'
-import { Textarea } from '~/components/ui/textarea'
-import { X, ChevronDown, ChevronUp, SlidersHorizontal, Check, Linkedin, Github, Sparkles } from 'lucide-vue-next'
+import { ChevronDown, ChevronUp, Linkedin, Github } from 'lucide-vue-next'
 
 const props = defineProps<{
   activeSection: string | null
@@ -48,16 +40,5 @@ const emit = defineEmits<{
   (e: 'toggle', section: string): void
 }>()
 
-const settingsStore = useSettings()
-const modelStore = useModel()
-const chatStore = useChat()
 const { t } = useI18n()
-
-// Only include what's needed for the section
-
-
-
-
-
-
 </script>

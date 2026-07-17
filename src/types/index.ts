@@ -1,8 +1,8 @@
-import { DeviceScore } from '~/domain/device/DeviceScore'
-import { BrowserType } from '~/domain/device/BrowserType'
-import { OperatingSystem } from '~/domain/device/OperatingSystem'
-import { MessageRole } from '~/domain/chat/MessageRole'
-import { ModelStatus } from '~/domain/model/ModelStatus'
+import type { DeviceScore } from '~/domain/device/DeviceScore'
+import type { BrowserType } from '~/domain/device/BrowserType'
+import type { OperatingSystem } from '~/domain/device/OperatingSystem'
+import type { MessageRole } from '~/domain/chat/MessageRole'
+import type { ModelStatus } from '~/domain/model/ModelStatus'
 
 export interface Message {
   id: string

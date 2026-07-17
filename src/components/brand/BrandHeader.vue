@@ -11,7 +11,7 @@
       Tout le nécessaire pour parler de ChouetteGPT. Retrouvez nos logos officiels, nos fiches techniques, nos angles de rédaction et nos ressources prêtes à l'emploi.
     </p>
     <div class="actions-container">
-      <Button @click="$router.push('/')" variant="outline" class="back-button">
+      <Button variant="outline" class="back-button" @click="$router.push('/')">
         <ArrowLeft class="button-icon" /> Retour à l'accueil
       </Button>
     </div>

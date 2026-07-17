@@ -2,10 +2,10 @@
 <!-- Section 3: Limites & Ajustements -->
       <div class="accordion-item" data-testid="accordion-limits">
         <button 
-          @click="emit('toggle', 'limits')" 
-          class="accordion-trigger"
+          class="accordion-trigger" 
           :class="{ 'active': activeSection === 'limits' }"
           data-testid="accordion-limits-trigger"
+          @click="emit('toggle', 'limits')"
         >
           <span class="accordion-title">
             <SlidersHorizontal class="icon-sliders text-indigo-500" />
@@ -18,7 +18,7 @@
         <div v-show="activeSection === 'limits'" class="accordion-content space-y-4">
           <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
             <span class="text-[10px] text-slate-400">Ajustements fins du modèle</span>
-            <Button variant="ghost" size="sm" class="reset-button h-7 text-[10px]" @click="settingsStore.resetSettings()" data-testid="reset-settings-button">
+            <Button variant="ghost" size="sm" class="reset-button h-7 text-[10px]" data-testid="reset-settings-button" @click="settingsStore.resetSettings()">
               {{ t('reset_btn') || 'Réinitialiser' }}
             </Button>
           </div>
@@ -52,16 +52,13 @@
       </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useSettings } from '~/contexts/settingsContext'
-import { useModel } from '~/contexts/modelContext'
-import { useChat } from '~/contexts/chatContext'
+import { computed } from 'vue'
+import { useSettingsStore } from '~/stores/settingsStore'
+import { useModelStore } from '~/stores/modelStore'
 import { useI18n } from '~/composables/useI18n'
 import { Button } from '~/components/ui/button'
-import { Progress } from '~/components/ui/progress'
 import { Slider } from '~/components/ui/slider'
-import { Textarea } from '~/components/ui/textarea'
-import { X, ChevronDown, ChevronUp, SlidersHorizontal, Check, Linkedin, Github, Sparkles } from 'lucide-vue-next'
+import { ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-vue-next'
 
 const props = defineProps<{
   activeSection: string | null
@@ -71,16 +68,9 @@ const emit = defineEmits<{
   (e: 'toggle', section: string): void
 }>()
 
-const settingsStore = useSettings()
-const modelStore = useModel()
-const chatStore = useChat()
+const settingsStore = useSettingsStore()
+const modelStore = useModelStore()
 const { t } = useI18n()
-
-// Only include what's needed for the section
-
-
-
-
 
 const supportsSampling = computed(() => {
   return modelStore.currentModel?.supportsSampling !== false
@@ -98,6 +88,4 @@ const repetitionPenaltyArray = computed({
   get: () => [settingsStore.repetitionPenalty],
   set: (val) => { settingsStore.repetitionPenalty = val[0] }
 })
-
-
 </script>

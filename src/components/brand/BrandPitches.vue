@@ -9,20 +9,20 @@
       <!-- Language Tab Selector -->
       <div class="lang-selector">
         <button 
-          @click="selectedLang = 'fr'"
           :class="[
             'lang-tab-btn',
             selectedLang === 'fr' ? 'active-tab' : 'inactive-tab'
           ]"
+          @click="selectedLang = 'fr'"
         >
           Français
         </button>
         <button 
-          @click="selectedLang = 'en'"
           :class="[
             'lang-tab-btn',
             selectedLang === 'en' ? 'active-tab' : 'inactive-tab'
           ]"
+          @click="selectedLang = 'en'"
         >
           English
         </button>

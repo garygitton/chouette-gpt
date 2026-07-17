@@ -24,10 +24,10 @@
             </span>
           </div>
           
-          <Button v-if="chatStore.isEngineLoading" variant="outline" size="icon" class="h-8 w-8 text-slate-500 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950/30 flex-shrink-0" @click="chatStore.pauseDownload" title="Mettre en pause">
+          <Button v-if="chatStore.isEngineLoading" variant="outline" size="icon" class="h-8 w-8 text-slate-500 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950/30 flex-shrink-0" title="Mettre en pause" @click="chatStore.pauseDownload">
             <Pause class="w-4 h-4" />
           </Button>
-          <Button v-if="chatStore.isEnginePaused" variant="outline" size="icon" class="h-8 w-8 text-slate-500 hover:text-green-500 hover:bg-green-50 dark:hover:bg-green-950/30 flex-shrink-0" @click="resumeDownload" title="Reprendre le téléchargement">
+          <Button v-if="chatStore.isEnginePaused" variant="outline" size="icon" class="h-8 w-8 text-slate-500 hover:text-green-500 hover:bg-green-50 dark:hover:bg-green-950/30 flex-shrink-0" title="Reprendre le téléchargement" @click="resumeDownload">
             <Play class="w-4 h-4" />
           </Button>
         </div>
@@ -56,17 +56,17 @@
 </template>
 
 <script setup lang="ts">
-import { useChat } from '~/contexts/chatContext'
-import { useModel } from '~/contexts/modelContext'
-import { useDevice } from '~/contexts/deviceContext'
+import { useChatStore } from '~/stores/chatStore'
+import { useModelStore } from '~/stores/modelStore'
+import { useDeviceStore } from '~/stores/deviceStore'
 import { Progress } from '~/components/ui/progress'
 import { Button } from '~/components/ui/button'
 import { Download, Pause, Play } from 'lucide-vue-next'
 import { computed, onMounted, onUnmounted } from 'vue'
 
-const chatStore = useChat()
-const modelStore = useModel()
-const deviceStore = useDevice()
+const chatStore = useChatStore()
+const modelStore = useModelStore()
+const deviceStore = useDeviceStore()
 
 const pendingModel = computed(() => {
   return modelStore.models.find(m => m.id === modelStore.currentModelId)

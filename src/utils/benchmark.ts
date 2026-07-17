@@ -1,32 +1,34 @@
+import * as Comlink from 'comlink'
 import { MessageRole } from '~/domain/chat/MessageRole'
-import type { ModelContext } from '~/contexts/modelContext'
 import { estimateTokens } from './chatUtils'
+import type { TransformersWorkerAPI } from '~/workers/transformers.worker'
 
 export async function executeBenchmark(
   modelId: string, 
   device: 'webgpu' | 'wasm',
-  modelContext: ModelContext,
+  modelStore: any,
   onProgress: (info: { text: string, tokens: number, elapsedMs: number, warmupMs: number }) => void,
   onEngineEvent: (type: 'progress' | 'init_done' | 'init_error', payload: any) => void
 ): Promise<{ warmupMs: number, tokensPerSec: number, totalTokens: number, text: string }> {
   
   const t0 = performance.now()
-  let localWorker = new Worker(new URL('../workers/transformers.worker.ts', import.meta.url), { type: 'module' })
+  const localWorker = new Worker(new URL('../workers/transformers.worker.ts', import.meta.url), { type: 'module' })
+  const workerApi = Comlink.wrap<TransformersWorkerAPI>(localWorker)
   
-  await new Promise<void>((resolve, reject) => {
-    localWorker.onmessage = (event) => {
-      const { type, payload } = event.data
-      onEngineEvent(type, payload)
-      if (type === 'init_done') {
-        resolve()
-      } else if (type === 'init_error') {
-        reject(new Error(payload))
-      }
-    }
-    const model = modelContext.models.find((m: any) => m.id === modelId)
-    const dtype = model?.quantization || 'q4'
-    localWorker.postMessage({ type: 'init', payload: { modelId, forceDevice: device, dtype } })
+  const onWorkerProgress = Comlink.proxy((payload: any) => {
+    onEngineEvent('progress', payload)
   })
+
+  try {
+    const model = modelStore.models.find((m: any) => m.id === modelId)
+    const dtype = model?.quantization || 'q4'
+    const result = await workerApi.init(modelId, dtype, device, onWorkerProgress)
+    onEngineEvent('init_done', { device: result.device })
+  } catch (err: any) {
+    onEngineEvent('init_error', err.message || 'Worker error')
+    localWorker.terminate()
+    throw err
+  }
 
   const t1 = performance.now()
   const warmupMs = t1 - t0
@@ -39,36 +41,23 @@ export async function executeBenchmark(
   
   const genId = Date.now()
 
-  await new Promise<void>((resolve, reject) => {
-    localWorker.onmessage = (event) => {
-      const { type, payload, generationId } = event.data
-      if (generationId !== genId) return
-      
-      if (type === 'generate_chunk') {
-        text += payload
-        const currentElapsed = performance.now() - t2
-        onProgress({ 
-          text, 
-          tokens: estimateTokens(text), 
-          elapsedMs: currentElapsed,
-          warmupMs 
-        })
-      } else if (type === 'generate_done') {
-        resolve()
-      } else if (type === 'generate_error') {
-        reject(new Error(payload))
-      }
-    }
-    localWorker.postMessage({ 
-      type: 'generate', 
-      payload: { 
-        messages: prompt, 
-        generationId: genId,
-        temperature: 0.7,
-        maxTokens: 50
-      } 
+  const onChunk = Comlink.proxy((payloadText: string) => {
+    text += payloadText
+    const currentElapsed = performance.now() - t2
+    onProgress({ 
+      text, 
+      tokens: estimateTokens(text), 
+      elapsedMs: currentElapsed,
+      warmupMs 
     })
   })
+
+  await workerApi.generate(
+    prompt,
+    genId,
+    { temperature: 0.7, maxTokens: 50 },
+    onChunk
+  )
 
   const t3 = performance.now()
   const genMs = t3 - t2

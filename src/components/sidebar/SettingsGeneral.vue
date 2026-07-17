@@ -2,10 +2,10 @@
 <!-- Section 1: Prompt Système -->
       <div class="accordion-item">
         <button 
-          @click="emit('toggle', 'general')" 
-          class="accordion-trigger"
+          class="accordion-trigger" 
           :class="{ 'active': activeSection === 'general' }"
           data-testid="accordion-general-trigger"
+          @click="emit('toggle', 'general')"
         >
           <span class="accordion-title">
             <SlidersHorizontal class="icon-sliders" />
@@ -32,8 +32,8 @@
             </Transition>
           </div>
           <Textarea 
-            data-testid="system-prompt-textarea"
-            v-model="settingsStore.systemPrompt" 
+            v-model="settingsStore.systemPrompt"
+            data-testid="system-prompt-textarea" 
             :placeholder="t('system_prompt_placeholder') || 'Comportement global de l\'assistant...'" 
             class="system-prompt-textarea mt-2"
             :class="{ 'saved-feedback-active': showSavedFeedback }"
@@ -45,16 +45,11 @@
       </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useSettings } from '~/contexts/settingsContext'
-import { useModel } from '~/contexts/modelContext'
-import { useChat } from '~/contexts/chatContext'
+import { ref } from 'vue'
+import { useSettingsStore } from '~/stores/settingsStore'
 import { useI18n } from '~/composables/useI18n'
-import { Button } from '~/components/ui/button'
-import { Progress } from '~/components/ui/progress'
-import { Slider } from '~/components/ui/slider'
 import { Textarea } from '~/components/ui/textarea'
-import { X, ChevronDown, ChevronUp, SlidersHorizontal, Check, Linkedin, Github, Sparkles } from 'lucide-vue-next'
+import { ChevronDown, ChevronUp, SlidersHorizontal, Check } from 'lucide-vue-next'
 
 const props = defineProps<{
   activeSection: string | null
@@ -64,12 +59,8 @@ const emit = defineEmits<{
   (e: 'toggle', section: string): void
 }>()
 
-const settingsStore = useSettings()
-const modelStore = useModel()
-const chatStore = useChat()
+const settingsStore = useSettingsStore()
 const { t } = useI18n()
-
-// Only include what's needed for the section
 
 const showSavedFeedback = ref(false)
 let feedbackTimeout: any = null
@@ -81,10 +72,4 @@ function triggerSavedFeedback() {
     showSavedFeedback.value = false
   }, 2000)
 }
-
-
-
-
-
-
 </script>

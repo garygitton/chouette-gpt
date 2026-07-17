@@ -8,7 +8,7 @@
         class="w-full pl-7 pr-2 py-1 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder:text-slate-400"
         @click.stop
         @keydown.stop
-      />
+      >
     </div>
   </div>
 </template>

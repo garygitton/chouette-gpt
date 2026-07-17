@@ -29,11 +29,11 @@
         <span 
           v-if="message.role === 'assistant' && chatStore.isGenerating && isLastMessage"
           class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-[#070a12] rounded-full animate-ping"
-        ></span>
+        />
         <span 
           v-if="message.role === 'assistant' && chatStore.isGenerating && isLastMessage"
           class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-[#070a12] rounded-full"
-        ></span>
+        />
       </div>
       
       <!-- Content & Bubble container -->
@@ -66,8 +66,8 @@
               size="icon"
               variant="ghost"
               class="rounded-md h-6 w-6"
-              @click="copyContent"
               title="Copier le message"
+              @click="copyContent"
             >
               <Check v-if="copied" class="w-3.5 h-3.5" />
               <Clipboard v-else class="w-3.5 h-3.5" />
@@ -77,8 +77,8 @@
               size="icon"
               variant="ghost"
               class="rounded-md h-6 w-6 text-slate-400 hover:text-indigo-500"
-              @click="isShareDialogOpen = true"
               title="Partager cette conversation"
+              @click="isShareDialogOpen = true"
             >
               <Share2 class="w-3.5 h-3.5" />
             </Button>
@@ -134,10 +134,10 @@
         </div>
 
         <DialogFooter class="grid grid-cols-2 gap-3 sm:space-x-0 pt-4">
-          <Button @click="shareTwitter" class="bg-[#1d9bf0] hover:bg-[#1a8cd8] text-white rounded-xl text-xs font-bold shadow-md shadow-sky-500/15 h-10">
+          <Button class="bg-[#1d9bf0] hover:bg-[#1a8cd8] text-white rounded-xl text-xs font-bold shadow-md shadow-sky-500/15 h-10" @click="shareTwitter">
             <Twitter class="w-4 h-4 mr-1.5 fill-white" /> Partager sur X
           </Button>
-          <Button @click="downloadSharePNG" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-500/20 h-10">
+          <Button class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-500/20 h-10" @click="downloadSharePNG">
             <Download class="w-4 h-4 mr-1.5" /> Télécharger PNG
           </Button>
         </DialogFooter>
@@ -150,10 +150,10 @@
 import { useRoute } from '#imports'
 import { ref, computed, defineAsyncComponent } from 'vue'
 import type { Message } from '~/types'
-import { useChat } from '~/contexts/chatContext'
-import { useConversation } from '~/contexts/conversationContext'
-import { useModel } from '~/contexts/modelContext'
-import { useDevice } from '~/contexts/deviceContext'
+import { useChatStore } from '~/stores/chatStore'
+import { useConversationStore } from '~/stores/conversationStore'
+import { useModelStore } from '~/stores/modelStore'
+import { useDeviceStore } from '~/stores/deviceStore'
 import { Button } from '~/components/ui/button'
 import { Avatar, AvatarFallback } from '~/components/ui/avatar'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '~/components/ui/dialog'
@@ -163,10 +163,10 @@ const MarkdownRenderer = defineAsyncComponent(() => import('~/components/Markdow
 
 const props = defineProps<{ message: Message }>()
 
-const chatStore = useChat()
-const convStore = useConversation()
+const chatStore = useChatStore()
+const convStore = useConversationStore()
 const route = useRoute()
-const deviceStore = useDevice()
+const deviceStore = useDeviceStore()
 
 const copied = ref(false)
 const isShareDialogOpen = ref(false)
@@ -175,7 +175,7 @@ const currentConversation = computed(() => {
   return convStore.conversations.find(c => c.id === route.query.id)
 })
 
-const modelStore = useModel()
+const modelStore = useModelStore()
 const modelName = computed(() => {
   if (!currentConversation.value) return null
   const modelId = currentConversation.value.modelId

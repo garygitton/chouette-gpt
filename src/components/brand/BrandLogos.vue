@@ -14,29 +14,29 @@
       <!-- Background Toggle for Logo Render preview -->
       <div class="bg-toggle-container">
         <button 
-          @click="logoBgMode = 'default'"
           :class="[
             'toggle-btn',
             logoBgMode === 'default' ? 'active-toggle' : 'inactive-toggle'
           ]"
+          @click="logoBgMode = 'default'"
         >
           <Sparkles class="button-icon" /> Couleur
         </button>
         <button 
-          @click="logoBgMode = 'light'"
           :class="[
             'toggle-btn',
             logoBgMode === 'light' ? 'active-toggle' : 'inactive-toggle'
           ]"
+          @click="logoBgMode = 'light'"
         >
           <Sun class="button-icon" /> Clair
         </button>
         <button 
-          @click="logoBgMode = 'dark'"
           :class="[
             'toggle-btn',
             logoBgMode === 'dark' ? 'active-toggle' : 'inactive-toggle'
           ]"
+          @click="logoBgMode = 'dark'"
         >
           <Moon class="button-icon" /> Sombre
         </button>
@@ -61,7 +61,7 @@
             logoBgMode === 'default' ? logo.bgClass : (logoBgMode === 'light' ? 'bg-white border-slate-200' : 'bg-slate-950 border-slate-800')
           ]"
         >
-          <div v-html="logo.svgRaw" :id="logo.id" class="svg-container"></div>
+          <div :id="logo.id" class="svg-container" v-html="logo.svgRaw"/>
         </div>
 
         <!-- Action buttons -->

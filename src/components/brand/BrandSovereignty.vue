@@ -14,7 +14,7 @@
             <!-- Specialized models column -->
             <div class="specialized-column">
               <h3 class="column-title">
-                <span class="bullet-accent"></span>
+                <span class="bullet-accent"/>
                 {{ t.specializedTitle }}
               </h3>
               <p class="column-desc">
@@ -25,7 +25,7 @@
             <!-- Sovereignty / No cloud column -->
             <div class="specialized-column">
               <h3 class="column-title">
-                <span class="bullet-accent"></span>
+                <span class="bullet-accent"/>
                 {{ t.sovereigntyTitle }}
               </h3>
               <p class="column-desc">
@@ -45,15 +45,15 @@
             </p>
             <div class="standards-row">
               <div class="standard-item">
-                <span class="bullet-standard"></span>
+                <span class="bullet-standard"/>
                 <span>RGPD / GDPR Compatible</span>
               </div>
               <div class="standard-item">
-                <span class="bullet-standard"></span>
+                <span class="bullet-standard"/>
                 <span>HIPAA Compliant (de-facto)</span>
               </div>
               <div class="standard-item">
-                <span class="bullet-standard"></span>
+                <span class="bullet-standard"/>
                 <span>SecNumCloud (host-aligned)</span>
               </div>
             </div>

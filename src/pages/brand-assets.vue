@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useSettings } from '~/contexts/settingsContext'
+import { useSettingsStore } from '~/stores/settingsStore'
 
 import BrandHeader from '~/components/brand/BrandHeader.vue'
 import BrandPitches from '~/components/brand/BrandPitches.vue'
@@ -31,7 +31,7 @@ import BrandFaq from '~/components/brand/BrandFaq.vue'
 import BrandPressAngles from '~/components/brand/BrandPressAngles.vue'
 import BrandContact from '~/components/brand/BrandContact.vue'
 
-const settingsStore = useSettings()
+const settingsStore = useSettingsStore()
 
 const selectedLang = computed({
   get: () => settingsStore.language === 'en' ? 'en' : 'fr',

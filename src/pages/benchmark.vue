@@ -45,12 +45,12 @@
           </div>
           
           <Button 
-            @click="runFullBenchmark" 
-            :disabled="isRunning || !selectedModel"
+            :disabled="isRunning || !selectedModel" 
             class="h-12 px-8 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-700 hover:to-pink-600 text-white shadow-lg shadow-indigo-500/25 transition-all hover:scale-105 w-full md:w-auto font-bold"
+            @click="runFullBenchmark"
           >
-            <Play class="w-5 h-5 mr-2" v-if="!isRunning" />
-            <Loader2 class="w-5 h-5 mr-2 animate-spin" v-else />
+            <Play v-if="!isRunning" class="w-5 h-5 mr-2" />
+            <Loader2 v-else class="w-5 h-5 mr-2 animate-spin" />
             {{ isRunning ? t('bench_running') : t('bench_start') }}
           </Button>
         </div>
@@ -61,7 +61,7 @@
         
         <!-- GPU Card -->
         <Card v-if="selectedEngine === 'both' || selectedEngine === 'webgpu'" class="relative overflow-hidden rounded-3xl border transition-all duration-500" :class="activeTest === 'webgpu' ? 'border-indigo-500 shadow-xl shadow-indigo-500/20' : 'border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50'">
-          <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none"></div>
+          <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none"/>
           <div class="p-6 relative z-10 space-y-6">
             <div class="flex items-center justify-between">
               <h3 class="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100">
@@ -99,7 +99,7 @@
 
         <!-- CPU Card -->
         <Card v-if="selectedEngine === 'both' || selectedEngine === 'wasm'" class="relative overflow-hidden rounded-3xl border transition-all duration-500" :class="activeTest === 'wasm' ? 'border-pink-500 shadow-xl shadow-pink-500/20' : 'border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50'">
-          <div class="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-orange-500/5 pointer-events-none"></div>
+          <div class="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-orange-500/5 pointer-events-none"/>
           <div class="p-6 relative z-10 space-y-6">
             <div class="flex items-center justify-between">
               <h3 class="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100">
@@ -141,10 +141,10 @@
 
         <!-- Social Share Buttons -->
         <div class="flex flex-wrap gap-4 justify-center py-2">
-          <Button @click="shareBenchmarkTwitter" class="bg-[#1d9bf0] hover:bg-[#1a8cd8] text-white rounded-xl text-xs font-bold shadow-md shadow-sky-500/15 h-11 px-6">
+          <Button class="bg-[#1d9bf0] hover:bg-[#1a8cd8] text-white rounded-xl text-xs font-bold shadow-md shadow-sky-500/15 h-11 px-6" @click="shareBenchmarkTwitter">
             <Twitter class="w-4 h-4 mr-2 fill-white" /> Partager mon score sur X
           </Button>
-          <Button @click="downloadBenchmarkBadge" variant="outline" class="rounded-xl border-indigo-300 dark:border-indigo-800 hover:bg-indigo-100/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold h-11 px-6 bg-white dark:bg-transparent">
+          <Button variant="outline" class="rounded-xl border-indigo-300 dark:border-indigo-800 hover:bg-indigo-100/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold h-11 px-6 bg-white dark:bg-transparent" @click="downloadBenchmarkBadge">
             <Download class="w-4 h-4 mr-2" /> Télécharger mon badge PNG
           </Button>
         </div>
@@ -170,56 +170,25 @@
         </DialogHeader>
         
         <div class="py-4 space-y-4">
-          <!-- Model Info Card -->
-          <div class="bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800/80 p-4 rounded-2xl flex items-center justify-between">
-            <div class="space-y-1">
-              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Modèle de test</p>
-              <p class="text-sm font-bold text-slate-800 dark:text-slate-200">
-                {{ selectedModelName }}
-              </p>
-            </div>
-            <div class="text-right">
-              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">{{ t('bench_ai_size') }}</p>
-              <Badge class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border-indigo-200/50 font-mono font-bold mt-0.5">
-                {{ selectedModelSize }}
-              </Badge>
-            </div>
-          </div>
-          
-          <!-- Reassurance Bullet Points -->
-          <div class="space-y-3.5 pt-2">
-            <div class="flex items-start space-x-3 text-xs">
-              <div class="p-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5">
-                <ShieldCheck class="w-4 h-4" />
-              </div>
-              <div>
-                <p class="font-bold text-slate-800 dark:text-slate-200">{{ t('bench_secure_test') }}</p>
-                <p class="text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
-                  {{ t('bench_secure_desc') }}
-                </p>
-              </div>
-            </div>
-
-            <div class="flex items-start space-x-3 text-xs">
-              <div class="p-1 rounded-lg bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5">
-                <Wifi class="w-4 h-4" />
-              </div>
-              <div>
-                <p class="font-bold text-slate-800 dark:text-slate-200">{{ t('bench_wifi_req') }}</p>
-                <p class="text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
-                  {{ t('bench_wifi_desc_1') }}{{ selectedModelSize }}{{ t('bench_wifi_desc_2') }}
-                </p>
-              </div>
-            </div>
-
-          </div>
+          <ModelReassuranceInfo 
+            :model-name="selectedModelName" 
+            :model-size="selectedModelSize"
+            model-label="Modèle de test"
+            :size-label="t('bench_ai_size')"
+            :secure-title="t('bench_secure_test')"
+            :secure-desc="t('bench_secure_desc')"
+            :wifi-title="t('bench_wifi_req')"
+            :wifi-desc="t('bench_wifi_desc_1') + selectedModelSize + t('bench_wifi_desc_2')"
+            hide-offline
+            hide-performance
+          />
         </div>
 
         <DialogFooter class="grid grid-cols-2 gap-3 sm:space-x-0 pt-2">
-          <Button variant="outline" @click="showBenchmarkConfirm = false" class="rounded-xl border-slate-200 dark:border-slate-800 h-11 text-xs font-semibold">
+          <Button variant="outline" class="rounded-xl border-slate-200 dark:border-slate-800 h-11 text-xs font-semibold" @click="showBenchmarkConfirm = false">
             Annuler
           </Button>
-          <Button @click="startBenchmarkAfterConfirm" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl h-11 text-xs font-bold shadow-lg shadow-indigo-500/20">
+          <Button class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl h-11 text-xs font-bold shadow-lg shadow-indigo-500/20" @click="startBenchmarkAfterConfirm">
             Autoriser et Démarrer
           </Button>
         </DialogFooter>
@@ -236,13 +205,14 @@ import { Button } from '~/components/ui/button'
 import { Badge } from '~/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '~/components/ui/dialog'
-import { Activity, Play, Cpu, Cpu as Microchip, Loader2, Zap, ShieldCheck, Wifi, Twitter, Download } from 'lucide-vue-next'
-import { useChat } from '~/contexts/chatContext'
+import { Activity, Play, Cpu, Cpu as Microchip, Loader2, Zap, Twitter, Download } from 'lucide-vue-next'
+import ModelReassuranceInfo from '~/components/ModelReassuranceInfo.vue'
+import { useChatStore } from '~/stores/chatStore'
 import { useI18n } from '~/composables/useI18n'
-import { useModel } from '~/contexts/modelContext'
+import { useModelStore } from '~/stores/modelStore'
 
-const chatStore = useChat()
-const modelStore = useModel()
+const chatStore = useChatStore()
+const modelStore = useModelStore()
 const { t } = useI18n()
 
 // WebGPU availability detection (lightweight, no full adapter request)

@@ -3,7 +3,7 @@
     <div class="max-w-6xl mx-auto relative z-10 space-y-8">
       <!-- Header -->
       <div class="flex items-center space-x-4">
-        <Button data-testid="back-button" variant="ghost" size="icon" @click="router.push('/')" class="rounded-xl">
+        <Button data-testid="back-button" variant="ghost" size="icon" class="rounded-xl" @click="router.push('/')">
           <ArrowLeft class="w-5 h-5 text-slate-500" />
         </Button>
         <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
@@ -13,6 +13,36 @@
 
       <div class="max-w-2xl mx-auto space-y-6">
         <DeviceInfoCard />
+
+        <!-- Engine Preferences Card -->
+        <Card class="rounded-2xl border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-[#0b0f19]/70 backdrop-blur-xl shadow-lg mt-6">
+          <CardHeader class="flex flex-row items-center space-x-2 pb-2">
+            <Cpu class="w-6 h-6 text-indigo-500" />
+            <CardTitle class="text-lg">{{ t('gen_config') }}</CardTitle>
+          </CardHeader>
+          <CardContent class="space-y-4">
+            <div class="flex items-start justify-between gap-4 p-4 rounded-xl bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200/50 dark:border-slate-850/50">
+              <div class="space-y-1">
+                <p class="text-sm font-bold text-slate-900 dark:text-white">{{ t('force_wasm_label') }}</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 leading-normal max-w-md">
+                  {{ t('force_wasm_desc') }}
+                </p>
+              </div>
+              <div class="flex items-center pt-1">
+                <button 
+                  type="button" 
+                  data-testid="force-wasm-toggle"
+                  :class="[settingsStore.forceWasm ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-slate-800', 'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2']"
+                  @click="settingsStore.forceWasm = !settingsStore.forceWasm"
+                >
+                  <span 
+                    :class="[settingsStore.forceWasm ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']"
+                  />
+                </button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <!-- About & License Card -->
         <Card class="rounded-2xl border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-[#0b0f19]/70 backdrop-blur-xl shadow-lg mt-6">
@@ -71,16 +101,18 @@
 import { useRouter } from '#imports'
 import { onMounted } from 'vue'
 
-import { useDevice } from '~/contexts/deviceContext'
+import { useDeviceStore } from '~/stores/deviceStore'
+import { useSettingsStore } from '~/stores/settingsStore'
 import DeviceInfoCard from '~/components/DeviceInfoCard.vue'
 
 import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
-import { ArrowLeft, Linkedin, Github, Info, Scale } from 'lucide-vue-next'
+import { ArrowLeft, Linkedin, Github, Info, Scale, Cpu } from 'lucide-vue-next'
 import { useI18n } from '~/composables/useI18n'
 
 const router = useRouter()
-const deviceStore = useDevice()
+const deviceStore = useDeviceStore()
+const settingsStore = useSettingsStore()
 const { t } = useI18n()
 
 onMounted(() => {

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator } from '@playwright/test';
 import * as path from 'path';
 
 test.describe('ChouetteGPT - Real WASM Long Conversation E2E Test', () => {

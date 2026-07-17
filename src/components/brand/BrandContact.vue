@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Card } from '~/components/ui/card'
-import { Github, Linkedin } from 'lucide-vue-next'
+import { Github, Linkedin, Mail } from 'lucide-vue-next'
 
 const props = defineProps<{ selectedLang: 'fr' | 'en' }>()
 const emit = defineEmits<{ (e: 'update:selectedLang', val: 'fr' | 'en'): void }>()

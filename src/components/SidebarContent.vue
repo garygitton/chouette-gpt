@@ -3,10 +3,10 @@
     <!-- Header (Mobile only) -->
     <div v-if="isMobile" class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-1.5">
-        <img src="/logo.svg" alt="" class="w-6 h-6" />
-        <span class="font-extrabold text-lg text-slate-800 dark:text-white tracking-tight">Chouette<span class="text-indigo-500">GPT</span></span>
+        <img src="~/assets/logo.svg" alt="" class="w-6 h-6" >
+        <span class="font-extrabold text-lg text-slate-800 dark:text-white tracking-tight">Chouette<span class="text-indigo-600 dark:text-indigo-500">GPT</span></span>
       </div>
-      <Button variant="ghost" size="icon" @click="$emit('close-sidebar')" aria-label="Fermer le menu">
+      <Button variant="ghost" size="icon" aria-label="Fermer le menu" @click="$emit('close-sidebar')">
         <X class="w-5 h-5" />
       </Button>
     </div>
@@ -134,8 +134,8 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from '#imports'
 import { ref, computed, onMounted } from 'vue'
-import { useConversation } from '~/contexts/conversationContext'
-import { useSettings } from '~/contexts/settingsContext'
+import { useConversationStore } from '~/stores/conversationStore'
+import { useSettingsStore } from '~/stores/settingsStore'
 
 import { useI18n } from '~/composables/useI18n'
 import LanguageSelector from '~/components/LanguageSelector.vue'
@@ -157,8 +157,8 @@ const props = defineProps({
 
 const emit = defineEmits(['close-sidebar'])
 
-const convStore = useConversation()
-const settingsStore = useSettings()
+const convStore = useConversationStore()
+const settingsStore = useSettingsStore()
 const router = useRouter()
 const route = useRoute()
 const { t } = useI18n()

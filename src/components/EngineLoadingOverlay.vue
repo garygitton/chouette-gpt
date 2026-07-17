@@ -8,7 +8,7 @@
       <div class="space-y-5 text-center">
         <!-- Dancing Owl Loading Animation -->
         <div class="owl-stage mx-auto">
-          <div class="logo-pulse"></div>
+          <div class="logo-pulse"/>
           <div class="owl-character">
             <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <!-- Ears -->
@@ -53,11 +53,11 @@
 </template>
 
 <script setup lang="ts">
-import { useChat } from '~/contexts/chatContext'
+import { useChatStore } from '~/stores/chatStore'
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '~/components/ui/dialog'
 import { Progress } from '~/components/ui/progress'
 
-const chatStore = useChat()
+const chatStore = useChatStore()
 </script>
 
 <style scoped>

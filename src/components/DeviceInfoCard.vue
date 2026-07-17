@@ -107,7 +107,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useDevice } from '~/contexts/deviceContext'
+import { useDeviceStore } from '~/stores/deviceStore'
 import { DeviceScore } from '~/domain/device/DeviceScore'
 import FeatureCheck from '~/components/FeatureCheck.vue'
 import { useI18n } from '~/composables/useI18n'
@@ -115,7 +115,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
 import { Monitor, Loader2 } from 'lucide-vue-next'
 
-const deviceStore = useDevice()
+const deviceStore = useDeviceStore()
 const { t } = useI18n()
 
 const scoreColor = computed(() => {

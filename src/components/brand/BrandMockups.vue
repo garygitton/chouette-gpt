@@ -10,20 +10,20 @@
       <!-- Tab Selector -->
       <div class="tab-selector">
         <button 
-          @click="screenshotTab = 'desktop'"
           :class="[
             'tab-btn',
             screenshotTab === 'desktop' ? 'active-tab' : 'inactive-tab'
           ]"
+          @click="screenshotTab = 'desktop'"
         >
           Desktop
         </button>
         <button 
-          @click="screenshotTab = 'mobile'"
           :class="[
             'tab-btn',
             screenshotTab === 'mobile' ? 'active-tab' : 'inactive-tab'
           ]"
+          @click="screenshotTab = 'mobile'"
         >
           Mobile
         </button>
@@ -43,7 +43,7 @@
             'mockup-img',
             screenshotTab === 'desktop' ? 'desktop-img' : 'mobile-img'
           ]"
-        />
+        >
       </div>
 
       <!-- Description and actions -->
