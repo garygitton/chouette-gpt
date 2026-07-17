@@ -88,25 +88,44 @@ self.onmessage = async (event: MessageEvent) => {
         self.postMessage({ type: 'progress', payload: { text, progress: overallProgress } });
       };
 
-      let activeDevice = 'webgpu';
+      // Determine device capability inside the worker context
+      let targetDevice = forceDevice;
+      if (!targetDevice) {
+        let hasWorkerWebGPU = false;
+        if (typeof navigator !== 'undefined' && 'gpu' in navigator) {
+          try {
+            const adapter = await (navigator as any).gpu.requestAdapter();
+            if (adapter && adapter.features && adapter.features.has('shader-f16')) {
+              hasWorkerWebGPU = true;
+            }
+          } catch (e) {
+            hasWorkerWebGPU = false;
+          }
+        }
+        targetDevice = hasWorkerWebGPU ? 'webgpu' : 'wasm';
+      }
+
+      let activeDevice = targetDevice;
       try {
         generator = await pipeline('text-generation', modelId, {
-          device: forceDevice || 'webgpu',
+          device: targetDevice,
           dtype: dtype || 'q4',
           progress_callback: progressCb
         });
       } catch (gpuError) {
-        if (forceDevice === 'webgpu') throw gpuError;
-
-        console.warn('[Transformers Worker] WebGPU initialization failed, falling back to WASM/CPU:', gpuError);
-        downloadTotals = {};
-        downloadLoaded = {};
-        generator = await pipeline('text-generation', modelId, {
-          device: 'wasm',
-          dtype: dtype || 'q4',
-          progress_callback: progressCb
-        });
-        activeDevice = 'wasm';
+        if (targetDevice === 'webgpu') {
+          console.warn('[Transformers Worker] WebGPU initialization failed in worker, falling back to WASM/CPU:', gpuError);
+          downloadTotals = {};
+          downloadLoaded = {};
+          generator = await pipeline('text-generation', modelId, {
+            device: 'wasm',
+            dtype: dtype || 'q4',
+            progress_callback: progressCb
+          });
+          activeDevice = 'wasm';
+        } else {
+          throw gpuError;
+        }
       }
 
       self.postMessage({ type: 'init_done', payload: { device: activeDevice } });

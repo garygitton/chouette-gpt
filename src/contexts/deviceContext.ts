@@ -9,6 +9,10 @@ export function useProvideDevice() {
   async function evaluateDevice() {
     isEvaluating.value = true
     try {
+      // NOTE: During detectDevice() call on some platforms (like Linux Chrome with incomplete Vulkan support),
+      // Dawn/Chromium internally prints "Failed to create WebGPU Context Provider" directly to the console.
+      // This is a browser-internal log from the GPU capability query. It is caught here, and we safely
+      // fall back to WASM/CPU without interrupting execution.
       deviceInfo.value = await detectDevice()
     } catch (e) {
       console.error('Failed to evaluate device', e)
