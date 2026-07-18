@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+
 import { ref, computed, watch } from 'vue'
 import * as Comlink from 'comlink'
 import { MessageRole } from '~/domain/chat/MessageRole'
@@ -64,20 +65,21 @@ export const useChatStore = defineStore('chat', () => {
     showDownloadConfirmation.value = false
   }
 
-  let isInitialModelChange = true
-
   // Reset engine status when selected model changes
   watch(() => modelStore.currentModelId, (newId, oldId) => {
     if (newId && newId !== oldId) {
       cancelDownload()
       isEngineReady.value = false
 
-      if (isInitialModelChange) {
-        isInitialModelChange = false
+      if (!modelStore.isInitialized) {
         return
       }
 
       if (typeof window !== 'undefined') {
+        const href = window.location.href
+        if (href.includes('autoDownload=false') || href.includes('noAutoDownload=true')) {
+          return
+        }
         setTimeout(() => {
           downloadMultipleEngines([newId])
         }, 50)

@@ -19,7 +19,7 @@ test.describe('ChouetteGPT - BDD Download', () => {
   test('Téléchargement d\'un modèle au démarrage via la barre latérale', async ({ page }) => {
     
     await test.step('Given je suis sur la page d\'accueil sans modèle en cache', async () => {
-      await page.goto('/?mock=true', { waitUntil: 'domcontentloaded' });
+      await page.goto('/?mock=true&autoDownload=false', { waitUntil: 'domcontentloaded' });
       
       // The chat textarea should be disabled (no model loaded yet)
       const textarea = page.getByTestId('chat-textarea');

@@ -25,7 +25,7 @@ test.describe('ChouetteGPT - Advanced Settings Compatibility & Model Rules', () 
   });
 
   test('Positive case: General model supports sampling and creative controls', async ({ page }) => {
-    await page.goto('/?mock=true&showAllModels=true', { waitUntil: 'domcontentloaded' });
+    await page.goto('/?mock=true&showAllModels=true&autoDownload=false', { waitUntil: 'domcontentloaded' });
 
     // Download/Activate Qwen2.5-0.5B-Instruct (which supports sampling)
     const modelSelectTrigger = page.getByTestId('model-select-trigger');
@@ -66,7 +66,7 @@ test.describe('ChouetteGPT - Advanced Settings Compatibility & Model Rules', () 
   });
 
   test('Negative case: Math model disables sampling and shows warning', async ({ page }) => {
-    await page.goto('/?mock=true&showAllModels=true', { waitUntil: 'domcontentloaded' });
+    await page.goto('/?mock=true&showAllModels=true&autoDownload=false', { waitUntil: 'domcontentloaded' });
 
     // Select the Math model
     const modelSelectTrigger = page.getByTestId('model-select-trigger');
@@ -107,7 +107,7 @@ test.describe('ChouetteGPT - Advanced Settings Compatibility & Model Rules', () 
   });
 
   test('Edge case: Chatting with a model sends instructions and generates response', async ({ page }) => {
-    await page.goto('/?mock=true&showAllModels=true', { waitUntil: 'domcontentloaded' });
+    await page.goto('/?mock=true&showAllModels=true&autoDownload=false', { waitUntil: 'domcontentloaded' });
 
     // Start loading the default model
     try {

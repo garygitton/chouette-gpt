@@ -14,7 +14,7 @@ test.describe('Brand Assets Page', () => {
   });
 
   test('should display the brand assets page and support language toggling', async ({ page }) => {
-    await page.goto('/brand-assets');
+    await page.goto('/brand-assets?mock=true&autoDownload=false');
 
     // Verify main header is visible
     const header = page.locator('h1', { hasText: 'Brand Assets' });

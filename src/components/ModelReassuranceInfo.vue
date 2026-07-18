@@ -3,13 +3,13 @@
     <!-- Model Info Card -->
     <div class="bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800/80 p-4 rounded-2xl flex items-center justify-between">
       <div class="space-y-1">
-        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">{{ modelLabel || 'Modèle' }}</p>
+        <p class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">{{ modelLabel || 'Modèle' }}</p>
         <p class="text-sm font-bold text-slate-800 dark:text-slate-200">
           {{ modelName }}
         </p>
       </div>
       <div class="text-right">
-        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">{{ sizeLabel || 'Taille' }}</p>
+        <p class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">{{ sizeLabel || 'Taille' }}</p>
         <Badge class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border-indigo-200/50 font-mono font-bold mt-0.5">
           {{ modelSize || 'Inconnue' }}
         </Badge>

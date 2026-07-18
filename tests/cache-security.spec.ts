@@ -37,7 +37,7 @@ test.describe('ChouetteGPT - BDD Cache & Security', () => {
   test('Vérification de la stratégie de cache et du chargement WASM sécurisé', async ({ page }) => {
     
     await test.step('Given je suis sur ChouetteGPT', async () => {
-      await page.goto('/?mock=true', { waitUntil: 'networkidle' });
+      await page.goto('/?mock=true&autoDownload=false', { waitUntil: 'networkidle' });
     });
 
     await test.step('Then les fichiers statiques lourds sont servis avec un cache immutable', async () => {

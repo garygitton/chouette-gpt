@@ -28,7 +28,7 @@ test.describe('ChouetteGPT - E2E BDD Conversations and Behavior', () => {
     
     await test.step('Given je suis sur la page d\'accueil de ChouetteGPT', async () => {
       // open with mock=true to activate simulated Web-LLM engine
-      await page.goto('?mock=true', { waitUntil: 'domcontentloaded' });
+      await page.goto('?mock=true&autoDownload=false', { waitUntil: 'domcontentloaded' });
       
       // Verify app title
       await expect(page).toHaveTitle(/ChouetteGPT/);
@@ -207,7 +207,7 @@ test.describe('ChouetteGPT - E2E BDD Conversations and Behavior', () => {
 
   test('Vérifier et modifier la langue depuis la barre latérale pour toutes les langues supportées', async ({ page }) => {
     // Open home page with mock=true
-    await page.goto('?mock=true', { waitUntil: 'domcontentloaded' });
+    await page.goto('?mock=true&autoDownload=false', { waitUntil: 'domcontentloaded' });
 
     // Wait for the sidebar to be visible to ensure Nuxt hydration is complete
     await expect(page.getByTestId('sidebar')).toBeVisible({ timeout: 15000 });
@@ -247,7 +247,7 @@ test.describe('ChouetteGPT - E2E BDD Conversations and Behavior', () => {
 
   test('Accéder à la page des paramètres et vérifier les informations de l\'appareil', async ({ page }) => {
     // Go directly to settings
-    await page.goto('settings', { waitUntil: 'domcontentloaded' });
+    await page.goto('settings?mock=true&autoDownload=false', { waitUntil: 'domcontentloaded' });
 
     // Verify DeviceInfoCard is visible (using text that appears inside DeviceInfoCard)
     const deviceCard = page.getByText('Capacités de l\'appareil');
@@ -278,7 +278,7 @@ test.describe('ChouetteGPT - E2E BDD Conversations and Behavior', () => {
 
   test('Accéder à la page de confidentialité et retourner à l\'accueil', async ({ page }) => {
     // Open home page
-    await page.goto('', { waitUntil: 'domcontentloaded' });
+    await page.goto('/?mock=true&autoDownload=false', { waitUntil: 'domcontentloaded' });
 
     // Click privacy button in sidebar
     const privacySidebarBtn = page.getByTestId('privacy-button');

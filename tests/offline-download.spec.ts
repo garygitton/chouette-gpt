@@ -7,7 +7,7 @@ test.describe('Model Download & Pause Flow', () => {
     page.on('pageerror', error => console.log('BROWSER ERROR:', error.message));
 
     // Navigate to the app (using the mock mode so it downloads a fake small payload and we can control it)
-    await page.goto('/?mock=true');
+    await page.goto('/?mock=true&autoDownload=false');
 
     // Click "Télécharger et activer l'IA" button on the landing dashboard
     const downloadBtn = page.getByRole('button', { name: /Télécharger et activer l'IA/i });

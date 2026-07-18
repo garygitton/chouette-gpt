@@ -23,7 +23,7 @@ test.describe('ChouetteGPT - Mocked WASM Inference', () => {
   });
 
   test('Should download mocked tiny model and run inference', async ({ page }) => {
-    await page.goto('?showAllModels=true', { waitUntil: 'domcontentloaded' });
+    await page.goto('?showAllModels=true&mock=true&autoDownload=false', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('[data-testid="sidebar"]', { state: 'attached', timeout: 30000 });
  
     const combobox = page.getByRole('combobox').first();
@@ -61,7 +61,7 @@ test.describe('ChouetteGPT - Mocked WASM Inference', () => {
   });
 
   test('Should allow selecting all major models', async ({ page }) => {
-    await page.goto('?showAllModels=true', { waitUntil: 'domcontentloaded' });
+    await page.goto('?showAllModels=true&mock=true&autoDownload=false', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('[data-testid="sidebar"]', { state: 'attached', timeout: 30000 });
 
     const modelsToTest = [

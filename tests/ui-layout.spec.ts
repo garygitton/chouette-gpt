@@ -19,7 +19,7 @@ test.describe('UI & Experimental Mentions', () => {
 
   test('should display experimental badges and disclaimers on the dashboard', async ({ page }) => {
     // Navigate to the app (mock mode to bypass heavy model loading)
-    await page.goto('/?mock=true');
+    await page.goto('/?mock=true&autoDownload=false');
 
     // 1. Verify the "Expérimental" badge is present next to the title
     const experimentalBadge = page.locator('text=Expérimental').first();

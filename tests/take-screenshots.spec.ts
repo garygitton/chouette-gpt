@@ -10,7 +10,7 @@ test('take real site screenshots with conversation', async ({ page }) => {
   await page.waitForTimeout(5000);
 
   // 1. Visit the home page to initialize the domain/localstorage context
-  await page.goto('/');
+  await page.goto('/?mock=true&autoDownload=false');
   await page.waitForTimeout(2000);
 
   // 2. Seed IndexedDB with a conversation and set dark mode in localStorage
@@ -66,7 +66,7 @@ test('take real site screenshots with conversation', async ({ page }) => {
   });
 
   // 3. Navigate directly to the seeded conversation
-  await page.goto('/?id=123456789');
+  await page.goto('/?id=123456789&mock=true&autoDownload=false');
 
   // Wait for the conversation messages to render
   await page.waitForSelector('text=Bien sûr !');

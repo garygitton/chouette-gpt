@@ -49,7 +49,7 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
       // 1. Ouvrir l'application
       // On mock l'inférence pour TOUS les modèles dans ce test E2E pour éviter les crashs WebGPU/WASM
       // en mode headless. L'exécution réelle est testée dans webgpu-hardware.spec.ts
-      const url = '/?mock=true&showAllModels=true';
+      const url = '/?mock=true&showAllModels=true&autoDownload=false';
       await page.goto(url, { waitUntil: 'domcontentloaded' });
 
       // 2. Sélectionner le modèle dans la sidebar

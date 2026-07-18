@@ -1,9 +1,23 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('UI Feedback et Layout Réactif', () => {
+  test.beforeEach(async ({ page }) => {
+    // Bypass onboarding modal and use mock LLM mode
+    await page.addInitScript(() => {
+      try {
+        window.localStorage.setItem('chouette-onboarding-seen', 'true');
+        (window as any).__mock_llm = true;
+      } catch (e) {}
+    });
+
+    // Abort third-party network requests
+    await page.route(/hits\.seeyoufarm\.com/, route => route.abort());
+    await page.route(/shields\.io/, route => route.abort());
+  });
+
   test('Retour visuel de sauvegarde du prompt système', async ({ page }) => {
-    // Naviguer vers l'application
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    // Naviguer vers l'application en mode mock et sans auto-download pour éviter les dialogs
+    await page.goto('/?mock=true&autoDownload=false', { waitUntil: 'domcontentloaded' });
     
     // Fermer le wizard WebGPU s'il est présent
     try {

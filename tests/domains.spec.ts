@@ -16,15 +16,7 @@ test.describe('ChouetteGPT - Gestion des Domaines et Fallbacks', () => {
   });
 
   test('Devrait afficher la liste des domaines par défaut', async ({ page }) => {
-    // Mock navigator.deviceMemory to 8 GB (8192 MB)
-    await page.addInitScript(() => {
-      Object.defineProperty(navigator, 'deviceMemory', {
-        value: 8,
-        configurable: true
-      });
-    });
-
-    await page.goto('/?mock=true');
+    await page.goto('/?mock=true&mockMemory=8&autoDownload=false');
 
     // Click on the domain select trigger
     const selectTrigger = page.getByTestId('model-select-trigger');
@@ -57,14 +49,7 @@ test.describe('ChouetteGPT - Gestion des Domaines et Fallbacks', () => {
 
   test('Médecine devrait utiliser MedGemma sous 8GB de RAM et un Fallback sous 2GB de RAM', async ({ page }) => {
     await test.step('Avec 8 Go de RAM, Médecine utilise MedGemma-4B-Instruct', async () => {
-      await page.addInitScript(() => {
-        Object.defineProperty(navigator, 'deviceMemory', {
-          value: 8,
-          configurable: true
-        });
-      });
-
-      await page.goto('/?mock=true');
+      await page.goto('/?mock=true&mockMemory=8&autoDownload=false');
 
       // Click on dropdown
       await page.getByTestId('model-select-trigger').click();
@@ -84,15 +69,7 @@ test.describe('ChouetteGPT - Gestion des Domaines et Fallbacks', () => {
     });
 
     await test.step('Avec 2 Go de RAM, Médecine utilise un Fallback (Qwen2.5-0.5B-Instruct)', async () => {
-      // Re-setup page with 2GB memory mock
-      await page.addInitScript(() => {
-        Object.defineProperty(navigator, 'deviceMemory', {
-          value: 2,
-          configurable: true
-        });
-      });
-
-      await page.goto('/?mock=true');
+      await page.goto('/?mock=true&mockMemory=2&autoDownload=false');
 
       // Click on dropdown
       await page.getByTestId('model-select-trigger').click();

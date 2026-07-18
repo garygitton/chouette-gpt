@@ -159,38 +159,6 @@ export const useModelStore = defineStore('model', () => {
       performanceScore: 82,
       description: 'Raisonnement (CoT) DeepSeek-R1',
       domains: ['general']
-    },
-    {
-      id: 'native/Qwen2.5-32B-Instruct',
-      name: 'Qwen2.5-32B-Instruct (Natif)',
-      version: '2.5',
-      parameters: '32B',
-      totalSize: '20 GB',
-      quantization: 'native',
-      estimatedMemory: '22 GB',
-      usageCount: 0,
-      status: ModelStatus.Available,
-      ramRequired: 16384,
-      performanceScore: 92,
-      description: 'Intelligence avancée (Compagnon GPU/CPU)',
-      domains: ['general'],
-      isNative: true
-    },
-    {
-      id: 'native/Llama-3-70B-Instruct',
-      name: 'Llama-3-70B-Instruct (Natif)',
-      version: '3.0',
-      parameters: '70B',
-      totalSize: '42 GB',
-      quantization: 'native',
-      estimatedMemory: '45 GB',
-      usageCount: 0,
-      status: ModelStatus.Available,
-      ramRequired: 32768,
-      performanceScore: 98,
-      description: 'Raisonnement extrême (Compagnon GPU/CPU)',
-      domains: ['general'],
-      isNative: true
     }
   ])
 
@@ -230,12 +198,11 @@ export const useModelStore = defineStore('model', () => {
     // First, try to find a compatible specialized model for this domain
     const domainModels = models.value.filter(m => 
       m.domains.includes(domainId) && 
-      (isMock.value || m.ramRequired <= ram) &&
+      (m.ramRequired <= ram) &&
       (m.quantization !== 'q4f16' || hasWebGPU || isMock.value)
     )
     
     if (domainModels.length > 0) {
-      if (isMock.value) return domainModels[0]
       return domainModels.reduce((best, current) => 
         (current.performanceScore || 0) > (best.performanceScore || 0) ? current : best
       , domainModels[0])
@@ -244,11 +211,10 @@ export const useModelStore = defineStore('model', () => {
     // Fallback to the best compatible general model
     const generalModels = models.value.filter(m => 
       m.domains.includes('general') && 
-      (isMock.value || m.ramRequired <= ram) &&
+      (m.ramRequired <= ram) &&
       (m.quantization !== 'q4f16' || hasWebGPU || isMock.value)
     )
     if (generalModels.length > 0) {
-      if (isMock.value) return generalModels[0]
       return generalModels.reduce((best, current) => 
         (current.performanceScore || 0) > (best.performanceScore || 0) ? current : best
       , generalModels[0])
@@ -337,22 +303,28 @@ export const useModelStore = defineStore('model', () => {
     }
   })
 
+  const isInitialized = ref(false)
+
   async function detectBestModel() {
     if (typeof window === 'undefined') return;
 
-    if (!deviceStore.deviceInfo) {
-      await deviceStore.evaluateDevice()
-    }
-    
-    // Do not override if the user already interacted with the model selection
-    // while the device evaluation was running in the background.
-    if (currentModelId.value !== models.value[0].id) {
-      return
-    }
+    try {
+      if (!deviceStore.deviceInfo) {
+        await deviceStore.evaluateDevice()
+      }
+      
+      // Do not override if the user already interacted with the model selection
+      // while the device evaluation was running in the background.
+      if (currentModelId.value !== models.value[0].id) {
+        return
+      }
 
-    currentDomain.value = 'general'
-    const bestModel = getBestModelForDomain('general')
-    currentModelId.value = bestModel.id
+      currentDomain.value = 'general'
+      const bestModel = getBestModelForDomain('general')
+      currentModelId.value = bestModel.id
+    } finally {
+      isInitialized.value = true
+    }
   }
 
   function updateModelStatus(id: string, updates: Partial<ModelInfo>) {
@@ -376,6 +348,7 @@ export const useModelStore = defineStore('model', () => {
     compatibleDomains,
     updateModelStatus,
     detectBestModel,
-    isShowAllModels
+    isShowAllModels,
+    isInitialized
   }
 })

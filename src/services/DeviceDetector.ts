@@ -30,7 +30,13 @@ export async function detectDevice(): Promise<DeviceInfo> {
   }
 
   const cpuCores = navigator.hardwareConcurrency || 2
-  const ramGB = nav.deviceMemory || 4
+  let ramGB = nav.deviceMemory || 4
+  if (typeof window !== 'undefined') {
+    const match = window.location.href.match(/[?&]mockMemory=(\d+)/)
+    if (match) {
+      ramGB = parseInt(match[1], 10)
+    }
+  }
 
   // Check storage quota
   let storageAvailableGB = 0

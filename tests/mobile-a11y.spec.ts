@@ -11,7 +11,7 @@ test.describe('Mobile Accessibility and Responsiveness', () => {
 
   test('should pass axe-core accessibility checks on mobile layout', async ({ page }) => {
     // Navigate to the main page
-    await page.goto('/');
+    await page.goto('/?mock=true&autoDownload=false');
 
     // Wait for the main UI elements to be visible
     await expect(page.getByTestId('chat-textarea')).toBeVisible({ timeout: 120000 });

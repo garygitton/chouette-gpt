@@ -200,6 +200,9 @@ function handleModelChange(modelId: any) {
     return
   }
   modelStore.currentModelId = modelId
+  setTimeout(() => {
+    chatStore.downloadMultipleEngines([modelId])
+  }, 50)
 }
 
 function handleDomainChange(domainId: any) {
@@ -214,6 +217,12 @@ function handleDomainChange(domainId: any) {
     return
   }
   modelStore.currentDomain = domainId
+  setTimeout(() => {
+    const domainObj = modelStore.compatibleDomains.find(d => d.id === domainId)
+    if (domainObj && domainObj.resolvedModel) {
+      chatStore.downloadMultipleEngines([domainObj.resolvedModel.id])
+    }
+  }, 50)
 }
 
 function handleModelSelectedFromChart(modelId: string) {
@@ -225,6 +234,9 @@ function handleModelSelectedFromChart(modelId: string) {
     return
   }
   modelStore.currentModelId = modelId
+  setTimeout(() => {
+    chatStore.downloadMultipleEngines([modelId])
+  }, 50)
 }
 
 function getIcon(iconName: string) {

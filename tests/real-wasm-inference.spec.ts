@@ -27,8 +27,8 @@ test.describe('ChouetteGPT - Real WASM Inference', () => {
   });
 
   test('Should download Qwen2.5-0.5B and run inference on CPU/WASM', async ({ page }) => {
-    // 1. Load the app in real mode (no mock bypass) with showAllModels=true to list all models
-    await page.goto('?showAllModels=true', { waitUntil: 'domcontentloaded' });
+    // 1. Load the app in real mode (no mock bypass) with showAllModels=true to list all models and autoDownload=false
+    await page.goto('?showAllModels=true&autoDownload=false', { waitUntil: 'domcontentloaded' });
 
     // 2. Wait for Nuxt to mount the app
     await page.waitForSelector('[data-testid="sidebar"]', { state: 'attached', timeout: 30000 });

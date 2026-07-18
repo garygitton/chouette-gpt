@@ -76,7 +76,7 @@ test.describe('ChouetteGPT - Advanced Settings & Right Sidebar', () => {
 
   test('Vérifier et manipuler la barre latérale droite et ses paramètres', async ({ page }) => {
     await test.step('Given je suis sur la page avec le modèle chargé (mock)', async () => {
-      await page.goto('/?mock=true', { waitUntil: 'networkidle' });
+      await page.goto('/?mock=true&autoDownload=false', { waitUntil: 'networkidle' });
       
       // Click download button
       const downloadBtn = page.getByRole('button', { name: /Télécharger et activer l'IA/i });

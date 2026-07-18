@@ -16,7 +16,7 @@ test.describe('ChouetteGPT - Model Selector Search & Language Alignment', () => 
   });
 
   test('Should filter domains by typing in the search bar', async ({ page }) => {
-    await page.goto('/?mock=true');
+    await page.goto('/?mock=true&autoDownload=false');
 
     // Click on the domain select trigger to open the dropdown
     const selectTrigger = page.getByTestId('model-select-trigger');
@@ -39,7 +39,7 @@ test.describe('ChouetteGPT - Model Selector Search & Language Alignment', () => 
   });
 
   test('Should translate domain names dynamically when the language changes', async ({ page }) => {
-    await page.goto('/?mock=true');
+    await page.goto('/?mock=true&autoDownload=false');
 
     const langSelect = page.getByTestId('language-select-trigger');
     if (await langSelect.count() > 0) {
@@ -66,7 +66,7 @@ test.describe('ChouetteGPT - Model Selector Search & Language Alignment', () => 
   });
 
   test('Should translate domain names to Spanish and Chinese', async ({ page }) => {
-    await page.goto('/?mock=true');
+    await page.goto('/?mock=true&autoDownload=false');
 
     const langSelect = page.getByTestId('language-select-trigger');
     if (await langSelect.count() > 0) {
@@ -95,7 +95,7 @@ test.describe('ChouetteGPT - Model Selector Search & Language Alignment', () => 
   });
 
   test('Should align brand assets initial language with settingsStore language', async ({ page }) => {
-    await page.goto('/?mock=true');
+    await page.goto('/?mock=true&autoDownload=false');
 
     // Switch to English first
     const langSelect = page.getByTestId('language-select-trigger');
@@ -104,7 +104,7 @@ test.describe('ChouetteGPT - Model Selector Search & Language Alignment', () => 
       await page.getByTestId('language-item-en').click();
 
       // Navigate to /brand-assets
-      await page.goto('/brand-assets');
+      await page.goto('/brand-assets?mock=true&autoDownload=false');
 
       // English button should be active/selected, and English text should show
       await expect(page.locator('text=Role-Specific Specialized Models').first()).toBeVisible();

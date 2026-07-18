@@ -8,6 +8,13 @@ test.describe('ChouetteGPT - Téléchargement automatique lors de la sélection'
         window.localStorage.setItem('chouette-onboarding-seen', 'true');
         (window as any).__mock_llm = true;
       } catch (e) {}
+
+      try {
+        Object.defineProperty(navigator, 'deviceMemory', {
+          value: 8,
+          configurable: true
+        });
+      } catch (e) {}
     });
 
     // Abort third-party network requests

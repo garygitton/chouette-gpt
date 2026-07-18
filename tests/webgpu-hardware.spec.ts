@@ -29,8 +29,8 @@ test.describe('ChouetteGPT - Real WebGPU hardware acceleration', () => {
        await route.continue();
     });
 
-    // 1. Load the app in real mode (no mock bypass) with showAllModels=true to bypass domain filters
-    await page.goto('/?showAllModels=true', { waitUntil: 'domcontentloaded' });
+    // 1. Load the app in real mode (no mock bypass) with showAllModels=true to bypass domain filters and autoDownload=false
+    await page.goto('/?showAllModels=true&autoDownload=false', { waitUntil: 'domcontentloaded' });
     
     // 2. Wait for Nuxt/Vite to compile and mount the app (Cold Start)
     await page.waitForSelector('[data-testid="sidebar"]', { state: 'attached', timeout: 60000 });
@@ -114,8 +114,8 @@ test.describe('ChouetteGPT - Real WebGPU hardware acceleration', () => {
        await route.continue();
      });
 
-    // 1. Load the app in real mode (no mock bypass) with showAllModels=true to bypass domain filters
-    await page.goto('/?showAllModels=true', { waitUntil: 'domcontentloaded' });
+    // 1. Load the app in real mode (no mock bypass) with showAllModels=true to bypass domain filters and autoDownload=false
+    await page.goto('/?showAllModels=true&autoDownload=false', { waitUntil: 'domcontentloaded' });
     
     // 2. Wait for Nuxt/Vite to compile and mount the app (Cold Start)
     await page.waitForSelector('[data-testid="sidebar"]', { state: 'attached', timeout: 60000 });
