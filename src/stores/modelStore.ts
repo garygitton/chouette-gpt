@@ -144,6 +144,21 @@ export const useModelStore = defineStore('model', () => {
       performanceScore: 85,
       description: 'Diagnostic médical',
       domains: ['medicine']
+    },
+    {
+      id: 'onnx-community/DeepSeek-R1-Distill-Qwen-1.5B-ONNX',
+      name: 'DeepSeek-R1-Distill-Qwen-1.5B',
+      version: 'R1',
+      parameters: '1.5B',
+      totalSize: '1.6 GB',
+      quantization: 'q4',
+      estimatedMemory: '2.0 GB',
+      usageCount: 0,
+      status: ModelStatus.Available,
+      ramRequired: 4096,
+      performanceScore: 82,
+      description: 'Raisonnement (CoT) DeepSeek-R1',
+      domains: ['general']
     }
   ])
 

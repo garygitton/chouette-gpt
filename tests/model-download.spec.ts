@@ -12,7 +12,8 @@ test.describe('Validation du téléchargement réel des modèles HF', () => {
     { id: 'onnx-community/Qwen2.5-Coder-1.5B-Instruct', expectedWeight: 'onnx/model_q4.onnx' },
     { id: 'onnx-community/Llama-3.2-3B-Instruct-ONNX', expectedWeight: 'onnx/model_q4.onnx' },
     { id: 'onnx-community/Phi-3.5-mini-instruct-onnx-web', expectedWeight: 'onnx/model_q4f16.onnx' },
-    { id: 'vmanvs/medgemma-q4f16-chunked', expectedWeight: 'onnx/model_q4f16.onnx' }
+    { id: 'vmanvs/medgemma-q4f16-chunked', expectedWeight: 'onnx/model_q4f16.onnx' },
+    { id: 'onnx-community/DeepSeek-R1-Distill-Qwen-1.5B-ONNX', expectedWeight: 'onnx/model_q4.onnx' }
   ];
 
   for (const model of models) {

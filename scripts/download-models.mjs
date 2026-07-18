@@ -14,7 +14,8 @@ const models = [
   'onnx-community/Qwen2.5-Coder-1.5B-Instruct',
   'onnx-community/Llama-3.2-3B-Instruct-ONNX',
   'onnx-community/Phi-3.5-mini-instruct-onnx-web',
-  'vmanvs/medgemma-q4f16-chunked'
+  'vmanvs/medgemma-q4f16-chunked',
+  'onnx-community/DeepSeek-R1-Distill-Qwen-1.5B-ONNX'
 ];
 
 async function downloadModel(modelId) {

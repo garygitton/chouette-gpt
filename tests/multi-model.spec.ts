@@ -14,7 +14,8 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
     'Qwen2.5-Coder-1.5B-Instruct',
     'Llama-3.2-3B-Instruct',
     'Phi-3.5-mini-instruct',
-    'MedGemma-4B-Instruct'
+    'MedGemma-4B-Instruct',
+    'DeepSeek-R1-Distill-Qwen-1.5B'
   ];
 
   for (const modelName of models) {
