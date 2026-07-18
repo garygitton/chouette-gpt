@@ -21,7 +21,7 @@ describe('modelStore', () => {
   it('should initialize with general domain and fallback to the best model for 8GB RAM', () => {
     const store = useModelStore()
     expect(store.currentDomain).toBe('general')
-    expect(store.currentModelId).toBe('onnx-community/Phi-3.5-mini-instruct-onnx-web')
+    expect(store.currentModelId).toBe('onnx-community/DeepSeek-R1-Distill-Qwen-1.5B-ONNX')
   })
 
   it('should compute compatible models based on device RAM', () => {
