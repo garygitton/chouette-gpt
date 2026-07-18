@@ -230,11 +230,12 @@ export const useModelStore = defineStore('model', () => {
     // First, try to find a compatible specialized model for this domain
     const domainModels = models.value.filter(m => 
       m.domains.includes(domainId) && 
-      m.ramRequired <= ram &&
+      (isMock.value || m.ramRequired <= ram) &&
       (m.quantization !== 'q4f16' || hasWebGPU || isMock.value)
     )
     
     if (domainModels.length > 0) {
+      if (isMock.value) return domainModels[0]
       return domainModels.reduce((best, current) => 
         (current.performanceScore || 0) > (best.performanceScore || 0) ? current : best
       , domainModels[0])
@@ -243,10 +244,11 @@ export const useModelStore = defineStore('model', () => {
     // Fallback to the best compatible general model
     const generalModels = models.value.filter(m => 
       m.domains.includes('general') && 
-      m.ramRequired <= ram &&
+      (isMock.value || m.ramRequired <= ram) &&
       (m.quantization !== 'q4f16' || hasWebGPU || isMock.value)
     )
     if (generalModels.length > 0) {
+      if (isMock.value) return generalModels[0]
       return generalModels.reduce((best, current) => 
         (current.performanceScore || 0) > (best.performanceScore || 0) ? current : best
       , generalModels[0])
@@ -304,7 +306,17 @@ export const useModelStore = defineStore('model', () => {
     return allCompat.filter(m => bestModelIds.has(m.id))
   })
 
-  watch([currentDomain, deviceMemory], () => {
+  watch(currentDomain, () => {
+    // In developer/test mode, the domain selector is hidden, so domain changes are
+    // only side-effects of model selection. We should not auto-select models here.
+    if (isShowAllModels.value) return
+
+    // Do not auto-select if the current model is already valid for the new domain
+    const currentModel = models.value.find(m => m.id === currentModelId.value)
+    if (currentModel && currentModel.domains.includes(currentDomain.value)) {
+      return
+    }
+
     const bestModel = getBestModelForDomain(currentDomain.value)
     if (bestModel && currentModelId.value !== bestModel.id) {
       currentModelId.value = bestModel.id
@@ -332,6 +344,12 @@ export const useModelStore = defineStore('model', () => {
       await deviceStore.evaluateDevice()
     }
     
+    // Do not override if the user already interacted with the model selection
+    // while the device evaluation was running in the background.
+    if (currentModelId.value !== models.value[0].id) {
+      return
+    }
+
     currentDomain.value = 'general'
     const bestModel = getBestModelForDomain('general')
     currentModelId.value = bestModel.id

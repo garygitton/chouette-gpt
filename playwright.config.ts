@@ -14,7 +14,7 @@ export default defineConfig({
   outputDir: 'data/test-results',
   reporter: [['list'], ['html', { outputFolder: 'data/playwright-report', open: 'never' }]],
   use: {
-    baseURL: process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}/`,
+    baseURL: process.env.BASE_URL || `http://localhost:${process.env.PORT || 3005}/`,
     viewport: { width: 1280, height: 800 },
     locale: 'fr-FR',
     actionTimeout: 300000,
@@ -42,8 +42,8 @@ export default defineConfig({
     }
   ],
   webServer: (process.env.BASE_URL && !process.env.BASE_URL.includes('localhost')) ? undefined : {
-    command: process.env.CI ? `pnpm exec serve .output/public -l ${process.env.PORT || 3000}` : 'npm run dev',
-    url: process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}/`,
+    command: process.env.CI ? `pnpm exec serve .output/public -l ${process.env.PORT || 3005}` : `cross-env PORT=${process.env.PORT || 3005} npm run dev`,
+    url: process.env.BASE_URL || `http://localhost:${process.env.PORT || 3005}/`,
     reuseExistingServer: !process.env.CI,
     timeout: 300000,
   }

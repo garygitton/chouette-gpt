@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 
+
 test.describe('ChouetteGPT - Mocked WASM Inference', () => {
   test.setTimeout(60000); // 1 minute is more than enough for a 1MB mock model
 
@@ -12,37 +13,12 @@ test.describe('ChouetteGPT - Mocked WASM Inference', () => {
       worker.on('console', msg => console.log('WORKER CONSOLE:', msg.text()));
     });
 
-    // Bypass onboarding modal
+    // Bypass onboarding modal and activate mock engine
     await page.addInitScript(() => {
       try {
         window.localStorage.setItem('chouette-onboarding-seen', 'true');
+        (window as any).__mock_llm = true;
       } catch (e) {}
-    });
-
-    // Mock the transformers worker completely for fast UI E2E testing
-    await page.route('**/transformers.worker*.js', async route => {
-      const mockWorkerScript = `
-        self.onmessage = function(event) {
-          const { type, payload } = event.data;
-          if (type === 'init') {
-            self.postMessage({ type: 'progress', payload: { text: 'Mock loading...', progress: 0.5 } });
-            setTimeout(() => {
-              self.postMessage({ type: 'init_done', payload: { device: 'mock-webgpu' } });
-            }, 500);
-          } else if (type === 'generate') {
-            const { generationId } = payload;
-            self.postMessage({ type: 'generate_chunk', payload: 'B', generationId });
-            self.postMessage({ type: 'generate_chunk', payload: 'onjour', generationId });
-            self.postMessage({ type: 'generate_chunk', payload: ' !', generationId });
-            self.postMessage({ type: 'generate_done', generationId });
-          }
-        };
-      `;
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/javascript',
-        body: mockWorkerScript
-      });
     });
   });
 
