@@ -1,10 +1,9 @@
-<!-- @ds-ignore-file -->
 <template>
-  <div class="flex-1 flex flex-col relative h-full bg-white dark:bg-[#0b0f19]">
+  <div class="flex-1 flex flex-col relative min-h-0 bg-white dark:bg-[#0b0f19]">
 
     <!-- Chat Feed Container -->
-    <div ref="scrollContainer" class="flex-1 overflow-y-auto px-4 md:px-8 pt-4 pb-28 md:pb-36" @scroll="onScroll">
-      <div class="max-w-3xl w-full mx-auto flex flex-col justify-between">
+    <div ref="scrollContainer" class="flex-1 overflow-y-auto px-4 md:px-8 pt-4 pb-4" @scroll="onScroll">
+      <div class="max-w-3xl w-full mx-auto flex flex-col justify-between min-h-full pb-4">
         <LandingDashboard v-if="!currentConversation || currentConversation.messages.length === 0" @send-prompt="sendPrompt" />
         
         <!-- Active Chat Feed -->
@@ -23,7 +22,7 @@
       leave-from-class="transform translate-y-0 opacity-100"
       leave-to-class="transform translate-y-4 opacity-0"
     >
-      <div v-if="!isAtBottom && currentConversation?.messages?.length" class="absolute bottom-28 md:bottom-36 left-0 right-0 flex justify-center pointer-events-none z-10">
+      <div v-if="!isAtBottom && currentConversation?.messages?.length" class="absolute bottom-[130px] md:bottom-[150px] left-0 right-0 flex justify-center pointer-events-none z-10">
         <Button 
           variant="secondary" 
           class="pointer-events-auto rounded-full shadow-lg border border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-xs h-8 px-4 font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400" 
@@ -36,8 +35,8 @@
     </Transition>
 
     <!-- Fixed Bottom Input Area -->
-    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-transparent dark:from-[#0b0f19] dark:via-[#0b0f19] dark:to-transparent pt-12 pb-4 px-4 md:px-8 pointer-events-none">
-      <div class="max-w-3xl mx-auto pointer-events-auto">
+    <div class="flex-none border-t border-slate-100 dark:border-slate-800/40 bg-white dark:bg-[#0b0f19] pt-3 pb-6 md:pb-8 px-4 md:px-8">
+      <div class="max-w-3xl mx-auto">
         <ChatInputArea 
           v-model="input" 
           :disabled="!chatStore.isEngineReady" 

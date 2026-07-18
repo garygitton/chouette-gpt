@@ -1,6 +1,6 @@
 <!-- @ds-ignore-file -->
 <template>
-  <div class="my-auto py-12 space-y-10 ui-message-slide-in relative" aria-labelledby="dashboard-title">
+  <div class="my-auto py-4 md:py-12 space-y-6 md:space-y-10 ui-message-slide-in relative" aria-labelledby="dashboard-title">
     
     <!-- Ambient Background Glow -->
     <div class="absolute inset-0 pointer-events-none overflow-hidden -z-10">
@@ -9,11 +9,11 @@
 
     <!-- Main Glowing Logo Emblem -->
     <div class="text-center space-y-6">
-      <div class="relative w-28 h-28 mx-auto flex items-center justify-center group animate-slide-up-fade [animation-delay:50ms] [animation-fill-mode:both]">
+      <div class="relative w-20 h-20 md:w-28 md:h-28 mx-auto flex items-center justify-center group animate-slide-up-fade [animation-delay:50ms] [animation-fill-mode:both]">
         <!-- Breathing Aura -->
         <div class="absolute inset-0 bg-indigo-500/20 dark:bg-indigo-500/10 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-700 animate-pulse"/>
         <!-- Animated SVG Logo -->
-        <img src="~/assets/logo.svg" alt="Logo" class="relative z-10 w-24 h-24 transform group-hover:scale-110 transition-transform duration-500 drop-shadow-xl" >
+        <img src="~/assets/logo.svg" alt="Logo" class="relative z-10 w-16 h-16 md:w-24 md:h-24 transform group-hover:scale-110 transition-transform duration-500 drop-shadow-xl" >
       </div>
 
       <div class="space-y-4">
@@ -29,11 +29,11 @@
         <p v-else class="text-slate-600 dark:text-slate-300 text-base md:text-lg max-w-xl mx-auto font-normal leading-relaxed animate-slide-up-fade [animation-delay:150ms] [animation-fill-mode:both]">
           Votre assistant IA local, 100% privé et hors-ligne.
         </p>
-        <div class="max-w-xl mx-auto text-xs text-left text-slate-500 dark:text-slate-400 bg-slate-50/80 dark:bg-slate-950/40 backdrop-blur-md p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 space-y-3 shadow-sm animate-slide-up-fade [animation-delay:200ms] [animation-fill-mode:both]">
+        <div class="max-w-xl mx-auto text-xs text-left text-slate-500 dark:text-slate-400 bg-slate-50/80 dark:bg-slate-950/40 backdrop-blur-md p-4 md:p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 space-y-2 md:space-y-3 shadow-sm animate-slide-up-fade [animation-delay:200ms] [animation-fill-mode:both]">
           <p class="leading-relaxed">
             <strong class="text-slate-800 dark:text-slate-200">{{ t('landing_objective_title') }}</strong> {{ t('landing_objective_desc') }}
           </p>
-          <div class="flex items-start space-x-2.5 text-amber-600 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20 p-3 rounded-xl border border-amber-100/50 dark:border-amber-900/30">
+          <div class="flex items-start space-x-2 bg-amber-50/50 dark:bg-amber-950/20 p-2.5 rounded-xl border border-amber-100/50 dark:border-amber-900/30">
             <p class="leading-relaxed font-medium">
               {{ t('performance_notice') }}
             </p>
@@ -133,18 +133,18 @@
         role="button"
         :aria-label="'Essayer le prompt : ' + prompt.title"
         :data-testid="'suggested-prompt-' + prompt.title.toLowerCase().replace(/\s+/g, '-')"
-        class="group relative cursor-pointer text-left p-5 rounded-3xl border border-slate-200/50 dark:border-slate-800/50 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl transition-all duration-500 flex items-start space-x-4 overflow-hidden hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_12px_40px_-10px_rgb(0,0,0,0.1)] dark:hover:shadow-[0_12px_40px_-10px_rgba(99,102,241,0.2)] hover:border-indigo-500/50 dark:hover:border-indigo-500/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 animate-slide-up-fade"
+        class="group relative cursor-pointer text-left p-4 md:p-5 rounded-2xl md:rounded-3xl border border-slate-200/50 dark:border-slate-800/50 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl transition-all duration-500 flex items-start space-x-3 md:space-x-4 overflow-hidden hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_12px_40px_-10px_rgb(0,0,0,0.1)] dark:hover:shadow-[0_12px_40px_-10px_rgba(99,102,241,0.2)] hover:border-indigo-500/50 dark:hover:border-indigo-500/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 animate-slide-up-fade"
         :style="`animation-delay: ${300 + index * 100}ms; animation-fill-mode: both;`"
         @click="$emit('send-prompt', prompt.text)"
         @keydown.enter="$emit('send-prompt', prompt.text)"
       >
         <!-- Animated border gradient -->
-        <div class="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none gradient-border-mask"/>
+        <div class="absolute inset-0 rounded-2xl md:rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none gradient-border-mask"/>
         
         <!-- Ambient Glow -->
         <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"/>
 
-        <div class="relative z-10 p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-800/80 group-hover:bg-white dark:group-hover:bg-slate-800 transition-all duration-300 flex-shrink-0 shadow-sm group-hover:shadow-md group-hover:shadow-indigo-500/10">
+        <div class="relative z-10 p-2.5 md:p-3.5 rounded-xl md:rounded-2xl bg-slate-100/80 dark:bg-slate-800/80 group-hover:bg-white dark:group-hover:bg-slate-800 transition-all duration-300 flex-shrink-0 shadow-sm group-hover:shadow-md group-hover:shadow-indigo-500/10">
           <component :is="prompt.icon" class="w-5 h-5 transform group-hover:scale-110 transition-transform duration-300" :class="prompt.iconClass" />
         </div>
         
@@ -158,7 +158,7 @@
         </div>
         
         <div class="relative z-10 flex items-center justify-center self-center opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-          <div class="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-500/20 flex items-center justify-center group-hover:shadow-lg group-hover:shadow-indigo-500/20 transition-all">
+          <div class="w-7 h-7 md:w-8 md:h-8 rounded-full bg-indigo-50 dark:bg-indigo-500/20 flex items-center justify-center group-hover:shadow-lg group-hover:shadow-indigo-500/20 transition-all">
             <ArrowRight class="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
           </div>
         </div>
