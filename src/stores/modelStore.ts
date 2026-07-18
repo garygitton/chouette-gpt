@@ -159,6 +159,38 @@ export const useModelStore = defineStore('model', () => {
       performanceScore: 82,
       description: 'Raisonnement (CoT) DeepSeek-R1',
       domains: ['general']
+    },
+    {
+      id: 'native/Qwen2.5-32B-Instruct',
+      name: 'Qwen2.5-32B-Instruct (Natif)',
+      version: '2.5',
+      parameters: '32B',
+      totalSize: '20 GB',
+      quantization: 'native',
+      estimatedMemory: '22 GB',
+      usageCount: 0,
+      status: ModelStatus.Available,
+      ramRequired: 16384,
+      performanceScore: 92,
+      description: 'Intelligence avancée (Compagnon GPU/CPU)',
+      domains: ['general'],
+      isNative: true
+    },
+    {
+      id: 'native/Llama-3-70B-Instruct',
+      name: 'Llama-3-70B-Instruct (Natif)',
+      version: '3.0',
+      parameters: '70B',
+      totalSize: '42 GB',
+      quantization: 'native',
+      estimatedMemory: '45 GB',
+      usageCount: 0,
+      status: ModelStatus.Available,
+      ramRequired: 32768,
+      performanceScore: 98,
+      description: 'Raisonnement extrême (Compagnon GPU/CPU)',
+      domains: ['general'],
+      isNative: true
     }
   ])
 
@@ -166,6 +198,11 @@ export const useModelStore = defineStore('model', () => {
   const currentDomain = ref<string>('general')
   const isDownloading = ref(false)
   const deviceMemory = computed(() => deviceStore.deviceInfo ? deviceStore.deviceInfo.ramGB * 1024 : null)
+
+  const isExtension = computed(() => {
+    return typeof window !== 'undefined' && 
+      !!((window as any).chrome && (window as any).chrome.runtime && (window as any).chrome.runtime.id)
+  })
 
   const domains = [
     { id: 'general', name: 'Général', description: 'Polyvalent & créatif', icon: 'Cpu', prompt: '' },
@@ -245,7 +282,12 @@ export const useModelStore = defineStore('model', () => {
   const compatibleModels = computed(() => {
     const hasWebGPU = deviceStore.deviceInfo?.hasWebGPU ?? true
     const allCompat = models.value.filter(model => {
-      if (deviceMemory.value && deviceMemory.value < model.ramRequired) {
+      // Native models only allowed in extension environment
+      if (model.isNative && !isExtension.value) {
+        return false
+      }
+      // Bypass memory checks for native models since execution is offloaded
+      if (!model.isNative && deviceMemory.value && deviceMemory.value < model.ramRequired) {
         return false
       }
       if (model.quantization === 'q4f16' && !hasWebGPU && !isMock.value) {
@@ -311,6 +353,7 @@ export const useModelStore = defineStore('model', () => {
     currentModelName,
     isDownloading,
     deviceMemory,
+    isExtension,
     compatibleModels,
     compatibleDomains,
     updateModelStatus,

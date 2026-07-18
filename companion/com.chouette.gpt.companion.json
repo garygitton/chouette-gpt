@@ -1,0 +1,10 @@
+{
+  "name": "com.chouette.gpt.companion",
+  "description": "Chouette GPT Native Messaging Companion",
+  "path": "/home/gary/Projects/repositories/open-source/garygitton/chouette-gpt/companion/companion.py",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://knldjbgmffnchmenfpddjdbeligoaajd/",
+    "chrome-extension://*/*"
+  ]
+}

@@ -49,6 +49,7 @@ export const useChatStore = defineStore('chat', () => {
 
   const showDownloadConfirmation = ref(false)
   const pendingDownloadModelId = ref<string | null>(null)
+  const extensionPort = ref<any>(null)
   
   const pendingModelForConfirmation = computed(() => {
     if (!pendingDownloadModelId.value) return null
@@ -88,6 +89,74 @@ export const useChatStore = defineStore('chat', () => {
     if (isEngineReady.value && !progressPrefix) return
     isEnginePaused.value = false
 
+    const activeSessionId = sessionId || ++engineLoadSessionId
+
+    if (modelId.startsWith('native/')) {
+      isEngineLoading.value = true
+      isEngineReady.value = false
+      
+      try {
+        if (typeof window === 'undefined' || !(window as any).chrome?.runtime?.connect) {
+          throw new Error("L'extension Chrome et son compagnon natif sont requis pour ce modèle.")
+        }
+        
+        // Connect to service worker
+        extensionPort.value = (window as any).chrome.runtime.connect({ name: 'chouette-ui' })
+        
+        // Listen to download progress and success
+        const onMessage = (msg: any) => {
+          if (engineLoadSessionId !== activeSessionId) return
+          
+          if (msg.type === 'download_progress') {
+            engineProgress.value = { 
+              text: `${progressPrefix}Téléchargement : ${msg.downloaded} / ${msg.total} (${msg.speed})`, 
+              progress: msg.progress / 100 
+            }
+          } else if (msg.type === 'download_success') {
+            isEngineReady.value = true
+            isEngineLoading.value = false
+            engineProgress.value = { text: 'Modèle natif prêt !', progress: 1.0 }
+          } else if (msg.type === 'status' && msg.status === 'info') {
+            engineProgress.value = { text: msg.message, progress: 0.1 }
+          } else if (msg.type === 'status' && msg.status === 'error') {
+            console.error('Companion error:', msg.error)
+            engineProgress.value = { text: `Erreur : ${msg.error}`, progress: 0 }
+            isEngineLoading.value = false
+            isEngineReady.value = false
+          }
+        }
+        
+        extensionPort.value.onMessage.addListener(onMessage)
+        
+        // Trigger download
+        extensionPort.value.postMessage({ action: 'download', modelId })
+        
+        // Await model readiness
+        return new Promise<void>((resolve, reject) => {
+          const checkTimer = setInterval(() => {
+            if (engineLoadSessionId !== activeSessionId) {
+              clearInterval(checkTimer)
+              reject(new Error('Session annulée'))
+            }
+            if (isEngineReady.value) {
+              clearInterval(checkTimer)
+              resolve()
+            }
+            if (!isEngineLoading.value && !isEngineReady.value) {
+              clearInterval(checkTimer)
+              reject(new Error(engineProgress.value.text || 'Échec du chargement du modèle natif'))
+            }
+          }, 100)
+        })
+      } catch (err: any) {
+        console.error('Failed to init native engine:', err)
+        isEngineLoading.value = false
+        isEngineReady.value = false
+        engineProgress.value = { text: `Erreur extension : ${err.message}`, progress: 0 }
+        throw err
+      }
+    }
+
     const modelInfo = modelStore.models.find(m => m.id === modelId)
 
     const isMock = typeof window !== 'undefined' && 
@@ -95,8 +164,7 @@ export const useChatStore = defineStore('chat', () => {
       
     console.log('[CHATSTORE] initEngine:', { modelId, isMock, href: typeof window !== 'undefined' ? window.location.href : '' })
 
-    const activeSessionId = sessionId || ++engineLoadSessionId
-
+    
     if (isMock) {
       isEngineLoading.value = true;
       const steps = [
@@ -252,6 +320,10 @@ export const useChatStore = defineStore('chat', () => {
       worker = null
       workerApi = null
     }
+    if (extensionPort.value) {
+      extensionPort.value.disconnect()
+      extensionPort.value = null
+    }
   }
 
   function cancelDownload() {
@@ -280,7 +352,11 @@ export const useChatStore = defineStore('chat', () => {
       timestamp: Date.now()
     })
 
-    if (!workerApi) {
+    if (modelId.startsWith('native/')) {
+      if (!extensionPort.value) {
+        await initEngine(modelId)
+      }
+    } else if (!workerApi) {
       await initEngine(modelId)
     }
 
@@ -341,7 +417,34 @@ export const useChatStore = defineStore('chat', () => {
         repetitionPenalty: settingsStore.repetitionPenalty
       }
 
-      if (workerApi) {
+      if (modelId.startsWith('native/')) {
+        let fullContent = ''
+        
+        await new Promise<void>((resolve, reject) => {
+          const onMessage = (msg: any) => {
+            if (!isGenerating.value) {
+              extensionPort.value?.onMessage.removeListener(onMessage)
+              resolve()
+              return
+            }
+            
+            if (msg.type === 'chat_chunk') {
+              fullContent += msg.chunk
+              const m = currentConv.messages.find((m: any) => m.id === asstMsgId)
+              if (m) m.content = fullContent
+            } else if (msg.type === 'chat_done') {
+              extensionPort.value?.onMessage.removeListener(onMessage)
+              resolve()
+            } else if (msg.type === 'status' && msg.status === 'error') {
+              extensionPort.value?.onMessage.removeListener(onMessage)
+              reject(new Error(msg.error))
+            }
+          }
+          
+          extensionPort.value.onMessage.addListener(onMessage)
+          extensionPort.value.postMessage({ action: 'chat', prompt: text, modelId })
+        })
+      } else if (workerApi) {
         generationIdCounter++
         currentGenerationId = generationIdCounter
         
@@ -362,8 +465,13 @@ export const useChatStore = defineStore('chat', () => {
       }
       
       await convStore.persistConversation(convId)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Generation error', error)
+      // Display the error to the user in the assistant's message if native failed
+      if (modelId.startsWith('native/')) {
+        const msg = currentConv.messages.find((m: any) => m.id === asstMsgId)
+        if (msg) msg.content = `[Erreur du compagnon natif] : ${error.message || error}`
+      }
     } finally {
       isGenerating.value = false
     }
@@ -399,6 +507,10 @@ export const useChatStore = defineStore('chat', () => {
   async function stopGenerate() {
     if (workerApi) {
       await workerApi.interrupt()
+      isGenerating.value = false
+    }
+    if (extensionPort.value) {
+      extensionPort.value.postMessage({ action: 'interrupt' })
       isGenerating.value = false
     }
   }

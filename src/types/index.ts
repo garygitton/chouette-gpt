@@ -42,6 +42,7 @@ export interface ModelInfo {
   description: string
   domains: string[]
   supportsSampling?: boolean
+  isNative?: boolean
 }
 
 export interface DeviceInfo {
