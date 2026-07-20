@@ -1,6 +1,6 @@
 <!-- @ds-ignore-file -->
 <template>
-  <div class="my-auto py-4 md:py-12 space-y-6 md:space-y-10 ui-message-slide-in relative" aria-labelledby="dashboard-title">
+  <div class="md:my-auto mt-2 mb-8 py-4 md:py-12 space-y-6 md:space-y-10 ui-message-slide-in relative" aria-labelledby="dashboard-title">
     
     <!-- Ambient Background Glow -->
     <div class="absolute inset-0 pointer-events-none overflow-hidden -z-10">
