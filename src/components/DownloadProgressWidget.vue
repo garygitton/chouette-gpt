@@ -11,7 +11,7 @@
       v-if="chatStore.isEngineLoading || chatStore.isEnginePaused"
       class="fixed bottom-6 right-6 z-[100] flex flex-col items-end pointer-events-none p-4"
     >
-      <div class="pointer-events-auto w-[360px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/80 dark:border-slate-700/80 shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] rounded-2xl p-5 flex flex-col space-y-4">
+      <div class="pointer-events-auto w-[360px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/80 dark:border-slate-700/80 shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] rounded-2xl p-5 flex flex-col space-y-4" role="status" aria-live="polite">
         
         <div class="flex items-start justify-between">
           <div class="flex flex-col flex-1 min-w-0 pr-4">

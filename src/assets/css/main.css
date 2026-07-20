@@ -93,29 +93,6 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Custom premium scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(156, 163, 175, 0.25);
-  border-radius: 9999px;
-  transition: background 0.2s ease;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: rgba(156, 163, 175, 0.15);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(156, 163, 175, 0.45);
-}
 
 /* ────────────────────────────────────────────────────────────────────────── */
 /* 🛠️ PREMIUM DESIGN SYSTEM UTILITIES                                        */

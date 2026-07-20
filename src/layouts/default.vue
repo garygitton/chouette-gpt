@@ -1,5 +1,5 @@
 <template>
-  <div class="h-dvh w-full bg-slate-50 dark:bg-[#0b0f19] text-slate-900 dark:text-slate-100 flex overflow-hidden">
+  <div :style="{ height: appHeight }" class="w-full bg-slate-50 dark:bg-[#0b0f19] text-slate-900 dark:text-slate-100 flex overflow-hidden">
     
     <!-- Desktop Sidebar -->
     <aside data-testid="sidebar" class="hidden md:flex flex-col w-[280px] border-r border-slate-200 dark:border-slate-800/60 bg-slate-100/50 dark:bg-[#070a12]/80 h-full flex-shrink-0">
@@ -8,8 +8,12 @@
       </div>
     </aside>
 
-    <!-- Main Content Area -->
-    <div class="flex-1 flex flex-col min-w-0 h-full relative bg-white dark:bg-[#0b0f19]">
+    <!-- Main Content Area with swipe gestures to open sidebars -->
+    <div 
+      class="flex-1 flex flex-col min-w-0 h-full relative bg-white dark:bg-[#0b0f19]"
+      @touchstart="handleTouchStart"
+      @touchend="handleTouchEnd"
+    >
       
       <!-- Desktop Top Bar Options -->
       <div class="hidden md:flex absolute top-4 left-4 right-4 z-20 justify-between pointer-events-none">
@@ -124,6 +128,7 @@ const route = useRoute()
 const isSidebarOpen = ref(false)
 const isRightSidebarOpen = ref(true)
 const isMobileView = ref(false)
+const appHeight = ref('100dvh')
 
 function checkMobile() {
   if (typeof window !== 'undefined') {
@@ -136,14 +141,64 @@ function checkMobile() {
   }
 }
 
+function updateAppHeight() {
+  if (typeof window !== 'undefined') {
+    const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight
+    appHeight.value = `${vh}px`
+  }
+}
+
+const touchStartX = ref(0)
+const touchStartY = ref(0)
+
+function handleTouchStart(e: TouchEvent) {
+  if (e.touches.length === 1) {
+    touchStartX.value = e.touches[0].clientX
+    touchStartY.value = e.touches[0].clientY
+  }
+}
+
+function handleTouchEnd(e: TouchEvent) {
+  if (e.changedTouches.length === 1) {
+    const touchEndX = e.changedTouches[0].clientX
+    const touchEndY = e.changedTouches[0].clientY
+    const diffX = touchEndX - touchStartX.value
+    const diffY = touchEndY - touchStartY.value
+    
+    // Swipe horizontal gesture criteria: low vertical deviation and significant horizontal travel
+    if (Math.abs(diffY) < 40 && Math.abs(diffX) > 60) {
+      if (diffX > 0 && touchStartX.value < 45) {
+        // Swipe from left edge -> open main sidebar
+        isSidebarOpen.value = true
+      } else if (diffX < 0 && window.innerWidth - touchStartX.value < 45) {
+        // Swipe from right edge -> open settings sidebar on mobile
+        if (isMobileView.value) {
+          isRightSidebarOpen.value = true
+        }
+      }
+    }
+  }
+}
+
 onMounted(() => {
   checkMobile()
+  updateAppHeight()
   window.addEventListener('resize', checkMobile)
+  window.addEventListener('resize', updateAppHeight)
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', updateAppHeight)
+    window.visualViewport.addEventListener('scroll', updateAppHeight)
+  }
 })
 
 onBeforeUnmount(() => {
   if (typeof window !== 'undefined') {
     window.removeEventListener('resize', checkMobile)
+    window.removeEventListener('resize', updateAppHeight)
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', updateAppHeight)
+      window.visualViewport.removeEventListener('scroll', updateAppHeight)
+    }
   }
 })
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="prose" v-html="htmlContent"/>
+  <div class="prose max-w-none break-words" v-html="htmlContent"/>
 </template>
 
 <script setup lang="ts">

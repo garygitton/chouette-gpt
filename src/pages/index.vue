@@ -2,7 +2,7 @@
   <div class="flex-1 flex flex-col relative min-h-0 bg-white dark:bg-[#0b0f19]">
 
     <!-- Chat Feed Container -->
-    <div ref="scrollContainer" class="flex-1 overflow-y-auto px-4 md:px-8 pt-4 pb-4" @scroll="onScroll">
+    <div ref="scrollContainer" class="flex-1 overflow-y-auto overscroll-contain px-4 md:px-8 pt-4 pb-4" @scroll="onScroll">
       <div class="max-w-3xl w-full mx-auto flex flex-col justify-between min-h-full pb-4">
         <LandingDashboard v-if="!currentConversation || currentConversation.messages.length === 0" @send-prompt="sendPrompt" />
         

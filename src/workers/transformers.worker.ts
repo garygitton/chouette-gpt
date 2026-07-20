@@ -152,7 +152,7 @@ class TransformersAPI {
           console.error('[Transformers Worker] Failed to clear cache', cacheErr);
         }
       }
-      throw new Error(errorMsg);
+      throw new Error(errorMsg, { cause: e });
     }
   }
 

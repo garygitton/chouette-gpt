@@ -27,7 +27,7 @@
           rows="1"
           :placeholder="props.disabled ? 'Téléchargez un modèle pour commencer...' : t('chat_placeholder')"
           :disabled="props.disabled"
-          class="w-full bg-transparent border-0 outline-none focus:ring-0 text-slate-800 dark:text-slate-100 resize-none max-h-48 text-sm placeholder-slate-400 dark:placeholder-slate-500 disabled:opacity-50 disabled:cursor-not-allowed [field-sizing:content]"
+          class="w-full bg-transparent border-0 outline-none focus:ring-0 text-slate-800 dark:text-slate-100 resize-none max-h-48 text-base md:text-sm placeholder-slate-400 dark:placeholder-slate-500 disabled:opacity-50 disabled:cursor-not-allowed [field-sizing:content]"
           @keydown="handleKeydown"
           @paste="handlePaste"
           @drop.prevent="handleDrop"

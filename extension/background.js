@@ -1,3 +1,4 @@
+/* global chrome */
 let nativePort = null;
 
 // Listen for connections from the extension pages (main tab)
