@@ -29,7 +29,8 @@ A local AI text generation interface with CPU/GPU support (WebGPU/WebAssembly). 
 
 ## Project Direction
 - **[Project Goals](./GOAL.md)**: Read about the core philosophy, mission, and architectural goals of Chouette GPT.
-- **[Roadmap](./ROADMAP.md)**: Explore the planned evolutionary phases (Vision, Tools, specialized tasks).
+- **[Technical Roadmap](./ROADMAP.md)**: Explore the planned evolutionary phases (Vision, Tools, specialized tasks).
+- **[100-Step Commercial & Revenue Roadmap](./COMMERCIAL_ROADMAP.md)**: Explore the step-by-step master strategy from product packaging to market launch, B2B sales, and monetization.
 
 ## Contributing
 See CONTRIBUTING.md for guidelines
@@ -72,7 +73,8 @@ Une interface locale de génération de texte par IA avec support CPU/GPU (WebGP
 
 ## Orientation du projet
 - **[Objectifs du Projet](./GOAL.md)** : En savoir plus sur la philosophie centrale, la mission et les objectifs d'architecture de Chouette GPT.
-- **[Feuille de Route](./ROADMAP.md)** : Explorer les phases d'évolution planifiées (Vision, Outils, tâches spécialisées).
+- **[Feuille de Route Technique](./ROADMAP.md)** : Explorer les phases d'évolution planifiées (Vision, Outils, tâches spécialisées).
+- **[Plan Commercial & Revenus en 100 Étapes](./COMMERCIAL_ROADMAP.md)** : Explorer la stratégie complète de la finalisation produit à la commercialisation B2B et la monétisation.
 
 ## Contribuer
 Voir CONTRIBUTING.md pour les directives.
