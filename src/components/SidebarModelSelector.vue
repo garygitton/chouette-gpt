@@ -142,7 +142,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '~/components/u
 import ModelScatterChart from '~/components/ModelScatterChart.vue'
 import ModelSearchInput from '~/components/ModelSearchInput.vue'
 import { Progress } from '~/components/ui/progress'
-import { BarChart, Loader2, CheckCircle2, Cpu, Pause, Play, Download, Calculator, Code2, Stethoscope, Scale, PenTool, Languages, GraduationCap, TrendingUp, Coins, Search } from 'lucide-vue-next'
+import { BarChart, Loader2, CheckCircle2, Cpu, Pause, Play, Download, Calculator, Code2, Stethoscope, Scale, PenTool, Languages, GraduationCap, TrendingUp, Coins, Search, Zap } from 'lucide-vue-next'
 import { useDeviceStore } from '~/stores/deviceStore'
 import { useModelI18n } from '~/composables/useModelI18n'
 
@@ -241,6 +241,7 @@ function handleModelSelectedFromChart(modelId: string) {
 
 function getIcon(iconName: string) {
   switch (iconName) {
+    case 'Zap': return Zap
     case 'Cpu': return Cpu
     case 'Calculator': return Calculator
     case 'Code2': return Code2

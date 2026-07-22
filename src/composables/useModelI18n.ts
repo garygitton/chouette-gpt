@@ -223,6 +223,7 @@ export interface DomainTranslation {
 
 export const domainTranslations: Record<string, Record<string, DomainTranslation>> = {
   fr: {
+    small: { name: "Petit / Léger", desc: "Rapide & économe (~500 Mo)" },
     general: { name: "Général", desc: "Polyvalent & créatif" },
     maths: { name: "Mathématiques", desc: "Résolution de problèmes" },
     code: { name: "Développement", desc: "Écriture & analyse de code" },
@@ -235,6 +236,7 @@ export const domainTranslations: Record<string, Record<string, DomainTranslation
     finance: { name: "Finance & Calculs", desc: "Finance, bilans & formules de tableur" }
   },
   en: {
+    small: { name: "Small", desc: "Fast & lightweight (~500 MB)" },
     general: { name: "General", desc: "Versatile & creative" },
     maths: { name: "Mathematics", desc: "Problem solving & logic" },
     code: { name: "Development", desc: "Code writing & analysis" },
@@ -247,6 +249,7 @@ export const domainTranslations: Record<string, Record<string, DomainTranslation
     finance: { name: "Finance & Accounting", desc: "Financial sheets & spreadsheets" }
   },
   es: {
+    small: { name: "Pequeño", desc: "Rápido y ligero (~500 MB)" },
     general: { name: "General", desc: "Versátil y creativo" },
     maths: { name: "Matemáticas", desc: "Resolución de problemas y lógica" },
     code: { name: "Desarrollo", desc: "Escritura y análisis de código" },
@@ -259,6 +262,7 @@ export const domainTranslations: Record<string, Record<string, DomainTranslation
     finance: { name: "Finanzas & Contabilidad", desc: "Balances financieros y hojas de cálculo" }
   },
   zh: {
+    small: { name: "轻量/小模型", desc: "快速且省内存 (~500 MB)" },
     general: { name: "通用", desc: "多功能与创造性" },
     maths: { name: "数学", desc: "问题解决与逻辑推理" },
     code: { name: "代码开发", desc: "代码编写与分析" },
@@ -271,6 +275,7 @@ export const domainTranslations: Record<string, Record<string, DomainTranslation
     finance: { name: "财务与会计", desc: "财务报表与电子表格" }
   },
   hi: {
+    small: { name: "छोटा", desc: "तेज और हल्का (~500 MB)" },
     general: { name: "सामान्य", desc: "बहुमुखी और रचनात्मक" },
     maths: { name: "गणित", desc: "समस्या समाधान और तर्क" },
     code: { name: "विकास", desc: "कोड लेखन और विश्लेषण" },
@@ -283,6 +288,7 @@ export const domainTranslations: Record<string, Record<string, DomainTranslation
     finance: { name: "वित्त और लेखा", desc: "वित्तीय पत्रक और स्प्रेडशीट" }
   },
   ar: {
+    small: { name: "صغير", desc: "سريع وخفيف (~500 م.ب)" },
     general: { name: "عام", desc: "متعدد الاستخدامات ومبدع" },
     maths: { name: "الرياضيات", desc: "حل المشكلات والمنطق" },
     code: { name: "التطوير", desc: "كتابة وتحليل الأكواد" },
@@ -295,6 +301,7 @@ export const domainTranslations: Record<string, Record<string, DomainTranslation
     finance: { name: "المالية والمحاسبة", desc: "القوائم المالية وجداول البيانات" }
   },
   pt: {
+    small: { name: "Pequeno", desc: "Rápido e leve (~500 MB)" },
     general: { name: "Geral", desc: "Versátil e criativo" },
     maths: { name: "Matemática", desc: "Resolução de problemas e lógica" },
     code: { name: "Desenvolvimento", desc: "Escrita e análise de código" },
@@ -307,6 +314,7 @@ export const domainTranslations: Record<string, Record<string, DomainTranslation
     finance: { name: "Finanças & Contabilidade", desc: "Planilhas financeiras e relatórios" }
   },
   ru: {
+    small: { name: "Малый", desc: "Быстрый и легкий (~500 МБ)" },
     general: { name: "Общий", desc: "Универсальный и творческий" },
     maths: { name: "Математика", desc: "Решение задач и логика" },
     code: { name: "Разработка", desc: "Написание и анализ кода" },
@@ -319,6 +327,7 @@ export const domainTranslations: Record<string, Record<string, DomainTranslation
     finance: { name: "Финансы и учет", desc: "Финансовые отчеты и таблицы" }
   },
   bn: {
+    small: { name: "ছোট", desc: "দ্রুত ও হালকা (~500 এমবি)" },
     general: { name: "সাধারণ", desc: "বহুমুখী এবং সৃজনশীল" },
     maths: { name: "গণিত", desc: "সমস্যা समाधान এবং যুক্তি" },
     code: { name: "ডেভেলপমেন্ট", desc: "কোড লেখা এবং বিশ্লেষণ" },
@@ -331,6 +340,7 @@ export const domainTranslations: Record<string, Record<string, DomainTranslation
     finance: { name: "অর্থায়ন ও হিসাবরক্ষণ", desc: "আর্থিক শীট এবং স্প্রেডশীট" }
   },
   ur: {
+    small: { name: "چھوٹا", desc: "تیز اور ہلکا (~500 ایم بی)" },
     general: { name: "عام", desc: "ہمہ جہت اور تخلیقی" },
     maths: { name: "ریاضی", desc: "مسائل کا حل اور منطق" },
     code: { name: "ترقی اور کوڈنگ", desc: "کوڈ لکھنا اور تجزیہ کرنا" },

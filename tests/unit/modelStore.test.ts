@@ -18,11 +18,11 @@ describe('modelStore', () => {
     deviceStore.deviceInfo = { hasWebGPU: true, ramGB: 8 } as any
   })
 
-  it('should initialize with general domain and fallback to the best model for 8GB RAM', async () => {
+  it('should initialize with small domain and default to small model', async () => {
     const store = useModelStore()
     await store.detectBestModel()
-    expect(store.currentDomain).toBe('general')
-    expect(store.currentModelId).toBe('onnx-community/DeepSeek-R1-Distill-Qwen-1.5B-ONNX')
+    expect(store.currentDomain).toBe('small')
+    expect(store.currentModelId).toBe('onnx-community/Qwen2.5-0.5B-Instruct')
   })
 
   it('should compute compatible models based on device RAM', () => {

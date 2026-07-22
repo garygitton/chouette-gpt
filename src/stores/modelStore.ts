@@ -22,7 +22,7 @@ export const useModelStore = defineStore('model', () => {
       ramRequired: 2048,
       performanceScore: 45,
       description: 'Rapide & polyvalent',
-      domains: ['general']
+      domains: ['small', 'general']
     },
     {
       id: 'onnx-community/Llama-3.2-1B-Instruct-ONNX',
@@ -163,7 +163,7 @@ export const useModelStore = defineStore('model', () => {
   ])
 
   const currentModelId = ref<string>('onnx-community/Qwen2.5-0.5B-Instruct')
-  const currentDomain = ref<string>('general')
+  const currentDomain = ref<string>('small')
   const isDownloading = ref(false)
   const deviceMemory = computed(() => deviceStore.deviceInfo ? deviceStore.deviceInfo.ramGB * 1024 : null)
 
@@ -173,6 +173,7 @@ export const useModelStore = defineStore('model', () => {
   })
 
   const domains = [
+    { id: 'small', name: 'Petit / Léger', description: 'Rapide & économe (~500 MB)', icon: 'Zap', prompt: '' },
     { id: 'general', name: 'Général', description: 'Polyvalent & créatif', icon: 'Cpu', prompt: '' },
     { id: 'maths', name: 'Mathématiques', description: 'Résolution de problèmes', icon: 'Calculator', prompt: 'Tu es un assistant expert en mathématiques. Résous les problèmes étape par étape avec précision, clarté et rigueur.' },
     { id: 'code', name: 'Développement', description: 'Écriture & analyse de code', icon: 'Code2', prompt: 'Tu es un développeur et architecte logiciel expert. Écris du code propre, performant, sécurisé et bien commenté.' },
@@ -319,8 +320,8 @@ export const useModelStore = defineStore('model', () => {
         return
       }
 
-      currentDomain.value = 'general'
-      const bestModel = getBestModelForDomain('general')
+      currentDomain.value = 'small'
+      const bestModel = getBestModelForDomain('small')
       currentModelId.value = bestModel.id
     } finally {
       isInitialized.value = true

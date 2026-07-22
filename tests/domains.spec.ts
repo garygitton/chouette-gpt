@@ -23,7 +23,8 @@ test.describe('ChouetteGPT - Gestion des Domaines et Fallbacks', () => {
     await expect(selectTrigger).toBeVisible();
     await selectTrigger.click();
 
-    // Verify all 10 domains are present in the dropdown list
+    // Verify all 11 domains are present in the dropdown list
+    const smallOption = page.getByTestId('domain-option-small');
     const generalOption = page.getByTestId('domain-option-general');
     const mathsOption = page.getByTestId('domain-option-maths');
     const codeOption = page.getByTestId('domain-option-code');
@@ -35,6 +36,7 @@ test.describe('ChouetteGPT - Gestion des Domaines et Fallbacks', () => {
     const marketingOption = page.getByTestId('domain-option-marketing');
     const financeOption = page.getByTestId('domain-option-finance');
 
+    await expect(smallOption).toBeVisible();
     await expect(generalOption).toBeVisible();
     await expect(mathsOption).toBeVisible();
     await expect(codeOption).toBeVisible();
