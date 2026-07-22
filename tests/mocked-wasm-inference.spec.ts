@@ -65,9 +65,9 @@ test.describe('ChouetteGPT - Mocked WASM Inference', () => {
     await page.waitForSelector('[data-testid="sidebar"]', { state: 'attached', timeout: 30000 });
 
     const modelsToTest = [
-      { name: /Llama-3.2-1B/i, expected: 'Llama-3.2-1B-Instruct' },
-      { name: /Qwen2.5-Coder-1.5B/i, expected: 'Qwen2.5-Coder-1.5B-Instruct' },
-      { name: /Qwen2.5-Math-1.5B/i, expected: 'Qwen2.5-Math-1.5B-Instruct' }
+      { name: /Qwen2.5-0.5B/i, expected: 'Qwen2.5-0.5B-Instruct' },
+      { name: /Qwen2.5-Coder-0.5B/i, expected: 'Qwen2.5-Coder-0.5B-Instruct' },
+      { name: /SmolLM2-360M/i, expected: 'SmolLM2-360M-Instruct' }
     ];
 
     for (const model of modelsToTest) {
