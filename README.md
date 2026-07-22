@@ -28,6 +28,7 @@ A local AI text generation interface with CPU/GPU support (WebGPU/WebAssembly). 
 3. Access at http://localhost:3000
 
 ## Project Direction
+- **[Positioning & Core Strategy](./POSITIONING_STRATEGY.md)**: Discover our unique market focus: *"Your Private AI Playground in a Single Browser Tab. Instant, Offline, Zero-Setup."*
 - **[Project Goals](./GOAL.md)**: Read about the core philosophy, mission, and architectural goals of Chouette GPT.
 - **[Technical Roadmap](./ROADMAP.md)**: Explore the planned evolutionary phases (Vision, Tools, specialized tasks).
 - **[100-Step Commercial & Revenue Roadmap](./COMMERCIAL_ROADMAP.md)**: Explore the step-by-step master strategy from product packaging to market launch, B2B sales, and monetization.
@@ -54,6 +55,8 @@ This project is licensed under the **Apache License 2.0** - see the [LICENSE](LI
 
 ![ChouetteGPT Demo](./public/demo.gif)
 
+> **"Votre terrain de jeu IA privé dans un simple onglet de navigateur. Instantané, hors-ligne, zéro installation."**
+
 Une interface locale de génération de texte par IA avec support CPU/GPU (WebGPU/WebAssembly). Statut expérimental - à utiliser à vos propres risques.
 
 ## Fonctionnalités
@@ -72,6 +75,7 @@ Une interface locale de génération de texte par IA avec support CPU/GPU (WebGP
 3. Accédez à http://localhost:3000
 
 ## Orientation du projet
+- **[Stratégie de Positionnement Unique](./POSITIONING_STRATEGY.md)** : Découvrir notre avantage concurrentiel : *"The 1-Click Zero-Install Air-Gapped AI"*.
 - **[Objectifs du Projet](./GOAL.md)** : En savoir plus sur la philosophie centrale, la mission et les objectifs d'architecture de Chouette GPT.
 - **[Feuille de Route Technique](./ROADMAP.md)** : Explorer les phases d'évolution planifiées (Vision, Outils, tâches spécialisées).
 - **[Plan Commercial & Revenus en 100 Étapes](./COMMERCIAL_ROADMAP.md)** : Explorer la stratégie complète de la finalisation produit à la commercialisation B2B et la monétisation.
