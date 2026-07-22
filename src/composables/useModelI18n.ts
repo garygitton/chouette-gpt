@@ -206,6 +206,7 @@ export const uiTranslations: Record<string, Record<string, string>> = {
 export function getModelKey(modelId: string): string {
   if (!modelId) return 'qwen_05b'
   if (modelId.includes('Qwen2.5-0.5B')) return 'qwen_05b'
+  if (modelId.includes('SmolLM2')) return 'smollm_360m'
   if (modelId.includes('Llama-3.2-1B')) return 'llama_1b'
   if (modelId.includes('Qwen2.5-1.5B-Instruct')) return 'qwen_15b'
   if (modelId.includes('Math')) return 'qwen_math'

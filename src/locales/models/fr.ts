@@ -6,6 +6,11 @@ export default {
       lang: "Anglais, Chinois (bon), autres langues (basique).",
       warn: "Taille réduite : sujet à de fréquentes hallucinations et erreurs de logique."
     },
+    smollm_360m: {
+      desc: "Modèle ultra-compact de 360M paramètres (SmolLM2 par Hugging Face). Ultra-rapide.",
+      lang: "Anglais (bon), Français (basique).",
+      warn: "Capacités de raisonnement très basiques dues à sa petite taille."
+    },
     llama_1b: {
       desc: "Modèle équilibré de 1B paramètres par Meta. Bon compromis vitesse/précision.",
       lang: "Anglais, Français, Espagnol, Portugais, Allemand.",

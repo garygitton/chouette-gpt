@@ -6,6 +6,11 @@ export default {
       lang: "English, Chinese (good), other languages (basic).",
       warn: "Reduced size: prone to frequent hallucinations and logical errors."
     },
+    smollm_360m: {
+      desc: "Ultra-compact 360M parameter model (SmolLM2 by Hugging Face). Blazing fast.",
+      lang: "English (good), French (basic).",
+      warn: "Very basic reasoning capabilities due to small size."
+    },
     llama_1b: {
       desc: "Balanced 1B parameter model by Meta. Good trade-off between speed and accuracy.",
       lang: "English, French, Spanish, Portuguese, German.",

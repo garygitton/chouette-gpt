@@ -19,56 +19,10 @@ export const useModelStore = defineStore('model', () => {
       estimatedMemory: '600 MB',
       usageCount: 0,
       status: ModelStatus.Available,
-      ramRequired: 2048,
+      ramRequired: 1024,
       performanceScore: 45,
       description: 'Rapide & polyvalent',
       domains: ['small', 'general']
-    },
-    {
-      id: 'onnx-community/Llama-3.2-1B-Instruct-ONNX',
-      name: 'Llama-3.2-1B-Instruct',
-      version: '3.2',
-      parameters: '1B',
-      totalSize: '1.7 GB',
-      quantization: 'q4',
-      estimatedMemory: '1.5 GB',
-      usageCount: 0,
-      status: ModelStatus.Available,
-      ramRequired: 3072,
-      performanceScore: 55,
-      description: 'Équilibré & précis',
-      domains: ['general']
-    },
-    {
-      id: 'onnx-community/Qwen2.5-1.5B-Instruct',
-      name: 'Qwen2.5-1.5B-Instruct',
-      version: '2.5',
-      parameters: '1.5B',
-      totalSize: '1.8 GB',
-      quantization: 'q4',
-      estimatedMemory: '2 GB',
-      usageCount: 0,
-      status: ModelStatus.Available,
-      ramRequired: 4096,
-      performanceScore: 60,
-      description: 'Puissant & logique',
-      domains: ['general']
-    },
-    {
-      id: 'onnx-community/Qwen2.5-Math-1.5B-Instruct',
-      name: 'Qwen2.5-Math-1.5B-Instruct',
-      version: '2.5',
-      parameters: '1.5B',
-      totalSize: '1.8 GB',
-      quantization: 'q4',
-      estimatedMemory: '2 GB',
-      usageCount: 0,
-      status: ModelStatus.Available,
-      ramRequired: 4096,
-      performanceScore: 65,
-      description: 'Spécialisé en mathématiques',
-      domains: ['maths'],
-      supportsSampling: false
     },
     {
       id: 'onnx-community/Qwen2.5-Coder-0.5B-Instruct',
@@ -80,85 +34,25 @@ export const useModelStore = defineStore('model', () => {
       estimatedMemory: '600 MB',
       usageCount: 0,
       status: ModelStatus.Available,
-      ramRequired: 2048,
+      ramRequired: 1024,
       performanceScore: 50,
       description: 'Ultra-rapide pour le code',
       domains: ['code']
     },
     {
-      id: 'onnx-community/Qwen2.5-Coder-1.5B-Instruct',
-      name: 'Qwen2.5-Coder-1.5B-Instruct',
-      version: '2.5',
-      parameters: '1.5B',
-      totalSize: '1.8 GB',
+      id: 'onnx-community/SmolLM2-360M-Instruct',
+      name: 'SmolLM2-360M-Instruct',
+      version: '2.0',
+      parameters: '0.36B',
+      totalSize: '200 MB',
       quantization: 'q4',
-      estimatedMemory: '2 GB',
+      estimatedMemory: '400 MB',
       usageCount: 0,
       status: ModelStatus.Available,
-      ramRequired: 4096,
-      performanceScore: 68,
-      description: 'Spécialisé en programmation',
-      domains: ['code']
-    },
-    {
-      id: 'onnx-community/Llama-3.2-3B-Instruct-ONNX',
-      name: 'Llama-3.2-3B-Instruct',
-      version: '3.2',
-      parameters: '3B',
-      totalSize: '3.2 GB',
-      quantization: 'q4',
-      estimatedMemory: '3 GB',
-      usageCount: 0,
-      status: ModelStatus.Available,
-      ramRequired: 8192,
-      performanceScore: 70,
-      description: 'Créatif & intelligent',
-      domains: ['general']
-    },
-    {
-      id: 'onnx-community/Phi-3.5-mini-instruct-onnx-web',
-      name: 'Phi-3.5-mini-instruct',
-      version: '3.5',
-      parameters: '3.8B',
-      totalSize: '2.2 GB',
-      quantization: 'q4f16',
-      estimatedMemory: '4 GB',
-      usageCount: 0,
-      status: ModelStatus.Available,
-      ramRequired: 8192,
-      performanceScore: 75,
-      description: 'Raisonnement complexe',
-      domains: ['general']
-    },
-    {
-      id: 'vmanvs/medgemma-q4f16-chunked',
-      name: 'MedGemma-4B-Instruct',
-      version: '1.5',
-      parameters: '4B',
-      totalSize: '2.6 GB',
-      quantization: 'q4f16',
-      estimatedMemory: '4.5 GB',
-      usageCount: 0,
-      status: ModelStatus.Available,
-      ramRequired: 8192,
-      performanceScore: 85,
-      description: 'Diagnostic médical',
-      domains: ['medicine']
-    },
-    {
-      id: 'onnx-community/DeepSeek-R1-Distill-Qwen-1.5B-ONNX',
-      name: 'DeepSeek-R1-Distill-Qwen-1.5B',
-      version: 'R1',
-      parameters: '1.5B',
-      totalSize: '1.6 GB',
-      quantization: 'q4',
-      estimatedMemory: '2.0 GB',
-      usageCount: 0,
-      status: ModelStatus.Available,
-      ramRequired: 4096,
-      performanceScore: 82,
-      description: 'Raisonnement (CoT) DeepSeek-R1',
-      domains: ['general']
+      ramRequired: 1024,
+      performanceScore: 40,
+      description: 'Ultra-léger & économe',
+      domains: ['small']
     }
   ])
 
@@ -177,7 +71,7 @@ export const useModelStore = defineStore('model', () => {
     { id: 'general', name: 'Général', description: 'Polyvalent & créatif', icon: 'Cpu', prompt: '' },
     { id: 'maths', name: 'Mathématiques', description: 'Résolution de problèmes', icon: 'Calculator', prompt: 'Tu es un assistant expert en mathématiques. Résous les problèmes étape par étape avec précision, clarté et rigueur.' },
     { id: 'code', name: 'Développement', description: 'Écriture & analyse de code', icon: 'Code2', prompt: 'Tu es un développeur et architecte logiciel expert. Écris du code propre, performant, sécurisé et bien commenté.' },
-    { id: 'medicine', name: 'Médecine', description: 'Diagnostic & concepts médicaux', icon: 'Stethoscope', prompt: 'Tu es un assistant médical virtuel expert. Explique les concepts médicaux clairement, propose des pistes diagnostiques basées sur les symptômes, et rappelle toujours de consulter un médecin.' },
+    { id: 'medicine', name: 'Médecine', description: 'Diagnostic & concepts médicaux', icon: 'Stethoscope', prompt: 'Tu es un assistant virtuel médical expert. Explique les concepts médicaux clairement, propose des pistes diagnostiques basées sur les symptômes, et rappelle toujours de consulter un médecin.' },
     { id: 'legal', name: 'Droit', description: 'Analyse & rédaction juridique', icon: 'Scale', prompt: 'Tu es un assistant juridique expert en droit. Analyse les situations, explique les lois et règlements avec rigueur scientifique, et cite des références juridiques ou jurisprudentielles si possible.' },
     { id: 'writing', name: 'Rédaction & Création', description: 'Rédaction littéraire et créative', icon: 'PenTool', prompt: 'Tu es un écrivain, rédacteur et conteur expert. Rédige des textes captivants, fluides et créatifs en adaptant parfaitement ton ton au style demandé.' },
     { id: 'translation', name: 'Traduction', description: 'Traduction & apprentissage', icon: 'Languages', prompt: 'Tu es un traducteur et linguiste expert. Traduis fidèlement les textes d\'une langue à l\'autre en conservant les nuances culturelles, les expressions idiomatiques et le style d\'origine.' },
@@ -226,15 +120,19 @@ export const useModelStore = defineStore('model', () => {
   }
 
   const compatibleDomains = computed(() => {
-    return domains.map(domain => {
-      const resolvedModel = getBestModelForDomain(domain.id)
-      const isFallback = domain.id !== 'general' && !resolvedModel.domains.includes(domain.id)
-      return {
-        ...domain,
-        resolvedModel,
-        isFallback
-      }
-    })
+    // Only display domains backed by an explicit model in the catalog
+    const activeDomainIds = new Set(models.value.flatMap(m => m.domains))
+    return domains
+      .filter(domain => activeDomainIds.has(domain.id))
+      .map(domain => {
+        const resolvedModel = getBestModelForDomain(domain.id)
+        const isFallback = domain.id !== 'general' && !resolvedModel.domains.includes(domain.id)
+        return {
+          ...domain,
+          resolvedModel,
+          isFallback
+        }
+      })
   })
 
   const isShowAllModels = computed(() => {

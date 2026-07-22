@@ -8,14 +8,8 @@ test.describe('Vérification du fonctionnement des 3 modèles', () => {
 
   const models = [
     'Qwen2.5-0.5B-Instruct',
-    'Llama-3.2-1B-Instruct',
-    'Qwen2.5-1.5B-Instruct',
-    'Qwen2.5-Math-1.5B-Instruct',
-    'Qwen2.5-Coder-1.5B-Instruct',
-    'Llama-3.2-3B-Instruct',
-    'Phi-3.5-mini-instruct',
-    'MedGemma-4B-Instruct',
-    'DeepSeek-R1-Distill-Qwen-1.5B'
+    'Qwen2.5-Coder-0.5B-Instruct',
+    'SmolLM2-360M-Instruct'
   ];
 
   for (const modelName of models) {

@@ -65,14 +65,14 @@ test.describe('ChouetteGPT - Advanced Settings Compatibility & Model Rules', () 
     await expect(tempSlider).not.toHaveClass(/opacity-50/);
   });
 
-  test('Negative case: Math model disables sampling and shows warning', async ({ page }) => {
+  test('Compatibility case: Code model supports sampling and creative controls', async ({ page }) => {
     await page.goto('/?mock=true&showAllModels=true&autoDownload=false', { waitUntil: 'domcontentloaded' });
 
-    // Select the Math model
+    // Select the Code model
     const modelSelectTrigger = page.getByTestId('model-select-trigger');
     await modelSelectTrigger.click();
 
-    const option = page.locator('[data-testid^="model-option-"]').filter({ hasText: 'Qwen2.5-Math-1.5B-Instruct' }).first();
+    const option = page.locator('[data-testid^="model-option-"]').filter({ hasText: 'Qwen2.5-Coder-0.5B-Instruct' }).first();
     await expect(option).toBeVisible();
     await option.click();
 
@@ -93,17 +93,9 @@ test.describe('ChouetteGPT - Advanced Settings Compatibility & Model Rules', () 
     const samplingTrigger = page.getByTestId('accordion-sampling-trigger');
     await samplingTrigger.click();
 
-    // Alert SHOULD be visible
-    const alert = page.getByTestId('math-unsupported-alert');
-    await expect(alert).toBeVisible();
-
-    // Toggle should be disabled
+    // Creative mode toggle should be enabled
     const creativeToggle = page.getByTestId('creative-mode-toggle');
-    await expect(creativeToggle).toBeDisabled();
-
-    // Repetition penalty slider should be disabled/greyed-out
-    const repPenaltyItem = page.getByTestId('parameter-repetition-penalty');
-    await expect(repPenaltyItem).toHaveClass(/opacity-50 pointer-events-none/);
+    await expect(creativeToggle).toBeEnabled();
   });
 
   test('Edge case: Chatting with a model sends instructions and generates response', async ({ page }) => {

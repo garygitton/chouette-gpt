@@ -33,9 +33,9 @@ test.describe('ChouetteGPT - Model Selector Search & Language Alignment', () => 
     const codeOption = page.getByTestId('domain-option-code');
     await expect(codeOption).toBeVisible();
 
-    // "Mathématiques" option should NOT be visible
-    const mathsOption = page.getByTestId('domain-option-maths');
-    await expect(mathsOption).not.toBeVisible();
+    // "Petit / Léger" option should NOT be visible when searching "Développement"
+    const smallOption = page.getByTestId('domain-option-small');
+    await expect(smallOption).not.toBeVisible();
   });
 
   test('Should translate domain names dynamically when the language changes', async ({ page }) => {
@@ -59,9 +59,9 @@ test.describe('ChouetteGPT - Model Selector Search & Language Alignment', () => 
       const codeOption = page.getByTestId('domain-option-code');
       await expect(codeOption).toContainText('Development');
 
-      // The Mathematics domain should be translated to "Mathematics"
-      const mathsOption = page.getByTestId('domain-option-maths');
-      await expect(mathsOption).toContainText('Mathematics');
+      // The Small domain should be translated to "Small"
+      const smallOptionEn = page.getByTestId('domain-option-small');
+      await expect(smallOptionEn).toContainText('Small');
     }
   });
 
