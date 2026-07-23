@@ -142,7 +142,7 @@ export const comparisonTable: Record<string, any> = {
         criterion: "Coût d'usage",
         local: { text: "Gratuit (Modèles open-source sous licence libre)", status: "best" },
         webLocal: { text: "Gratuit (Inférence locale autonome sans coût serveur)", status: "best" },
-        cloud: { text: "Variable (Abonnements ou tarification à la consommation d'API)", status: "worst" }
+        cloud: { text: "Variable", status: "worst" }
       },
       {
         criterion: "Capacité & Taille des LLM",
