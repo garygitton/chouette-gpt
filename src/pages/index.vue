@@ -8,7 +8,9 @@
         
         <!-- Active Chat Feed -->
         <div v-else class="space-y-6 py-4">
-          <ChatMessage v-for="msg in currentConversation.messages" :key="msg.id" :message="msg" />
+          <template v-for="msg in currentConversation.messages" :key="msg.id">
+            <ChatMessage v-if="!msg.isHidden" :message="msg" />
+          </template>
         </div>
       </div>
     </div>
@@ -147,4 +149,27 @@ async function submit() {
   
   await chatStore.generate(modelStore.currentModelId, text)
 }
+
+watch(() => chatStore.isEngineReady, async (isReady) => {
+  if (isReady) {
+    const isNew = !route.query.id || !currentConversation.value || currentConversation.value.messages.length === 0
+    if (isNew && !chatStore.isGenerating) {
+      import('~/stores/settingsStore').then(async ({ useSettingsStore }) => {
+        const settingsStore = useSettingsStore()
+        if (!settingsStore.systemPrompt || settingsStore.systemPrompt.trim() === '') {
+          settingsStore.systemPrompt = "Tu es ChouetteGPT, un modèle d'IA local. Réponds de façon concise et utile en français."
+        }
+        
+        if (!route.query.id) {
+          const id = await convStore.createNewConversation()
+          await router.replace({ path: '/', query: { ...route.query, id } })
+        }
+        
+        // Let Vue process the route change and store updates
+        await nextTick()
+        await chatStore.generate(modelStore.currentModelId, 'Bonjour', true)
+      })
+    }
+  }
+}, { immediate: true })
 </script>

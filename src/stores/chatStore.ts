@@ -341,7 +341,7 @@ export const useChatStore = defineStore('chat', () => {
     engineProgress.value = { text: 'Téléchargement annulé', progress: 0 }
   }
 
-  async function generate(modelId: string, text: string) {
+  async function generate(modelId: string, text: string, isHidden = false) {
     if (!convStore.currentConversationId) {
       await convStore.createNewConversation()
     }
@@ -351,7 +351,8 @@ export const useChatStore = defineStore('chat', () => {
       id: Date.now().toString(),
       role: MessageRole.User,
       content: text,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      isHidden
     })
 
     if (modelId.startsWith('native/')) {

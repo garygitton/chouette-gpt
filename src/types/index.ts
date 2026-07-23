@@ -10,6 +10,7 @@ export interface Message {
   content: string
   timestamp: number
   tokens?: number
+  isHidden?: boolean
 }
 
 export interface Conversation {
